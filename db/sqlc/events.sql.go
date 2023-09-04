@@ -7,52 +7,83 @@ package db
 
 import (
 	"context"
+	"time"
+
+	"github.com/guregu/null/zero"
 )
 
 const getEvents = `-- name: GetEvents :many
-SELECT id, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at FROM "Event"
+SELECT e."id", e."visible",
+        e."name_no", e."name_en",
+        e."time_type", e."time_start", e."time_end", e."time_publish",
+        e."canceled", e."link_signup", e."capacity", e."full",
+        c."name_no" AS category_name_no, c."name_en"  AS category_name_en, 
+        -- TODO: Add audience
+        l."name_no" AS location_name_no, l."name_en" AS location_name_en,
+        -- TODO: Add organizer
+        e."updated_at"
+    FROM "event" AS e
+    INNER JOIN "category" AS c ON e."category" = c."id"
+    LEFT OUTER JOIN "location" AS l ON e."location" = l."id"
+    WHERE ($1::bool OR ((e."time_end" IS NOT NULL AND e."time_end" > now()) OR (e."time_start" > now() - interval '1 day')))
+    ORDER BY e."id"
+    LIMIT $3::int
+    OFFSET $2::int
 `
 
-func (q *Queries) GetEvents(ctx context.Context) ([]Event, error) {
-	rows, err := q.db.QueryContext(ctx, getEvents)
+type GetEventsParams struct {
+	Historical bool  `json:"historical"`
+	Offset     int32 `json:"offset"`
+	Limit      int32 `json:"limit"`
+}
+
+type GetEventsRow struct {
+	ID             int32        `json:"id"`
+	Visible        bool         `json:"visible"`
+	NameNo         string       `json:"name_no"`
+	NameEn         zero.String  `json:"name_en"`
+	TimeType       TimeTypeEnum `json:"time_type"`
+	TimeStart      time.Time    `json:"time_start"`
+	TimeEnd        zero.Time    `json:"time_end"`
+	TimePublish    zero.Time    `json:"time_publish"`
+	Canceled       bool         `json:"canceled"`
+	LinkSignup     string       `json:"link_signup"`
+	Capacity       zero.Int     `json:"capacity"`
+	Full           bool         `json:"full"`
+	CategoryNameNo string       `json:"category_name_no"`
+	CategoryNameEn zero.String  `json:"category_name_en"`
+	LocationNameNo zero.String  `json:"location_name_no"`
+	LocationNameEn zero.String  `json:"location_name_en"`
+	UpdatedAt      time.Time    `json:"updated_at"`
+}
+
+func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEventsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getEvents, arg.Historical, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Event{}
+	items := []GetEventsRow{}
 	for rows.Next() {
-		var i Event
+		var i GetEventsRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.Visible,
 			&i.NameNo,
 			&i.NameEn,
-			&i.DescriptionNo,
-			&i.DescriptionEn,
-			&i.InformationalNo,
-			&i.InformationalEn,
 			&i.TimeType,
 			&i.TimeStart,
 			&i.TimeEnd,
 			&i.TimePublish,
-			&i.TimeSignupRelease,
-			&i.TimeSignupDeadline,
 			&i.Canceled,
-			&i.Digital,
-			&i.Highlight,
-			&i.ImageSmall,
-			&i.ImageBanner,
-			&i.LinkFacebook,
-			&i.LinkDiscord,
 			&i.LinkSignup,
-			&i.LinkStream,
 			&i.Capacity,
 			&i.Full,
-			&i.Category,
-			&i.Location,
-			&i.Parent,
-			&i.Rule,
+			&i.CategoryNameNo,
+			&i.CategoryNameEn,
+			&i.LocationNameNo,
+			&i.LocationNameEn,
 			&i.UpdatedAt,
-			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

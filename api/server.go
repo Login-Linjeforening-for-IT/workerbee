@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"os"
 
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
@@ -33,6 +34,15 @@ func NewServer(config *Config, service service.Service) *Server {
 
 func (server *Server) initRouter() {
 	router := gin.Default()
+
+	api := router.Group("/api", server.authMiddleware)
+	{
+		api.GET("/events", server.getEvents)
+	}
+
+	router.GET("/500", func(ctx *gin.Context) {
+		server.writeError(ctx, 500, errors.New("test"))
+	})
 
 	server.router = router
 }

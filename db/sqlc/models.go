@@ -156,6 +156,7 @@ type Audience struct {
 	DescriptionEn zero.String `json:"description_en"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 	CreatedAt     time.Time   `json:"created_at"`
+	DeletedAt     zero.Time   `json:"deleted_at"`
 }
 
 type Category struct {
@@ -176,6 +177,7 @@ type City struct {
 
 type Event struct {
 	ID                 int32        `json:"id"`
+	Visible            bool         `json:"visible"`
 	NameNo             string       `json:"name_no"`
 	NameEn             zero.String  `json:"name_en"`
 	DescriptionNo      string       `json:"description_no"`
@@ -205,6 +207,7 @@ type Event struct {
 	Rule               zero.Int     `json:"rule"`
 	UpdatedAt          time.Time    `json:"updated_at"`
 	CreatedAt          time.Time    `json:"created_at"`
+	DeletedAt          zero.Time    `json:"deleted_at"`
 }
 
 type EventAudienceRelation struct {
@@ -235,10 +238,12 @@ type JobAdvertisement struct {
 	ApplicationUrl      string      `json:"application_url"`
 	UpdatedAt           time.Time   `json:"updated_at"`
 	CreatedAt           time.Time   `json:"created_at"`
+	DeletedAt           zero.Time   `json:"deleted_at"`
 }
 
 type Location struct {
 	ID              int32        `json:"id"`
+	Visible         bool         `json:"visible"`
 	NameNo          string       `json:"name_no"`
 	NameEn          zero.String  `json:"name_en"`
 	Type            LocationType `json:"type"`
@@ -252,6 +257,7 @@ type Location struct {
 	Url             zero.String  `json:"url"`
 	UpdatedAt       time.Time    `json:"updated_at"`
 	CreatedAt       time.Time    `json:"created_at"`
+	DeletedAt       zero.Time    `json:"deleted_at"`
 }
 
 type Organization struct {
@@ -267,6 +273,7 @@ type Organization struct {
 	Logo          zero.String `json:"logo"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 	CreatedAt     time.Time   `json:"created_at"`
+	DeletedAt     zero.Time   `json:"deleted_at"`
 }
 
 type Rule struct {
@@ -277,6 +284,7 @@ type Rule struct {
 	DescriptionEn zero.String `json:"description_en"`
 	UpdatedAt     time.Time   `json:"updated_at"`
 	CreatedAt     time.Time   `json:"created_at"`
+	DeletedAt     zero.Time   `json:"deleted_at"`
 }
 
 type Skill struct {

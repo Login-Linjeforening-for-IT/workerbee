@@ -6,6 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.3.1
 	github.com/guregu/null v4.0.0+incompatible
+	github.com/lib/pq v1.10.9
 	github.com/rs/zerolog v1.30.0
 )
 

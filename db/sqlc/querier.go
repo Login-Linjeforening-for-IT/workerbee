@@ -9,7 +9,7 @@ import (
 )
 
 type Querier interface {
-	GetEvents(ctx context.Context) ([]Event, error)
+	GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEventsRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

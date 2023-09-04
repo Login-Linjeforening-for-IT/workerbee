@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -40,13 +42,19 @@ func (e *RedactedError) Error() string {
 func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 	if status >= 500 {
 		id := uuid.NewString()
+
+		errChain := []string{}
+		for chainErr := err; chainErr != nil; chainErr = errors.Unwrap(chainErr) {
+			errChain = append(errChain, chainErr.Error())
+		}
+
+		server.logger.Error().Err(err).Str("error-id", id).Str("error-chain", strings.Join(errChain, " -- ")).Int("error-chain-length", len(errChain)).Send()
+
 		err = &RedactedError{
 			ID:      id,
 			Status:  status,
 			Message: "Something went wrong. Contact admin if problem persists.",
 		}
-
-		server.logger.Error().Err(err).Str("error-id", id).Send()
 	}
 
 	ctx.JSON(status, newErrorResponse(status, err))
