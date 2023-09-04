@@ -36,8 +36,12 @@ func (server *Server) initRouter() {
 
 	api := router.Group("/api", server.authMiddleware)
 	{
-		api.GET("/events", server.getEvents)
-		api.GET("/events/:id", server.getEvent)
+		events := api.Group("/events")
+		{
+			events.GET("/", server.getEvents)
+			events.GET("/:id", server.getEvent)
+			events.POST("/", server.createEvent)
+		}
 	}
 
 	server.router = router

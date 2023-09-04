@@ -12,6 +12,125 @@ import (
 	"github.com/guregu/null/zero"
 )
 
+const createEvent = `-- name: CreateEvent :one
+
+INSERT INTO "event" (
+    "visible",
+    "name_no", "name_en",
+    "description_no", "description_en",
+    "informational_no", "informational_en",
+    "time_type", "time_start", "time_end", "time_publish",
+    "time_signup_release", "time_signup_deadline",
+    "canceled", "digital", "highlight",
+    "image_small", "image_banner",
+    "link_facebook", "link_discord", "link_signup", "link_stream",
+    "capacity", "full",
+    "category", "location", "parent", "rule"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+RETURNING id, visible, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at, deleted_at
+`
+
+type CreateEventParams struct {
+	Visible            bool         `json:"visible"`
+	NameNo             string       `json:"name_no"`
+	NameEn             zero.String  `json:"name_en"`
+	DescriptionNo      string       `json:"description_no"`
+	DescriptionEn      zero.String  `json:"description_en"`
+	InformationalNo    zero.String  `json:"informational_no"`
+	InformationalEn    zero.String  `json:"informational_en"`
+	TimeType           TimeTypeEnum `json:"time_type"`
+	TimeStart          time.Time    `json:"time_start"`
+	TimeEnd            zero.Time    `json:"time_end"`
+	TimePublish        zero.Time    `json:"time_publish"`
+	TimeSignupRelease  zero.Time    `json:"time_signup_release"`
+	TimeSignupDeadline zero.Time    `json:"time_signup_deadline"`
+	Canceled           bool         `json:"canceled"`
+	Digital            bool         `json:"digital"`
+	Highlight          bool         `json:"highlight"`
+	ImageSmall         string       `json:"image_small"`
+	ImageBanner        string       `json:"image_banner"`
+	LinkFacebook       string       `json:"link_facebook"`
+	LinkDiscord        string       `json:"link_discord"`
+	LinkSignup         string       `json:"link_signup"`
+	LinkStream         zero.String  `json:"link_stream"`
+	Capacity           zero.Int     `json:"capacity"`
+	Full               bool         `json:"full"`
+	Category           int32        `json:"category"`
+	Location           zero.Int     `json:"location"`
+	Parent             zero.Int     `json:"parent"`
+	Rule               zero.Int     `json:"rule"`
+}
+
+// sqlc.embed(event)
+func (q *Queries) CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error) {
+	row := q.db.QueryRowContext(ctx, createEvent,
+		arg.Visible,
+		arg.NameNo,
+		arg.NameEn,
+		arg.DescriptionNo,
+		arg.DescriptionEn,
+		arg.InformationalNo,
+		arg.InformationalEn,
+		arg.TimeType,
+		arg.TimeStart,
+		arg.TimeEnd,
+		arg.TimePublish,
+		arg.TimeSignupRelease,
+		arg.TimeSignupDeadline,
+		arg.Canceled,
+		arg.Digital,
+		arg.Highlight,
+		arg.ImageSmall,
+		arg.ImageBanner,
+		arg.LinkFacebook,
+		arg.LinkDiscord,
+		arg.LinkSignup,
+		arg.LinkStream,
+		arg.Capacity,
+		arg.Full,
+		arg.Category,
+		arg.Location,
+		arg.Parent,
+		arg.Rule,
+	)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Visible,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.InformationalNo,
+		&i.InformationalEn,
+		&i.TimeType,
+		&i.TimeStart,
+		&i.TimeEnd,
+		&i.TimePublish,
+		&i.TimeSignupRelease,
+		&i.TimeSignupDeadline,
+		&i.Canceled,
+		&i.Digital,
+		&i.Highlight,
+		&i.ImageSmall,
+		&i.ImageBanner,
+		&i.LinkFacebook,
+		&i.LinkDiscord,
+		&i.LinkSignup,
+		&i.LinkStream,
+		&i.Capacity,
+		&i.Full,
+		&i.Category,
+		&i.Location,
+		&i.Parent,
+		&i.Rule,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getEvent = `-- name: GetEvent :one
 SELECT id, visible, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at, deleted_at FROM "event" WHERE "id" = $1::int LIMIT 1
 `
@@ -142,4 +261,142 @@ func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEven
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateEvent = `-- name: UpdateEvent :one
+UPDATE "event"
+SET
+    "visible" = COALESCE($1, visible),
+    "name_no" = COALESCE($2, name_no),
+    "name_en" = COALESCE($3, name_en),
+    "description_no" = COALESCE($4, description_no),
+    "description_en" = COALESCE($5, description_en),
+    "informational_no" = COALESCE($6, informational_no),
+    "informational_en" = COALESCE($7, informational_en),
+    "time_type" = COALESCE($8, time_type),
+    "time_start" = COALESCE($9, time_start),
+    "time_end" = COALESCE($10, time_end),
+    "time_publish" = COALESCE($11, time_publish),
+    "time_signup_release" = COALESCE($12, time_signup_release),
+    "time_signup_deadline" = COALESCE($13, time_signup_deadline),
+    "canceled" = COALESCE($14, canceled),
+    "digital" = COALESCE($15, digital),
+    "highlight" = COALESCE($16, highlight),
+    "image_small" = COALESCE($17, image_small),
+    "image_banner" = COALESCE($18, image_banner),
+    "link_facebook" = COALESCE($19, link_facebook),
+    "link_discord" = COALESCE($20, link_discord),
+    "link_signup" = COALESCE($21, link_signup),
+    "link_stream" = COALESCE($22, link_stream),
+    "capacity" = COALESCE($23, capacity),
+    "full" = COALESCE($24, "full"),
+    "category" = COALESCE($25, category),
+    "location" = COALESCE($26, "location"),
+    "parent" = COALESCE($27, parent),
+    "rule" = COALESCE($28, rule),
+    "updated_at" = now()
+WHERE "id" = $29::int
+RETURNING id, visible, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at, deleted_at
+`
+
+type UpdateEventParams struct {
+	Visible            bool             `json:"visible"`
+	NameNo             zero.String      `json:"name_no"`
+	NameEn             zero.String      `json:"name_en"`
+	DescriptionNo      zero.String      `json:"description_no"`
+	DescriptionEn      zero.String      `json:"description_en"`
+	InformationalNo    zero.String      `json:"informational_no"`
+	InformationalEn    zero.String      `json:"informational_en"`
+	TimeType           NullTimeTypeEnum `json:"time_type"`
+	TimeStart          zero.Time        `json:"time_start"`
+	TimeEnd            zero.Time        `json:"time_end"`
+	TimePublish        zero.Time        `json:"time_publish"`
+	TimeSignupRelease  zero.Time        `json:"time_signup_release"`
+	TimeSignupDeadline zero.Time        `json:"time_signup_deadline"`
+	Canceled           zero.Bool        `json:"canceled"`
+	Digital            zero.Bool        `json:"digital"`
+	Highlight          zero.Bool        `json:"highlight"`
+	ImageSmall         zero.String      `json:"image_small"`
+	ImageBanner        zero.String      `json:"image_banner"`
+	LinkFacebook       zero.String      `json:"link_facebook"`
+	LinkDiscord        zero.String      `json:"link_discord"`
+	LinkSignup         zero.String      `json:"link_signup"`
+	LinkStream         zero.String      `json:"link_stream"`
+	Capacity           zero.Int         `json:"capacity"`
+	Full               zero.Bool        `json:"full"`
+	Category           zero.Int         `json:"category"`
+	Location           zero.Int         `json:"location"`
+	Parent             zero.Int         `json:"parent"`
+	Rule               zero.Int         `json:"rule"`
+	ID                 int32            `json:"id"`
+}
+
+func (q *Queries) UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error) {
+	row := q.db.QueryRowContext(ctx, updateEvent,
+		arg.Visible,
+		arg.NameNo,
+		arg.NameEn,
+		arg.DescriptionNo,
+		arg.DescriptionEn,
+		arg.InformationalNo,
+		arg.InformationalEn,
+		arg.TimeType,
+		arg.TimeStart,
+		arg.TimeEnd,
+		arg.TimePublish,
+		arg.TimeSignupRelease,
+		arg.TimeSignupDeadline,
+		arg.Canceled,
+		arg.Digital,
+		arg.Highlight,
+		arg.ImageSmall,
+		arg.ImageBanner,
+		arg.LinkFacebook,
+		arg.LinkDiscord,
+		arg.LinkSignup,
+		arg.LinkStream,
+		arg.Capacity,
+		arg.Full,
+		arg.Category,
+		arg.Location,
+		arg.Parent,
+		arg.Rule,
+		arg.ID,
+	)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Visible,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.InformationalNo,
+		&i.InformationalEn,
+		&i.TimeType,
+		&i.TimeStart,
+		&i.TimeEnd,
+		&i.TimePublish,
+		&i.TimeSignupRelease,
+		&i.TimeSignupDeadline,
+		&i.Canceled,
+		&i.Digital,
+		&i.Highlight,
+		&i.ImageSmall,
+		&i.ImageBanner,
+		&i.LinkFacebook,
+		&i.LinkDiscord,
+		&i.LinkSignup,
+		&i.LinkStream,
+		&i.Capacity,
+		&i.Full,
+		&i.Category,
+		&i.Location,
+		&i.Parent,
+		&i.Rule,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
 }

@@ -19,3 +19,54 @@ SELECT e."id", e."visible",
 
 -- name: GetEvent :one
 SELECT * FROM "event" WHERE "id" = sqlc.arg('id')::int LIMIT 1;   -- sqlc.embed(event)
+
+-- name: CreateEvent :one
+INSERT INTO "event" (
+    "visible",
+    "name_no", "name_en",
+    "description_no", "description_en",
+    "informational_no", "informational_en",
+    "time_type", "time_start", "time_end", "time_publish",
+    "time_signup_release", "time_signup_deadline",
+    "canceled", "digital", "highlight",
+    "image_small", "image_banner",
+    "link_facebook", "link_discord", "link_signup", "link_stream",
+    "capacity", "full",
+    "category", "location", "parent", "rule"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)
+RETURNING *;
+
+-- name: UpdateEvent :one
+UPDATE "event"
+SET
+    "visible" = COALESCE(sqlc.arg(visible), visible),
+    "name_no" = COALESCE(sqlc.narg(name_no), name_no),
+    "name_en" = COALESCE(sqlc.narg(name_en), name_en),
+    "description_no" = COALESCE(sqlc.narg(description_no), description_no),
+    "description_en" = COALESCE(sqlc.narg(description_en), description_en),
+    "informational_no" = COALESCE(sqlc.narg(informational_no), informational_no),
+    "informational_en" = COALESCE(sqlc.narg(informational_en), informational_en),
+    "time_type" = COALESCE(sqlc.narg(time_type), time_type),
+    "time_start" = COALESCE(sqlc.narg(time_start), time_start),
+    "time_end" = COALESCE(sqlc.narg(time_end), time_end),
+    "time_publish" = COALESCE(sqlc.narg(time_publish), time_publish),
+    "time_signup_release" = COALESCE(sqlc.narg(time_signup_release), time_signup_release),
+    "time_signup_deadline" = COALESCE(sqlc.narg(time_signup_deadline), time_signup_deadline),
+    "canceled" = COALESCE(sqlc.narg(canceled), canceled),
+    "digital" = COALESCE(sqlc.narg(digital), digital),
+    "highlight" = COALESCE(sqlc.narg(highlight), highlight),
+    "image_small" = COALESCE(sqlc.narg(image_small), image_small),
+    "image_banner" = COALESCE(sqlc.narg(image_banner), image_banner),
+    "link_facebook" = COALESCE(sqlc.narg(link_facebook), link_facebook),
+    "link_discord" = COALESCE(sqlc.narg(link_discord), link_discord),
+    "link_signup" = COALESCE(sqlc.narg(link_signup), link_signup),
+    "link_stream" = COALESCE(sqlc.narg(link_stream), link_stream),
+    "capacity" = COALESCE(sqlc.narg(capacity), capacity),
+    "full" = COALESCE(sqlc.narg('full'), "full"),
+    "category" = COALESCE(sqlc.narg(category), category),
+    "location" = COALESCE(sqlc.narg('location'), "location"),
+    "parent" = COALESCE(sqlc.narg(parent), parent),
+    "rule" = COALESCE(sqlc.narg(rule), rule),
+    "updated_at" = now()
+WHERE "id" = sqlc.arg(id)::int
+RETURNING *;
