@@ -1,9 +1,14 @@
 package service
 
-import db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+import (
+	"context"
+
+	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+)
 
 type Service interface {
 	db.Store
+	GetEventDetails(context.Context, int32) (EventDetails, error)
 }
 
 type service struct {
@@ -14,4 +19,13 @@ func NewService(store db.Store) Service {
 	return &service{
 		Store: store,
 	}
+}
+
+type EventDetails struct {
+	Event         db.Event          `json:"event"`
+	Category      db.Category       `json:"category"`
+	Rule          *db.Rule          `json:"rule,omitempty"`
+	Location      *db.Location      `json:"location,omitempty"`
+	Organizations []db.Organization `json:"organizations"`
+	Audiences     []db.Audience     `json:"audiences"`
 }

@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -39,23 +40,39 @@ func (e *RedactedError) Error() string {
 	return fmt.Sprintf("(id=%s) %s", e.ID, e.Message)
 }
 
+type NotFoundError struct {
+	Message string `json:"message"`
+}
+
+func (e *NotFoundError) Error() string {
+	return e.Message
+}
+
 func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 	if status >= 500 {
-		id := uuid.NewString()
-
-		errChain := []string{}
-		for chainErr := err; chainErr != nil; chainErr = errors.Unwrap(chainErr) {
-			errChain = append(errChain, chainErr.Error())
-		}
-
-		server.logger.Error().Err(err).Str("error-id", id).Str("error-chain", strings.Join(errChain, " -- ")).Int("error-chain-length", len(errChain)).Send()
-
-		err = &RedactedError{
-			ID:      id,
-			Status:  status,
-			Message: "Something went wrong. Contact admin if problem persists.",
+		err = server.redactError(err)
+	} else if status == http.StatusNotFound {
+		err = &NotFoundError{
+			Message: ctx.Request.URL.Path + " not found",
 		}
 	}
 
 	ctx.JSON(status, newErrorResponse(status, err))
+}
+
+func (server *Server) redactError(err error) error {
+	id := uuid.NewString()
+
+	errChain := []string{}
+	for chainErr := err; chainErr != nil; chainErr = errors.Unwrap(chainErr) {
+		errChain = append(errChain, chainErr.Error())
+	}
+
+	server.logger.Error().Err(err).Str("error-id", id).Str("error-chain", strings.Join(errChain, " -- ")).Int("error-chain-length", len(errChain)).Send()
+
+	return &RedactedError{
+		ID:      id,
+		Status:  http.StatusInternalServerError,
+		Message: "Something went wrong. Contact admin if problem persists.",
+	}
 }

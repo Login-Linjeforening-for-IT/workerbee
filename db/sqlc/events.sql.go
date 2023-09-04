@@ -12,6 +12,50 @@ import (
 	"github.com/guregu/null/zero"
 )
 
+const getEvent = `-- name: GetEvent :one
+SELECT id, visible, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at, deleted_at FROM "event" WHERE "id" = $1::int LIMIT 1
+`
+
+func (q *Queries) GetEvent(ctx context.Context, id int32) (Event, error) {
+	row := q.db.QueryRowContext(ctx, getEvent, id)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Visible,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.InformationalNo,
+		&i.InformationalEn,
+		&i.TimeType,
+		&i.TimeStart,
+		&i.TimeEnd,
+		&i.TimePublish,
+		&i.TimeSignupRelease,
+		&i.TimeSignupDeadline,
+		&i.Canceled,
+		&i.Digital,
+		&i.Highlight,
+		&i.ImageSmall,
+		&i.ImageBanner,
+		&i.LinkFacebook,
+		&i.LinkDiscord,
+		&i.LinkSignup,
+		&i.LinkStream,
+		&i.Capacity,
+		&i.Full,
+		&i.Category,
+		&i.Location,
+		&i.Parent,
+		&i.Rule,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getEvents = `-- name: GetEvents :many
 SELECT e."id", e."visible",
         e."name_no", e."name_en",
@@ -21,7 +65,7 @@ SELECT e."id", e."visible",
         -- TODO: Add audience
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
         -- TODO: Add organizer
-        e."updated_at"
+        e."updated_at", e."deleted_at" IS NOT NULL AS is_deleted
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
     LEFT OUTER JOIN "location" AS l ON e."location" = l."id"
@@ -55,6 +99,7 @@ type GetEventsRow struct {
 	LocationNameNo zero.String  `json:"location_name_no"`
 	LocationNameEn zero.String  `json:"location_name_en"`
 	UpdatedAt      time.Time    `json:"updated_at"`
+	IsDeleted      interface{}  `json:"is_deleted"`
 }
 
 func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEventsRow, error) {
@@ -84,6 +129,7 @@ func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEven
 			&i.LocationNameNo,
 			&i.LocationNameEn,
 			&i.UpdatedAt,
+			&i.IsDeleted,
 		); err != nil {
 			return nil, err
 		}

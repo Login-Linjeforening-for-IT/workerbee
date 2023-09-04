@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-04T17:30:02.494Z
+-- Generated at: 2023-09-04T21:36:21.987Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -178,6 +178,10 @@ CREATE INDEX ON "event" ("visible");
 CREATE INDEX ON "event" ("highlight");
 
 CREATE INDEX ON "event" ("category");
+
+CREATE INDEX ON "event" ("location");
+
+CREATE INDEX ON "event" ("rule");
 
 CREATE INDEX ON "event" ("time_start");
 

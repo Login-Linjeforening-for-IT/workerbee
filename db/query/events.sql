@@ -7,7 +7,7 @@ SELECT e."id", e."visible",
         -- TODO: Add audience
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
         -- TODO: Add organizer
-        e."updated_at"
+        e."updated_at", e."deleted_at" IS NOT NULL AS is_deleted
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
     LEFT OUTER JOIN "location" AS l ON e."location" = l."id"
@@ -15,3 +15,7 @@ SELECT e."id", e."visible",
     ORDER BY e."id"
     LIMIT sqlc.arg('limit')::int
     OFFSET sqlc.arg('offset')::int;
+
+
+-- name: GetEvent :one
+SELECT * FROM "event" WHERE "id" = sqlc.arg('id')::int LIMIT 1;   -- sqlc.embed(event)
