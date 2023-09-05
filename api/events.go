@@ -11,7 +11,7 @@ import (
 )
 
 type getEventsRequest struct {
-	Limit      int32 `form:"limit"`
+	Limit      int32 `form:"limit,default=20"`
 	Offset     int32 `form:"offset"`
 	Historical bool  `form:"historical"`
 }
@@ -98,12 +98,17 @@ type createEventRequest struct {
 	Location zero.Int `json:"location"`
 	Parent   zero.Int `json:"parent"`
 	Rule     zero.Int `json:"rule"`
+
+	/* // TODO: should these be here or should they be as a patch?
+	Organizations []string `json:"organizations"`
+	Audiences     []int    `json:"audiences"`
+	*/
 }
 
 func (server *Server) createEvent(ctx *gin.Context) {
 	var req createEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		writeValidationError[createEventRequest](server, ctx, err)
 		return
 	}
 
@@ -158,7 +163,7 @@ type updateEventRequest struct {
 func (server *Server) updateEvent(ctx *gin.Context) {
 	var req updateEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		writeValidationError[updateEventRequest](server, ctx, err)
 		return
 	}
 

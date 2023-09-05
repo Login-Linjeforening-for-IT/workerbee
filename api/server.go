@@ -42,6 +42,20 @@ func (server *Server) initRouter() {
 			events.GET("/:id", server.getEvent)
 			events.POST("/", server.createEvent)
 			events.PATCH("/", server.updateEvent)
+
+			// rules := events.Group("/rules")
+			// {
+			// 	rules.POST("/", server.addRuleToEvent)
+			// 	rules.DELETE("/", server.removeRuleFromEvent)
+			// }
+		}
+
+		rules := api.Group("/rules")
+		{
+			rules.GET("/", server.getRules)
+			rules.GET("/:id", server.getRule)
+			rules.POST("/", server.createRule)
+			rules.PATCH("/", server.updateRule)
 		}
 	}
 

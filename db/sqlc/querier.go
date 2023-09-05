@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	// sqlc.embed(event)
 	CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error)
+	CreateRule(ctx context.Context, arg CreateRuleParams) (Rule, error)
 	GetAudiencesOfEvent(ctx context.Context, eventID int32) ([]Audience, error)
 	GetCategory(ctx context.Context, id int32) (Category, error)
 	GetEvent(ctx context.Context, id int32) (Event, error)
@@ -18,7 +19,9 @@ type Querier interface {
 	GetLocation(ctx context.Context, id int32) (Location, error)
 	GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]Organization, error)
 	GetRule(ctx context.Context, id int32) (Rule, error)
+	GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesRow, error)
 	UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error)
+	UpdateRule(ctx context.Context, arg UpdateRuleParams) (Rule, error)
 }
 
 var _ Querier = (*Queries)(nil)

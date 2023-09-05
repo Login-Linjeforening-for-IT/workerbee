@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
@@ -48,6 +49,35 @@ func (e *NotFoundError) Error() string {
 	return e.Message
 }
 
+type ValidationErrors struct {
+	Errors []ValidationError `json:"errors"`
+}
+
+func (e *ValidationErrors) Error() string {
+	var sb strings.Builder
+
+	sb.WriteString(fmt.Sprintf("Found %d validation errors: ", len(e.Errors)))
+
+	for i, err := range e.Errors {
+		if i != 0 {
+			sb.WriteString(", ")
+		}
+
+		sb.WriteString(err.Error())
+	}
+
+	return sb.String()
+}
+
+type ValidationError struct {
+	Field string `json:"field"`
+	Tag   string `json:"tag"`
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("validation for field %s failed on tag %s", e.Field, e.Tag)
+}
+
 func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 	if status >= 500 {
 		err = server.redactError(err)
@@ -55,9 +85,59 @@ func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 		err = &NotFoundError{
 			Message: ctx.Request.URL.Path + " not found",
 		}
+	} else {
+		switch uErr := err.(type) {
+		case validator.ValidationErrors:
+			errs := make([]ValidationError, 0, len(uErr))
+			for _, fieldErr := range uErr {
+				errs = append(errs, ValidationError{
+					Field: fieldErr.Field(),
+					Tag:   fieldErr.Tag(),
+				})
+			}
+			err = &ValidationErrors{errs}
+		}
 	}
 
 	ctx.JSON(status, newErrorResponse(status, err))
+}
+
+// If error is not a validation error, this functions as an alias for server.writeError(ctx, http.StatusBadRequest, err)
+// However, if error is a validation error this function will attempt to replace the go field name with the json tag if it exists
+func writeValidationError[T any](server *Server, ctx *gin.Context, err error) {
+	switch uErr := err.(type) {
+	case validator.ValidationErrors:
+		var dummy T
+		t := reflect.TypeOf(dummy)
+		for t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+
+		if t.Kind() != reflect.Struct {
+			break
+		}
+
+		errs := make([]ValidationError, 0, len(uErr))
+		for _, fieldErr := range uErr {
+			field := fieldErr.Field()
+
+			sf, ok := t.FieldByName(field)
+			if ok {
+				tagField, ok := sf.Tag.Lookup("json")
+				if ok {
+					field = tagField
+				}
+			}
+
+			errs = append(errs, ValidationError{
+				Field: field,
+				Tag:   fieldErr.Tag(),
+			})
+		}
+		err = &ValidationErrors{errs}
+	}
+
+	server.writeError(ctx, http.StatusBadRequest, err)
 }
 
 func (server *Server) redactError(err error) error {
