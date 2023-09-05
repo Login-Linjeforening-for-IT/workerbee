@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-04T21:36:21.987Z
+-- Generated at: 2023-09-05T14:45:32.301Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -120,7 +120,6 @@ CREATE TABLE "event_organization_relation" (
 
 CREATE TABLE "location" (
   "id" SERIAL PRIMARY KEY,
-  "visible" bool NOT NULL DEFAULT false,
   "name_no" varchar NOT NULL,
   "name_en" varchar,
   "type" location_type NOT NULL DEFAULT 'none',
@@ -139,6 +138,7 @@ CREATE TABLE "location" (
 
 CREATE TABLE "job_advertisement" (
   "id" SERIAL PRIMARY KEY,
+  "visible" bool NOT NULL DEFAULT false,
   "title_no" varchar NOT NULL,
   "title_en" varchar,
   "position_title_no" varchar NOT NULL,
@@ -178,10 +178,6 @@ CREATE INDEX ON "event" ("visible");
 CREATE INDEX ON "event" ("highlight");
 
 CREATE INDEX ON "event" ("category");
-
-CREATE INDEX ON "event" ("location");
-
-CREATE INDEX ON "event" ("rule");
 
 CREATE INDEX ON "event" ("time_start");
 

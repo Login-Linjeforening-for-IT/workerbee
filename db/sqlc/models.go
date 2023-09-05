@@ -222,6 +222,7 @@ type EventOrganizationRelation struct {
 
 type JobAdvertisement struct {
 	ID                  int32       `json:"id"`
+	Visible             bool        `json:"visible"`
 	TitleNo             string      `json:"title_no"`
 	TitleEn             zero.String `json:"title_en"`
 	PositionTitleNo     string      `json:"position_title_no"`
@@ -243,7 +244,6 @@ type JobAdvertisement struct {
 
 type Location struct {
 	ID              int32        `json:"id"`
-	Visible         bool         `json:"visible"`
 	NameNo          string       `json:"name_no"`
 	NameEn          zero.String  `json:"name_en"`
 	Type            LocationType `json:"type"`

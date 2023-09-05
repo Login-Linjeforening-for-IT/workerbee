@@ -3,10 +3,23 @@ package api
 import (
 	"os"
 
+	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
 )
+
+func init() {
+	validator, ok := binding.Validator.Engine().(*validator.Validate)
+	if !ok {
+		return
+	}
+
+	db.BindTimeTypeEnumValidator(validator, "timetypeenum")
+	db.BindLocationTypeValidator(validator, "locationtype")
+}
 
 type Config struct {
 	Port string `config:"PORT" default:"8080"`
@@ -56,6 +69,14 @@ func (server *Server) initRouter() {
 			rules.GET("/:id", server.getRule)
 			rules.POST("/", server.createRule)
 			rules.PATCH("/", server.updateRule)
+		}
+
+		locations := api.Group("/locations")
+		{
+			locations.GET("/", server.getLocations)
+			locations.GET("/:id", server.getLocation)
+			locations.POST("/", server.createLocation)
+			locations.PATCH("/", server.updateLocation)
 		}
 	}
 

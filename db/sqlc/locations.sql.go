@@ -7,10 +7,186 @@ package db
 
 import (
 	"context"
+	"time"
+
+	"github.com/guregu/null/zero"
 )
 
+const createLocation = `-- name: CreateLocation :one
+INSERT INTO "location" (
+    "name_no", "name_en",
+    "address_street", "address_postcode", "city_name",
+    "coordinate_lat", "coordinate_long",
+    "mazemap_campus_id", "mazemap_poi_id",
+    "type", "url"
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at
+`
+
+type CreateLocationParams struct {
+	NameNo          string       `json:"name_no"`
+	NameEn          zero.String  `json:"name_en"`
+	AddressStreet   zero.String  `json:"address_street"`
+	AddressPostcode zero.Int     `json:"address_postcode"`
+	CityName        zero.String  `json:"city_name"`
+	CoordinateLat   zero.Float   `json:"coordinate_lat"`
+	CoordinateLong  zero.Float   `json:"coordinate_long"`
+	MazemapCampusID zero.Int     `json:"mazemap_campus_id"`
+	MazemapPoiID    zero.Int     `json:"mazemap_poi_id"`
+	Type            LocationType `json:"type"`
+	Url             zero.String  `json:"url"`
+}
+
+func (q *Queries) CreateLocation(ctx context.Context, arg CreateLocationParams) (Location, error) {
+	row := q.db.QueryRowContext(ctx, createLocation,
+		arg.NameNo,
+		arg.NameEn,
+		arg.AddressStreet,
+		arg.AddressPostcode,
+		arg.CityName,
+		arg.CoordinateLat,
+		arg.CoordinateLong,
+		arg.MazemapCampusID,
+		arg.MazemapPoiID,
+		arg.Type,
+		arg.Url,
+	)
+	var i Location
+	err := row.Scan(
+		&i.ID,
+		&i.NameNo,
+		&i.NameEn,
+		&i.Type,
+		&i.MazemapCampusID,
+		&i.MazemapPoiID,
+		&i.AddressStreet,
+		&i.AddressPostcode,
+		&i.CityName,
+		&i.CoordinateLat,
+		&i.CoordinateLong,
+		&i.Url,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getAddressLocations = `-- name: GetAddressLocations :many
+SELECT "id", "name_no", "name_en", 
+        "address_street", "address_postcode", "city_name",
+        "updated_at", "url"
+    FROM "location"
+    WHERE "type" = 'address'
+    LIMIT $2::int
+    OFFSET $1::int
+`
+
+type GetAddressLocationsParams struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+type GetAddressLocationsRow struct {
+	ID              int32       `json:"id"`
+	NameNo          string      `json:"name_no"`
+	NameEn          zero.String `json:"name_en"`
+	AddressStreet   zero.String `json:"address_street"`
+	AddressPostcode zero.Int    `json:"address_postcode"`
+	CityName        zero.String `json:"city_name"`
+	UpdatedAt       time.Time   `json:"updated_at"`
+	Url             zero.String `json:"url"`
+}
+
+func (q *Queries) GetAddressLocations(ctx context.Context, arg GetAddressLocationsParams) ([]GetAddressLocationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAddressLocations, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetAddressLocationsRow{}
+	for rows.Next() {
+		var i GetAddressLocationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.NameNo,
+			&i.NameEn,
+			&i.AddressStreet,
+			&i.AddressPostcode,
+			&i.CityName,
+			&i.UpdatedAt,
+			&i.Url,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCoordsLocations = `-- name: GetCoordsLocations :many
+SELECT "id", "name_no", "name_en", 
+        "coordinate_lat", "coordinate_long",
+        "updated_at", "url"
+    FROM "location"
+    WHERE "type" = 'coords'
+    LIMIT $2::int
+    OFFSET $1::int
+`
+
+type GetCoordsLocationsParams struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+type GetCoordsLocationsRow struct {
+	ID             int32       `json:"id"`
+	NameNo         string      `json:"name_no"`
+	NameEn         zero.String `json:"name_en"`
+	CoordinateLat  zero.Float  `json:"coordinate_lat"`
+	CoordinateLong zero.Float  `json:"coordinate_long"`
+	UpdatedAt      time.Time   `json:"updated_at"`
+	Url            zero.String `json:"url"`
+}
+
+func (q *Queries) GetCoordsLocations(ctx context.Context, arg GetCoordsLocationsParams) ([]GetCoordsLocationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCoordsLocations, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetCoordsLocationsRow{}
+	for rows.Next() {
+		var i GetCoordsLocationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.NameNo,
+			&i.NameEn,
+			&i.CoordinateLat,
+			&i.CoordinateLong,
+			&i.UpdatedAt,
+			&i.Url,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getLocation = `-- name: GetLocation :one
-SELECT id, visible, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at FROM "location" WHERE "id" = $1::int LIMIT 1
+SELECT id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at FROM "location" WHERE "id" = $1::int LIMIT 1
 `
 
 func (q *Queries) GetLocation(ctx context.Context, id int32) (Location, error) {
@@ -18,7 +194,182 @@ func (q *Queries) GetLocation(ctx context.Context, id int32) (Location, error) {
 	var i Location
 	err := row.Scan(
 		&i.ID,
-		&i.Visible,
+		&i.NameNo,
+		&i.NameEn,
+		&i.Type,
+		&i.MazemapCampusID,
+		&i.MazemapPoiID,
+		&i.AddressStreet,
+		&i.AddressPostcode,
+		&i.CityName,
+		&i.CoordinateLat,
+		&i.CoordinateLong,
+		&i.Url,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getLocations = `-- name: GetLocations :many
+SELECT id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at FROM "location"
+    LIMIT $2::int
+    OFFSET $1::int
+`
+
+type GetLocationsParams struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+func (q *Queries) GetLocations(ctx context.Context, arg GetLocationsParams) ([]Location, error) {
+	rows, err := q.db.QueryContext(ctx, getLocations, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Location{}
+	for rows.Next() {
+		var i Location
+		if err := rows.Scan(
+			&i.ID,
+			&i.NameNo,
+			&i.NameEn,
+			&i.Type,
+			&i.MazemapCampusID,
+			&i.MazemapPoiID,
+			&i.AddressStreet,
+			&i.AddressPostcode,
+			&i.CityName,
+			&i.CoordinateLat,
+			&i.CoordinateLong,
+			&i.Url,
+			&i.UpdatedAt,
+			&i.CreatedAt,
+			&i.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getMazemapLocations = `-- name: GetMazemapLocations :many
+SELECT "id", "name_no", "name_en", 
+        "mazemap_campus_id", "mazemap_poi_id",
+        "updated_at", "url"
+    FROM "location"
+    WHERE "type" = 'mazemap'
+    LIMIT $2::int
+    OFFSET $1::int
+`
+
+type GetMazemapLocationsParams struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+type GetMazemapLocationsRow struct {
+	ID              int32       `json:"id"`
+	NameNo          string      `json:"name_no"`
+	NameEn          zero.String `json:"name_en"`
+	MazemapCampusID zero.Int    `json:"mazemap_campus_id"`
+	MazemapPoiID    zero.Int    `json:"mazemap_poi_id"`
+	UpdatedAt       time.Time   `json:"updated_at"`
+	Url             zero.String `json:"url"`
+}
+
+func (q *Queries) GetMazemapLocations(ctx context.Context, arg GetMazemapLocationsParams) ([]GetMazemapLocationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMazemapLocations, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetMazemapLocationsRow{}
+	for rows.Next() {
+		var i GetMazemapLocationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.NameNo,
+			&i.NameEn,
+			&i.MazemapCampusID,
+			&i.MazemapPoiID,
+			&i.UpdatedAt,
+			&i.Url,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateLocation = `-- name: UpdateLocation :one
+UPDATE "location"
+SET
+    "name_no" = COALESCE($1, name_no),
+    "name_en" = COALESCE($2, name_en),
+    "address_street" = COALESCE($3, address_street),
+    "address_postcode" = COALESCE($4, address_postcode),
+    "city_name" = COALESCE($5, city_name),
+    "coordinate_lat" = COALESCE($6, coordinate_lat),
+    "coordinate_long" = COALESCE($7, coordinate_long),
+    "mazemap_campus_id" = COALESCE($8, mazemap_campus_id),
+    "mazemap_poi_id" = COALESCE($9, mazemap_poi_id),
+    "type" = COALESCE($10, type),
+    "url" = COALESCE($11, url),
+    "updated_at" = now()
+WHERE "id" = $12::int
+RETURNING id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at
+`
+
+type UpdateLocationParams struct {
+	NameNo          zero.String      `json:"name_no"`
+	NameEn          zero.String      `json:"name_en"`
+	AddressStreet   zero.String      `json:"address_street"`
+	AddressPostcode zero.Int         `json:"address_postcode"`
+	CityName        zero.String      `json:"city_name"`
+	CoordinateLat   zero.Float       `json:"coordinate_lat"`
+	CoordinateLong  zero.Float       `json:"coordinate_long"`
+	MazemapCampusID zero.Int         `json:"mazemap_campus_id"`
+	MazemapPoiID    zero.Int         `json:"mazemap_poi_id"`
+	Type            NullLocationType `json:"type"`
+	Url             zero.String      `json:"url"`
+	ID              int32            `json:"id"`
+}
+
+func (q *Queries) UpdateLocation(ctx context.Context, arg UpdateLocationParams) (Location, error) {
+	row := q.db.QueryRowContext(ctx, updateLocation,
+		arg.NameNo,
+		arg.NameEn,
+		arg.AddressStreet,
+		arg.AddressPostcode,
+		arg.CityName,
+		arg.CoordinateLat,
+		arg.CoordinateLong,
+		arg.MazemapCampusID,
+		arg.MazemapPoiID,
+		arg.Type,
+		arg.Url,
+		arg.ID,
+	)
+	var i Location
+	err := row.Scan(
+		&i.ID,
 		&i.NameNo,
 		&i.NameEn,
 		&i.Type,
