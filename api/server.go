@@ -41,6 +41,7 @@ func (server *Server) initRouter() {
 			events.GET("/", server.getEvents)
 			events.GET("/:id", server.getEvent)
 			events.POST("/", server.createEvent)
+			events.PATCH("/", server.updateEvent)
 		}
 	}
 

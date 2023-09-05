@@ -149,3 +149,33 @@ func (server *Server) createEvent(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, event)
 }
+
+type updateEventRequest struct {
+	ID int32 `json:"id" binding:"required"`
+	db.UpdateEventParams
+}
+
+func (server *Server) updateEvent(ctx *gin.Context) {
+	var req updateEventRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		server.writeError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	// TODO: Check enum validity
+
+	req.UpdateEventParams.ID = req.ID
+
+	event, err := server.service.UpdateEvent(ctx, req.UpdateEventParams)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, event)
+}

@@ -39,7 +39,7 @@ RETURNING *;
 -- name: UpdateEvent :one
 UPDATE "event"
 SET
-    "visible" = COALESCE(sqlc.arg(visible), visible),
+    "visible" = COALESCE(sqlc.narg(visible), visible),
     "name_no" = COALESCE(sqlc.narg(name_no), name_no),
     "name_en" = COALESCE(sqlc.narg(name_en), name_en),
     "description_no" = COALESCE(sqlc.narg(description_no), description_no),

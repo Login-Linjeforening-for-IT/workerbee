@@ -300,7 +300,7 @@ RETURNING id, visible, name_no, name_en, description_no, description_en, informa
 `
 
 type UpdateEventParams struct {
-	Visible            bool             `json:"visible"`
+	Visible            zero.Bool        `json:"visible"`
 	NameNo             zero.String      `json:"name_no"`
 	NameEn             zero.String      `json:"name_en"`
 	DescriptionNo      zero.String      `json:"description_no"`
