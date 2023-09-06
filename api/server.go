@@ -79,12 +79,18 @@ func (server *Server) initRouter() {
 			locations.PATCH("/", server.updateLocation)
 		}
 
-		organization := api.Group("/organizations")
+		organizations := api.Group("/organizations")
 		{
-			organization.GET("/", server.getOrganizations)
-			organization.GET("/:shortname", server.getOrganization)
-			organization.POST("/", server.createOrganization)
-			organization.PATCH("/", server.updateOrganization)
+			organizations.GET("/", server.getOrganizations)
+			organizations.GET("/:shortname", server.getOrganization)
+			organizations.POST("/", server.createOrganization)
+			organizations.PATCH("/", server.updateOrganization)
+		}
+
+		categories := api.Group("/categories")
+		{
+			categories.GET("/", server.getCategories)
+			categories.GET("/:id", server.getCategory)
 		}
 	}
 

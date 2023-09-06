@@ -16,6 +16,7 @@ type Querier interface {
 	CreateRule(ctx context.Context, arg CreateRuleParams) (Rule, error)
 	GetAddressLocations(ctx context.Context, arg GetAddressLocationsParams) ([]GetAddressLocationsRow, error)
 	GetAudiencesOfEvent(ctx context.Context, eventID int32) ([]Audience, error)
+	GetCategories(ctx context.Context) ([]GetCategoriesRow, error)
 	GetCategory(ctx context.Context, id int32) (Category, error)
 	GetCoordsLocations(ctx context.Context, arg GetCoordsLocationsParams) ([]GetCoordsLocationsRow, error)
 	GetEvent(ctx context.Context, id int32) (Event, error)

@@ -7,7 +7,48 @@ package db
 
 import (
 	"context"
+
+	"github.com/guregu/null/zero"
 )
+
+const getCategories = `-- name: GetCategories :many
+SELECT "id", "color", "name_no", "name_en" FROM "category" ORDER BY "id"
+`
+
+type GetCategoriesRow struct {
+	ID     int32       `json:"id"`
+	Color  string      `json:"color"`
+	NameNo string      `json:"name_no"`
+	NameEn zero.String `json:"name_en"`
+}
+
+func (q *Queries) GetCategories(ctx context.Context) ([]GetCategoriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetCategoriesRow{}
+	for rows.Next() {
+		var i GetCategoriesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Color,
+			&i.NameNo,
+			&i.NameEn,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const getCategory = `-- name: GetCategory :one
 SELECT id, color, name_no, name_en, description_no, description_en, updated_at, created_at FROM "category" WHERE "id" = $1::int LIMIT 1
