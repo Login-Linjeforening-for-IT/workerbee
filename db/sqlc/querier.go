@@ -12,6 +12,7 @@ type Querier interface {
 	// sqlc.embed(event)
 	CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error)
 	CreateLocation(ctx context.Context, arg CreateLocationParams) (Location, error)
+	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreateRule(ctx context.Context, arg CreateRuleParams) (Rule, error)
 	GetAddressLocations(ctx context.Context, arg GetAddressLocationsParams) ([]GetAddressLocationsRow, error)
 	GetAudiencesOfEvent(ctx context.Context, eventID int32) ([]Audience, error)
@@ -22,11 +23,14 @@ type Querier interface {
 	GetLocation(ctx context.Context, id int32) (Location, error)
 	GetLocations(ctx context.Context, arg GetLocationsParams) ([]Location, error)
 	GetMazemapLocations(ctx context.Context, arg GetMazemapLocationsParams) ([]GetMazemapLocationsRow, error)
+	GetOrganization(ctx context.Context, shortname string) (Organization, error)
+	GetOrganizations(ctx context.Context, arg GetOrganizationsParams) ([]GetOrganizationsRow, error)
 	GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]Organization, error)
 	GetRule(ctx context.Context, id int32) (Rule, error)
 	GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesRow, error)
 	UpdateEvent(ctx context.Context, arg UpdateEventParams) (Event, error)
 	UpdateLocation(ctx context.Context, arg UpdateLocationParams) (Location, error)
+	UpdateOrganization(ctx context.Context, arg UpdateOrganizationParams) (Organization, error)
 	UpdateRule(ctx context.Context, arg UpdateRuleParams) (Rule, error)
 }
 

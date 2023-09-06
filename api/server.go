@@ -78,6 +78,14 @@ func (server *Server) initRouter() {
 			locations.POST("/", server.createLocation)
 			locations.PATCH("/", server.updateLocation)
 		}
+
+		organization := api.Group("/organizations")
+		{
+			organization.GET("/", server.getOrganizations)
+			organization.GET("/:shortname", server.getOrganization)
+			organization.POST("/", server.createOrganization)
+			organization.PATCH("/", server.updateOrganization)
+		}
 	}
 
 	server.router = router
