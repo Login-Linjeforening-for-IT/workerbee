@@ -98,6 +98,14 @@ func (server *Server) initRouter() {
 			audiences.GET("/", server.getAudiences)
 			audiences.GET("/:id", server.getAudience)
 		}
+
+		jobs := api.Group("/jobs")
+		{
+			jobs.GET("/", server.getJobs)
+			jobs.GET("/:id", server.getJob)
+			jobs.POST("/", server.createJob)
+			jobs.PATCH("/", server.updateJob)
+		}
 	}
 
 	server.router = router
