@@ -92,6 +92,12 @@ func (server *Server) initRouter() {
 			categories.GET("/", server.getCategories)
 			categories.GET("/:id", server.getCategory)
 		}
+
+		audiences := api.Group("/audiences")
+		{
+			audiences.GET("/", server.getAudiences)
+			audiences.GET("/:id", server.getAudience)
+		}
 	}
 
 	server.router = router

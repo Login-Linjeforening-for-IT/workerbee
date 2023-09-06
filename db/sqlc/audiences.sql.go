@@ -7,7 +7,62 @@ package db
 
 import (
 	"context"
+
+	"github.com/guregu/null/zero"
 )
+
+const getAudience = `-- name: GetAudience :one
+SELECT id, name_no, name_en, description_no, description_en, updated_at, created_at, deleted_at FROM "audience" WHERE "id" = $1::int LIMIT 1
+`
+
+func (q *Queries) GetAudience(ctx context.Context, id int32) (Audience, error) {
+	row := q.db.QueryRowContext(ctx, getAudience, id)
+	var i Audience
+	err := row.Scan(
+		&i.ID,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const getAudiences = `-- name: GetAudiences :many
+SELECT "id", "name_no", "name_en" FROM "audience" ORDER BY "id"
+`
+
+type GetAudiencesRow struct {
+	ID     int32       `json:"id"`
+	NameNo string      `json:"name_no"`
+	NameEn zero.String `json:"name_en"`
+}
+
+func (q *Queries) GetAudiences(ctx context.Context) ([]GetAudiencesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAudiences)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetAudiencesRow{}
+	for rows.Next() {
+		var i GetAudiencesRow
+		if err := rows.Scan(&i.ID, &i.NameNo, &i.NameEn); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const getAudiencesOfEvent = `-- name: GetAudiencesOfEvent :many
 SELECT aud.id, aud.name_no, aud.name_en, aud.description_no, aud.description_en, aud.updated_at, aud.created_at, aud.deleted_at FROM "event_audience_relation"
