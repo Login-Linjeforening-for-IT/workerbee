@@ -189,6 +189,34 @@ func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([
 	return items, nil
 }
 
+const softDeleteOrganization = `-- name: SoftDeleteOrganization :one
+UPDATE "organization"
+SET
+    "deleted_at" = now()
+WHERE "shortname" = $1::text RETURNING shortname, name_no, name_en, description_no, description_en, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
+`
+
+func (q *Queries) SoftDeleteOrganization(ctx context.Context, shortname string) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, softDeleteOrganization, shortname)
+	var i Organization
+	err := row.Scan(
+		&i.Shortname,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.LinkHomepage,
+		&i.LinkLinkedin,
+		&i.LinkFacebook,
+		&i.LinkInstagram,
+		&i.Logo,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const updateOrganization = `-- name: UpdateOrganization :one
 UPDATE "organization"
 SET

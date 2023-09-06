@@ -22,3 +22,10 @@ SET
     "updated_at" = now()
 WHERE "id" = sqlc.arg(id)::int
 RETURNING *;
+
+-- name: SoftDeleteRule :one
+UPDATE "rule"
+SET
+    "deleted_at" = now()
+WHERE "id" = sqlc.arg('id')::int
+RETURNING *;

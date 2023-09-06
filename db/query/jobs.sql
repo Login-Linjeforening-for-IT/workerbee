@@ -49,3 +49,9 @@ SET
     "application_url" = COALESCE(sqlc.narg(application_url), application_url),
     "updated_at" = now()
 WHERE "id" = sqlc.arg('id')::int RETURNING *;
+
+-- name: SoftDeleteJob :one
+UPDATE "job_advertisement"
+SET
+    "deleted_at" = now()
+WHERE "id" = sqlc.arg('id')::int RETURNING *;

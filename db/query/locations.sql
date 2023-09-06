@@ -59,3 +59,10 @@ SET
     "updated_at" = now()
 WHERE "id" = sqlc.arg(id)::int
 RETURNING *;
+
+-- name: SoftDeleteLocation :one
+UPDATE "location"
+SET
+    "deleted_at" = now()
+WHERE "id" = sqlc.arg('id')::int
+RETURNING *;

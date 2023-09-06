@@ -8,6 +8,7 @@ SELECT e."id", e."visible",
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
         -- TODO: Add organizer
         e."updated_at", e."deleted_at" IS NOT NULL AS is_deleted
+        -- deleted_at == null => is_deleted == false
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
     LEFT OUTER JOIN "location" AS l ON e."location" = l."id"
@@ -68,5 +69,12 @@ SET
     "parent" = COALESCE(sqlc.narg(parent), parent),
     "rule" = COALESCE(sqlc.narg(rule), rule),
     "updated_at" = now()
+WHERE "id" = sqlc.arg(id)::int
+RETURNING *;
+
+-- name: SoftDeleteEvent :one
+UPDATE "event"
+SET
+    "deleted_at" = now()
 WHERE "id" = sqlc.arg(id)::int
 RETURNING *;

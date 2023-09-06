@@ -113,6 +113,30 @@ func (q *Queries) GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesR
 	return items, nil
 }
 
+const softDeleteRule = `-- name: SoftDeleteRule :one
+UPDATE "rule"
+SET
+    "deleted_at" = now()
+WHERE "id" = $1::int
+RETURNING id, name_no, name_en, description_no, description_en, updated_at, created_at, deleted_at
+`
+
+func (q *Queries) SoftDeleteRule(ctx context.Context, id int32) (Rule, error) {
+	row := q.db.QueryRowContext(ctx, softDeleteRule, id)
+	var i Rule
+	err := row.Scan(
+		&i.ID,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const updateRule = `-- name: UpdateRule :one
 UPDATE "rule"
 SET

@@ -136,3 +136,28 @@ func (server *Server) updateJob(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, job)
 }
+
+type deleteJobRequest struct {
+	ID int32 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) deleteJob(ctx *gin.Context) {
+	var req deleteJobRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		server.writeError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	job, err := server.service.SoftDeleteJob(ctx, req.ID)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, job)
+}

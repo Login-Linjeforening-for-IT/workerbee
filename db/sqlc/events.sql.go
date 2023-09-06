@@ -185,6 +185,7 @@ SELECT e."id", e."visible",
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
         -- TODO: Add organizer
         e."updated_at", e."deleted_at" IS NOT NULL AS is_deleted
+        -- deleted_at == null => is_deleted == false
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
     LEFT OUTER JOIN "location" AS l ON e."location" = l."id"
@@ -261,6 +262,54 @@ func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEven
 		return nil, err
 	}
 	return items, nil
+}
+
+const softDeleteEvent = `-- name: SoftDeleteEvent :one
+UPDATE "event"
+SET
+    "deleted_at" = now()
+WHERE "id" = $1::int
+RETURNING id, visible, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at, deleted_at
+`
+
+func (q *Queries) SoftDeleteEvent(ctx context.Context, id int32) (Event, error) {
+	row := q.db.QueryRowContext(ctx, softDeleteEvent, id)
+	var i Event
+	err := row.Scan(
+		&i.ID,
+		&i.Visible,
+		&i.NameNo,
+		&i.NameEn,
+		&i.DescriptionNo,
+		&i.DescriptionEn,
+		&i.InformationalNo,
+		&i.InformationalEn,
+		&i.TimeType,
+		&i.TimeStart,
+		&i.TimeEnd,
+		&i.TimePublish,
+		&i.TimeSignupRelease,
+		&i.TimeSignupDeadline,
+		&i.Canceled,
+		&i.Digital,
+		&i.Highlight,
+		&i.ImageSmall,
+		&i.ImageBanner,
+		&i.LinkFacebook,
+		&i.LinkDiscord,
+		&i.LinkSignup,
+		&i.LinkStream,
+		&i.Capacity,
+		&i.Full,
+		&i.Category,
+		&i.Location,
+		&i.Parent,
+		&i.Rule,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
 }
 
 const updateEvent = `-- name: UpdateEvent :one

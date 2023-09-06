@@ -318,6 +318,37 @@ func (q *Queries) GetMazemapLocations(ctx context.Context, arg GetMazemapLocatio
 	return items, nil
 }
 
+const softDeleteLocation = `-- name: SoftDeleteLocation :one
+UPDATE "location"
+SET
+    "deleted_at" = now()
+WHERE "id" = $1::int
+RETURNING id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at
+`
+
+func (q *Queries) SoftDeleteLocation(ctx context.Context, id int32) (Location, error) {
+	row := q.db.QueryRowContext(ctx, softDeleteLocation, id)
+	var i Location
+	err := row.Scan(
+		&i.ID,
+		&i.NameNo,
+		&i.NameEn,
+		&i.Type,
+		&i.MazemapCampusID,
+		&i.MazemapPoiID,
+		&i.AddressStreet,
+		&i.AddressPostcode,
+		&i.CityName,
+		&i.CoordinateLat,
+		&i.CoordinateLong,
+		&i.Url,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const updateLocation = `-- name: UpdateLocation :one
 UPDATE "location"
 SET

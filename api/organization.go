@@ -112,3 +112,28 @@ func (server *Server) updateOrganization(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, organization)
 }
+
+type deleteOrganizationRequest struct {
+	Shortname string `uri:"shortname" binding:"required,min=1"`
+}
+
+func (server *Server) deleteOrganization(ctx *gin.Context) {
+	var req deleteOrganizationRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		server.writeError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	organization, err := server.service.SoftDeleteOrganization(ctx, req.Shortname)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, organization)
+}

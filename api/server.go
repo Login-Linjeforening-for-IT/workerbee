@@ -55,6 +55,7 @@ func (server *Server) initRouter() {
 			events.GET("/:id", server.getEvent)
 			events.POST("/", server.createEvent)
 			events.PATCH("/", server.updateEvent)
+			events.DELETE("/:id", server.deleteEvent)
 
 			// rules := events.Group("/rules")
 			// {
@@ -69,6 +70,7 @@ func (server *Server) initRouter() {
 			rules.GET("/:id", server.getRule)
 			rules.POST("/", server.createRule)
 			rules.PATCH("/", server.updateRule)
+			rules.DELETE("/:id", server.deleteRule)
 		}
 
 		locations := api.Group("/locations")
@@ -77,6 +79,7 @@ func (server *Server) initRouter() {
 			locations.GET("/:id", server.getLocation)
 			locations.POST("/", server.createLocation)
 			locations.PATCH("/", server.updateLocation)
+			locations.DELETE("/:id", server.deleteLocation)
 		}
 
 		organizations := api.Group("/organizations")
@@ -85,6 +88,7 @@ func (server *Server) initRouter() {
 			organizations.GET("/:shortname", server.getOrganization)
 			organizations.POST("/", server.createOrganization)
 			organizations.PATCH("/", server.updateOrganization)
+			organizations.DELETE("/:shortname", server.deleteOrganization)
 		}
 
 		categories := api.Group("/categories")
@@ -105,6 +109,7 @@ func (server *Server) initRouter() {
 			jobs.GET("/:id", server.getJob)
 			jobs.POST("/", server.createJob)
 			jobs.PATCH("/", server.updateJob)
+			jobs.DELETE("/:id", server.deleteJob)
 		}
 	}
 

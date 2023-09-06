@@ -154,3 +154,28 @@ func (server *Server) updateLocation(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, location)
 }
+
+type deleteLocationRequest struct {
+	ID int32 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) deleteLocation(ctx *gin.Context) {
+	var req deleteLocationRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		server.writeError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	location, err := server.service.SoftDeleteLocation(ctx, req.ID)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, location)
+}

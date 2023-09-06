@@ -36,3 +36,9 @@ SET
     "logo" = COALESCE(sqlc.narg(logo), logo),
     "updated_at" = now()
 WHERE "shortname" = sqlc.arg('shortname')::text RETURNING *;
+
+-- name: SoftDeleteOrganization :one
+UPDATE "organization"
+SET
+    "deleted_at" = now()
+WHERE "shortname" = sqlc.arg('shortname')::text RETURNING *;

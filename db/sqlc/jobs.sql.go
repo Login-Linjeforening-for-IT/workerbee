@@ -226,6 +226,40 @@ func (q *Queries) GetJobs(ctx context.Context, arg GetJobsParams) ([]GetJobsRow,
 	return items, nil
 }
 
+const softDeleteJob = `-- name: SoftDeleteJob :one
+UPDATE "job_advertisement"
+SET
+    "deleted_at" = now()
+WHERE "id" = $1::int RETURNING id, visible, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+`
+
+func (q *Queries) SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement, error) {
+	row := q.db.QueryRowContext(ctx, softDeleteJob, id)
+	var i JobAdvertisement
+	err := row.Scan(
+		&i.ID,
+		&i.Visible,
+		&i.TitleNo,
+		&i.TitleEn,
+		&i.PositionTitleNo,
+		&i.PositionTitleEn,
+		&i.DescriptionShortNo,
+		&i.DescriptionShortEn,
+		&i.DescriptionLongNo,
+		&i.DescriptionLongEn,
+		&i.JobType,
+		&i.TimePublish,
+		&i.ApplicationDeadline,
+		&i.BannerImage,
+		&i.Organization,
+		&i.ApplicationUrl,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const updateJob = `-- name: UpdateJob :one
 UPDATE "job_advertisement"
 SET

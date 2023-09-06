@@ -114,3 +114,28 @@ func (server *Server) updateRule(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, rule)
 }
+
+type deleteRuleRequest struct {
+	ID int32 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) deleteRule(ctx *gin.Context) {
+	var req deleteRuleRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		server.writeError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	rule, err := server.service.SoftDeleteRule(ctx, req.ID)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, rule)
+}
