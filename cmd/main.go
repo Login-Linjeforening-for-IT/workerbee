@@ -40,6 +40,7 @@ func main() {
 
 	conn, err := sql.Open("postgres", dsn)
 	guard(err)
+	defer conn.Close()
 
 	err = conn.Ping()
 	guard(err)

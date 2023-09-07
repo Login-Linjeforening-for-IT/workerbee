@@ -57,11 +57,11 @@ func (server *Server) initRouter() {
 			events.PATCH("/", server.updateEvent)
 			events.DELETE("/:id", server.deleteEvent)
 
-			// rules := events.Group("/rules")
-			// {
-			// 	rules.POST("/", server.addRuleToEvent)
-			// 	rules.DELETE("/", server.removeRuleFromEvent)
-			// }
+			// events.POST("/organizations", server.addOrganizationToEvent)
+			// events.DELETE("/:id/organizations/:shortname", server.removeOrganizationFromEvent)
+
+			// events.POST("/categories", server.addCategoryToEvent)
+			// events.DELETE("/:id/categories/:id", server.removeCategoryFromEvent)
 		}
 
 		rules := api.Group("/rules")
@@ -110,6 +110,12 @@ func (server *Server) initRouter() {
 			jobs.POST("/", server.createJob)
 			jobs.PATCH("/", server.updateJob)
 			jobs.DELETE("/:id", server.deleteJob)
+
+			jobs.POST("/cities", server.addCityToJob)
+			jobs.DELETE("/cities", server.removeCityFromJob)
+
+			jobs.POST("/skills", server.addSkillToJob)
+			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
 	}
 

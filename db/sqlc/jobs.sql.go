@@ -10,7 +10,36 @@ import (
 	"time"
 
 	"github.com/guregu/null/zero"
+	"github.com/lib/pq"
 )
+
+const addCityToJob = `-- name: AddCityToJob :exec
+INSERT INTO "ad_city_relation" ("ad", "city") VALUES ($1, $2) ON CONFLICT DO NOTHING
+`
+
+type AddCityToJobParams struct {
+	Ad   int32  `json:"ad"`
+	City string `json:"city"`
+}
+
+func (q *Queries) AddCityToJob(ctx context.Context, arg AddCityToJobParams) error {
+	_, err := q.db.ExecContext(ctx, addCityToJob, arg.Ad, arg.City)
+	return err
+}
+
+const addSkillToJob = `-- name: AddSkillToJob :exec
+INSERT INTO "skill" ("ad", "skill") VALUES ($1, $2) ON CONFLICT DO NOTHING
+`
+
+type AddSkillToJobParams struct {
+	Ad    int32  `json:"ad"`
+	Skill string `json:"skill"`
+}
+
+func (q *Queries) AddSkillToJob(ctx context.Context, arg AddSkillToJobParams) error {
+	_, err := q.db.ExecContext(ctx, addSkillToJob, arg.Ad, arg.Skill)
+	return err
+}
 
 const createJob = `-- name: CreateJob :one
 INSERT INTO "job_advertisement" (
@@ -87,8 +116,8 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvert
 
 const getJob = `-- name: GetJob :one
 SELECT job.id, job.visible, job.title_no, job.title_en, job.position_title_no, job.position_title_en, job.description_short_no, job.description_short_en, job.description_long_no, job.description_long_en, job.job_type, job.time_publish, job.application_deadline, job.banner_image, job.organization, job.application_url, job.updated_at, job.created_at, job.deleted_at, org."shortname", org."name_no", org."name_en", 
-		array(SELECT "skill" FROM "skill" WHERE "ad" = $1::int) AS skills,
-		array(SELECT "city" FROM "ad_city_relation" WHERE "ad" = $1::int) AS cities
+		array(SELECT "skill" FROM "skill" WHERE "ad" = $1::int)::varchar[] AS skills,
+		array(SELECT "city" FROM "ad_city_relation" WHERE "ad" = $1::int)::varchar[] AS cities
     FROM "job_advertisement" AS job
     INNER JOIN "organization" AS org ON job."organization" = org."shortname"
     WHERE job."id" = $1::int LIMIT 1
@@ -117,8 +146,8 @@ type GetJobRow struct {
 	Shortname           string      `json:"shortname"`
 	NameNo              string      `json:"name_no"`
 	NameEn              zero.String `json:"name_en"`
-	Skills              interface{} `json:"skills"`
-	Cities              interface{} `json:"cities"`
+	Skills              []string    `json:"skills"`
+	Cities              []string    `json:"cities"`
 }
 
 func (q *Queries) GetJob(ctx context.Context, id int32) (GetJobRow, error) {
@@ -147,8 +176,8 @@ func (q *Queries) GetJob(ctx context.Context, id int32) (GetJobRow, error) {
 		&i.Shortname,
 		&i.NameNo,
 		&i.NameEn,
-		&i.Skills,
-		&i.Cities,
+		pq.Array(&i.Skills),
+		pq.Array(&i.Cities),
 	)
 	return i, err
 }
@@ -224,6 +253,34 @@ func (q *Queries) GetJobs(ctx context.Context, arg GetJobsParams) ([]GetJobsRow,
 		return nil, err
 	}
 	return items, nil
+}
+
+const removeCityFromJob = `-- name: RemoveCityFromJob :exec
+DELETE FROM "ad_city_relation" WHERE "ad" = $1 AND "city" = $2
+`
+
+type RemoveCityFromJobParams struct {
+	Ad   int32  `json:"ad"`
+	City string `json:"city"`
+}
+
+func (q *Queries) RemoveCityFromJob(ctx context.Context, arg RemoveCityFromJobParams) error {
+	_, err := q.db.ExecContext(ctx, removeCityFromJob, arg.Ad, arg.City)
+	return err
+}
+
+const removeSkillFromJob = `-- name: RemoveSkillFromJob :exec
+DELETE FROM "skill" WHERE "ad" = $1 AND "skill" = $2
+`
+
+type RemoveSkillFromJobParams struct {
+	Ad    int32  `json:"ad"`
+	Skill string `json:"skill"`
+}
+
+func (q *Queries) RemoveSkillFromJob(ctx context.Context, arg RemoveSkillFromJobParams) error {
+	_, err := q.db.ExecContext(ctx, removeSkillFromJob, arg.Ad, arg.Skill)
+	return err
 }
 
 const softDeleteJob = `-- name: SoftDeleteJob :one

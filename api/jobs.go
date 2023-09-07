@@ -161,3 +161,127 @@ func (server *Server) deleteJob(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, job)
 }
+
+type addSkillToJobRequest struct {
+	JobID int32  `json:"id" binding:"required,min=1"`
+	Skill string `json:"skill" binding:"required,min=1"`
+}
+
+func (server *Server) addSkillToJob(ctx *gin.Context) {
+	var req addSkillToJobRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[addSkillToJobRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.AddSkillToJob(ctx, db.AddSkillToJobParams{
+		Ad:    req.JobID,
+		Skill: req.Skill,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		case *db.UniqueViolationError:
+			server.writeError(ctx, http.StatusConflict, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+type removeSkillFromJobRequest struct {
+	JobID int32  `json:"id" binding:"required,min=1"`
+	Skill string `json:"skill" binding:"required,min=1"`
+}
+
+func (server *Server) removeSkillFromJob(ctx *gin.Context) {
+	var req removeSkillFromJobRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[removeSkillFromJobRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.RemoveSkillFromJob(ctx, db.RemoveSkillFromJobParams{
+		Ad:    req.JobID,
+		Skill: req.Skill,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
+type addCityToJobRequest struct {
+	JobID int32  `json:"id" binding:"required,min=1"`
+	City  string `json:"city" binding:"required,min=1"`
+}
+
+func (server *Server) addCityToJob(ctx *gin.Context) {
+	var req addCityToJobRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[addCityToJobRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.AddCityToJob(ctx, db.AddCityToJobParams{
+		Ad:   req.JobID,
+		City: req.City,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		case *db.UniqueViolationError:
+			server.writeError(ctx, http.StatusConflict, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+type removeCityFromJobRequest struct {
+	JobID int32  `json:"id" binding:"required,min=1"`
+	City  string `json:"city" binding:"required,min=1"`
+}
+
+func (server *Server) removeCityFromJob(ctx *gin.Context) {
+	var req removeCityFromJobRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[removeCityFromJobRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.RemoveCityFromJob(ctx, db.RemoveCityFromJobParams{
+		Ad:   req.JobID,
+		City: req.City,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}

@@ -12,6 +12,34 @@ import (
 	"github.com/guregu/null/zero"
 )
 
+const addAudienceToEvent = `-- name: AddAudienceToEvent :exec
+INSERT INTO "event_audience_relation" ("event", "audience") VALUES ($1, $2) ON CONFLICT DO NOTHING
+`
+
+type AddAudienceToEventParams struct {
+	Event    int32 `json:"event"`
+	Audience int32 `json:"audience"`
+}
+
+func (q *Queries) AddAudienceToEvent(ctx context.Context, arg AddAudienceToEventParams) error {
+	_, err := q.db.ExecContext(ctx, addAudienceToEvent, arg.Event, arg.Audience)
+	return err
+}
+
+const addOrganizationToEvent = `-- name: AddOrganizationToEvent :exec
+INSERT INTO "event_organization_relation" ("event", "organization") VALUES ($1, $2) ON CONFLICT DO NOTHING
+`
+
+type AddOrganizationToEventParams struct {
+	Event        int32  `json:"event"`
+	Organization string `json:"organization"`
+}
+
+func (q *Queries) AddOrganizationToEvent(ctx context.Context, arg AddOrganizationToEventParams) error {
+	_, err := q.db.ExecContext(ctx, addOrganizationToEvent, arg.Event, arg.Organization)
+	return err
+}
+
 const createEvent = `-- name: CreateEvent :one
 
 INSERT INTO "event" (

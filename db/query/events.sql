@@ -78,3 +78,9 @@ SET
     "deleted_at" = now()
 WHERE "id" = sqlc.arg(id)::int
 RETURNING *;
+
+-- name: AddOrganizationToEvent :exec
+INSERT INTO "event_organization_relation" ("event", "organization") VALUES ($1, $2) ON CONFLICT DO NOTHING;
+
+-- name: AddAudienceToEvent :exec
+INSERT INTO "event_audience_relation" ("event", "audience") VALUES ($1, $2) ON CONFLICT DO NOTHING;

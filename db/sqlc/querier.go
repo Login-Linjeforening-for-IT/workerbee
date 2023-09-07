@@ -9,6 +9,10 @@ import (
 )
 
 type Querier interface {
+	AddAudienceToEvent(ctx context.Context, arg AddAudienceToEventParams) error
+	AddCityToJob(ctx context.Context, arg AddCityToJobParams) error
+	AddOrganizationToEvent(ctx context.Context, arg AddOrganizationToEventParams) error
+	AddSkillToJob(ctx context.Context, arg AddSkillToJobParams) error
 	// sqlc.embed(event)
 	CreateEvent(ctx context.Context, arg CreateEventParams) (Event, error)
 	CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvertisement, error)
@@ -34,6 +38,8 @@ type Querier interface {
 	GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]Organization, error)
 	GetRule(ctx context.Context, id int32) (Rule, error)
 	GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesRow, error)
+	RemoveCityFromJob(ctx context.Context, arg RemoveCityFromJobParams) error
+	RemoveSkillFromJob(ctx context.Context, arg RemoveSkillFromJobParams) error
 	SoftDeleteEvent(ctx context.Context, id int32) (Event, error)
 	SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement, error)
 	SoftDeleteLocation(ctx context.Context, id int32) (Location, error)

@@ -12,8 +12,8 @@ SELECT job."id", job."title_no", job."title_en",
 
 -- name: GetJob :one
 SELECT job.*, org."shortname", org."name_no", org."name_en", 
-		array(SELECT "skill" FROM "skill" WHERE "ad" = sqlc.arg('id')::int) AS skills,
-		array(SELECT "city" FROM "ad_city_relation" WHERE "ad" = sqlc.arg('id')::int) AS cities
+		array(SELECT "skill" FROM "skill" WHERE "ad" = sqlc.arg('id')::int)::varchar[] AS skills,
+		array(SELECT "city" FROM "ad_city_relation" WHERE "ad" = sqlc.arg('id')::int)::varchar[] AS cities
     FROM "job_advertisement" AS job
     INNER JOIN "organization" AS org ON job."organization" = org."shortname"
     WHERE job."id" = sqlc.arg('id')::int LIMIT 1;
@@ -55,3 +55,20 @@ UPDATE "job_advertisement"
 SET
     "deleted_at" = now()
 WHERE "id" = sqlc.arg('id')::int RETURNING *;
+
+-- name: AddCityToJob :exec
+INSERT INTO "ad_city_relation" ("ad", "city") VALUES ($1, $2) ON CONFLICT DO NOTHING;
+
+-- name: AddSkillToJob :exec
+INSERT INTO "skill" ("ad", "skill") VALUES ($1, $2) ON CONFLICT DO NOTHING;
+
+-- name: RemoveCityFromJob :exec
+DELETE FROM "ad_city_relation" WHERE "ad" = $1 AND "city" = $2;
+
+-- name: RemoveSkillFromJob :exec
+DELETE FROM "skill" WHERE "ad" = $1 AND "skill" = $2;
+
+-- -- name: RemoveSkillFromJob :one
+-- WITH deleted AS (
+--     DELETE FROM "skill" WHERE "ad" = $1 AND "skill" = $2 RETURNING *
+-- ) SELECT COUNT(*) FROM deleted LIMIT 1;

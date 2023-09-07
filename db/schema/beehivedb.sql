@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-05T14:45:32.301Z
+-- Generated at: 2023-09-06T23:02:35.301Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -160,7 +160,8 @@ CREATE TABLE "job_advertisement" (
 
 CREATE TABLE "ad_city_relation" (
   "ad" int NOT NULL,
-  "city" varchar NOT NULL
+  "city" varchar NOT NULL,
+  PRIMARY KEY ("ad", "city")
 );
 
 CREATE TABLE "city" (
@@ -234,8 +235,6 @@ CREATE INDEX ON "job_advertisement" ("deleted_at");
 CREATE INDEX ON "ad_city_relation" ("ad");
 
 CREATE INDEX ON "ad_city_relation" ("city");
-
-CREATE INDEX ON "ad_city_relation" ("ad", "city");
 
 CREATE INDEX ON "skill" ("ad");
 
