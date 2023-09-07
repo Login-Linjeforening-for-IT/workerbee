@@ -63,10 +63,10 @@ INSERT INTO "ad_city_relation" ("ad", "city") VALUES ($1, $2) ON CONFLICT DO NOT
 INSERT INTO "skill" ("ad", "skill") VALUES ($1, $2) ON CONFLICT DO NOTHING;
 
 -- name: RemoveCityFromJob :exec
-DELETE FROM "ad_city_relation" WHERE "ad" = $1 AND "city" = $2;
+DELETE FROM "ad_city_relation" WHERE ("ad", "city") = (sqlc.arg('ad')::int, sqlc.arg('city')::varchar);
 
 -- name: RemoveSkillFromJob :exec
-DELETE FROM "skill" WHERE "ad" = $1 AND "skill" = $2;
+DELETE FROM "skill" WHERE ("ad", "skill") = (sqlc.arg('ad')::int, sqlc.arg('skill')::varchar);
 
 -- -- name: RemoveSkillFromJob :one
 -- WITH deleted AS (

@@ -292,6 +292,34 @@ func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEven
 	return items, nil
 }
 
+const removeAudienceFromEvent = `-- name: RemoveAudienceFromEvent :exec
+DELETE FROM "event_audience_relation" WHERE ("event", "audience") = ($1::int, $2::int)
+`
+
+type RemoveAudienceFromEventParams struct {
+	Event    int32 `json:"event"`
+	Audience int32 `json:"audience"`
+}
+
+func (q *Queries) RemoveAudienceFromEvent(ctx context.Context, arg RemoveAudienceFromEventParams) error {
+	_, err := q.db.ExecContext(ctx, removeAudienceFromEvent, arg.Event, arg.Audience)
+	return err
+}
+
+const removeOrganizationFromEvent = `-- name: RemoveOrganizationFromEvent :exec
+DELETE FROM "event_organization_relation" WHERE ("event", "organization") = ($1::int, $2::varchar)
+`
+
+type RemoveOrganizationFromEventParams struct {
+	Event        int32  `json:"event"`
+	Organization string `json:"organization"`
+}
+
+func (q *Queries) RemoveOrganizationFromEvent(ctx context.Context, arg RemoveOrganizationFromEventParams) error {
+	_, err := q.db.ExecContext(ctx, removeOrganizationFromEvent, arg.Event, arg.Organization)
+	return err
+}
+
 const softDeleteEvent = `-- name: SoftDeleteEvent :one
 UPDATE "event"
 SET

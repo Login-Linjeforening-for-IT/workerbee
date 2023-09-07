@@ -84,3 +84,9 @@ INSERT INTO "event_organization_relation" ("event", "organization") VALUES ($1, 
 
 -- name: AddAudienceToEvent :exec
 INSERT INTO "event_audience_relation" ("event", "audience") VALUES ($1, $2) ON CONFLICT DO NOTHING;
+
+-- name: RemoveOrganizationFromEvent :exec
+DELETE FROM "event_organization_relation" WHERE ("event", "organization") = (sqlc.arg('event')::int, sqlc.arg('organization')::varchar);
+
+-- name: RemoveAudienceFromEvent :exec
+DELETE FROM "event_audience_relation" WHERE ("event", "audience") = (sqlc.arg('event')::int, sqlc.arg('audience')::int);

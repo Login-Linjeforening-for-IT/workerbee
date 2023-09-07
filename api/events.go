@@ -209,3 +209,127 @@ func (server *Server) deleteEvent(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, event)
 }
+
+type addOrganizationToEventRequest struct {
+	Event        int32  `json:"event" binding:"required,min=1"`
+	Organization string `json:"organization" binding:"required"`
+}
+
+func (server *Server) addOrganizationToEvent(ctx *gin.Context) {
+	var req addOrganizationToEventRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[addOrganizationToEventRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.AddOrganizationToEvent(ctx, db.AddOrganizationToEventParams{
+		Event:        req.Event,
+		Organization: req.Organization,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		case *db.UniqueViolationError:
+			server.writeError(ctx, http.StatusConflict, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+type removeOrganizationFromEventRequest struct {
+	Event        int32  `json:"event" binding:"required,min=1"`
+	Organization string `json:"organization" binding:"required"`
+}
+
+func (server *Server) removeOrganizationFromEvent(ctx *gin.Context) {
+	var req removeOrganizationFromEventRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[removeOrganizationFromEventRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.RemoveOrganizationFromEvent(ctx, db.RemoveOrganizationFromEventParams{
+		Event:        req.Event,
+		Organization: req.Organization,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+type addAudienceToEventRequest struct {
+	Event    int32 `json:"event" binding:"required,min=1"`
+	Audience int32 `json:"audience" binding:"required,min=1"`
+}
+
+func (server *Server) addAudienceToEvent(ctx *gin.Context) {
+	var req addAudienceToEventRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[addAudienceToEventRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.AddAudienceToEvent(ctx, db.AddAudienceToEventParams{
+		Event:    req.Event,
+		Audience: req.Audience,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		case *db.UniqueViolationError:
+			server.writeError(ctx, http.StatusConflict, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+type removeAudienceFromEventRequest struct {
+	Event    int32 `json:"event" binding:"required,min=1"`
+	Audience int32 `json:"audience" binding:"required,min=1"`
+}
+
+func (server *Server) removeAudienceFromEvent(ctx *gin.Context) {
+	var req removeAudienceFromEventRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		writeValidationError[removeAudienceFromEventRequest](server, ctx, err)
+		return
+	}
+
+	err := server.service.RemoveAudienceFromEvent(ctx, db.RemoveAudienceFromEventParams{
+		Event:    req.Event,
+		Audience: req.Audience,
+	})
+	err = db.ParseError(err)
+	if err != nil {
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

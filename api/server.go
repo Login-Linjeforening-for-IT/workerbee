@@ -57,11 +57,11 @@ func (server *Server) initRouter() {
 			events.PATCH("/", server.updateEvent)
 			events.DELETE("/:id", server.deleteEvent)
 
-			// events.POST("/organizations", server.addOrganizationToEvent)
-			// events.DELETE("/:id/organizations/:shortname", server.removeOrganizationFromEvent)
+			events.POST("/organizations", server.addOrganizationToEvent)
+			events.DELETE("/organizations", server.removeOrganizationFromEvent)
 
-			// events.POST("/categories", server.addCategoryToEvent)
-			// events.DELETE("/:id/categories/:id", server.removeCategoryFromEvent)
+			events.POST("/audiences", server.addAudienceToEvent)
+			events.DELETE("/audiences", server.removeAudienceFromEvent)
 		}
 
 		rules := api.Group("/rules")

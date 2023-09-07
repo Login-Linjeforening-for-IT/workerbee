@@ -38,7 +38,9 @@ type Querier interface {
 	GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]Organization, error)
 	GetRule(ctx context.Context, id int32) (Rule, error)
 	GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesRow, error)
+	RemoveAudienceFromEvent(ctx context.Context, arg RemoveAudienceFromEventParams) error
 	RemoveCityFromJob(ctx context.Context, arg RemoveCityFromJobParams) error
+	RemoveOrganizationFromEvent(ctx context.Context, arg RemoveOrganizationFromEventParams) error
 	RemoveSkillFromJob(ctx context.Context, arg RemoveSkillFromJobParams) error
 	SoftDeleteEvent(ctx context.Context, id int32) (Event, error)
 	SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement, error)

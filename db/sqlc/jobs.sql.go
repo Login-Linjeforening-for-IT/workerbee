@@ -256,7 +256,7 @@ func (q *Queries) GetJobs(ctx context.Context, arg GetJobsParams) ([]GetJobsRow,
 }
 
 const removeCityFromJob = `-- name: RemoveCityFromJob :exec
-DELETE FROM "ad_city_relation" WHERE "ad" = $1 AND "city" = $2
+DELETE FROM "ad_city_relation" WHERE ("ad", "city") = ($1::int, $2::varchar)
 `
 
 type RemoveCityFromJobParams struct {
@@ -270,7 +270,7 @@ func (q *Queries) RemoveCityFromJob(ctx context.Context, arg RemoveCityFromJobPa
 }
 
 const removeSkillFromJob = `-- name: RemoveSkillFromJob :exec
-DELETE FROM "skill" WHERE "ad" = $1 AND "skill" = $2
+DELETE FROM "skill" WHERE ("ad", "skill") = ($1::int, $2::varchar)
 `
 
 type RemoveSkillFromJobParams struct {
