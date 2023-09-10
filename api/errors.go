@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -100,6 +101,20 @@ func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 	}
 
 	ctx.JSON(status, newErrorResponse(status, err))
+}
+
+// writeDBError checks error type and writes appropriate error response
+// extracted from a lot of duplicated code
+// should do db.ParseError first to get the correct error type
+func (server *Server) writeDBError(ctx *gin.Context, err error) {
+	switch err.(type) {
+	case *db.ForeignKeyViolationError, *db.NotFoundError:
+		server.writeError(ctx, http.StatusNotFound, err)
+	case *db.UniqueViolationError:
+		server.writeError(ctx, http.StatusConflict, err)
+	default:
+		server.writeError(ctx, http.StatusInternalServerError, err)
+	}
 }
 
 // If error is not a validation error, this functions as an alias for server.writeError(ctx, http.StatusBadRequest, err)

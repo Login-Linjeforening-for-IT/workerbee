@@ -76,9 +76,9 @@ func (server *Server) createOrganization(ctx *gin.Context) {
 		NameNo:    req.NameNo,
 		NameEn:    req.NameEn,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		// TODO: Check for duplicate
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -100,13 +100,9 @@ func (server *Server) updateOrganization(ctx *gin.Context) {
 	req.UpdateOrganizationParams.Shortname = req.Shortname
 
 	organization, err := server.service.UpdateOrganization(ctx, req.UpdateOrganizationParams)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -125,13 +121,9 @@ func (server *Server) deleteOrganization(ctx *gin.Context) {
 	}
 
 	organization, err := server.service.SoftDeleteOrganization(ctx, req.Shortname)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 

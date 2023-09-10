@@ -68,7 +68,6 @@ type createRuleRequest struct {
 func (server *Server) createRule(ctx *gin.Context) {
 	var req createRuleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		// server.writeError(ctx, http.StatusBadRequest, err)
 		writeValidationError[createEventRequest](server, ctx, err)
 		return
 	}
@@ -79,8 +78,9 @@ func (server *Server) createRule(ctx *gin.Context) {
 		DescriptionNo: req.DescriptionNo,
 		DescriptionEn: req.DescriptionEn,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -102,13 +102,9 @@ func (server *Server) updateRule(ctx *gin.Context) {
 	req.UpdateRuleParams.ID = req.ID
 
 	rule, err := server.service.UpdateRule(ctx, req.UpdateRuleParams)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -127,13 +123,9 @@ func (server *Server) deleteRule(ctx *gin.Context) {
 	}
 
 	rule, err := server.service.SoftDeleteRule(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 

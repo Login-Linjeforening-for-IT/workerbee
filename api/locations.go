@@ -119,8 +119,9 @@ func (server *Server) createLocation(ctx *gin.Context) {
 		MazemapCampusID: req.MazemapCampusID,
 		MazemapPoiID:    req.MazemapPOIID,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -142,13 +143,9 @@ func (server *Server) updateLocation(ctx *gin.Context) {
 	req.UpdateLocationParams.ID = req.ID
 
 	location, err := server.service.UpdateLocation(ctx, req.UpdateLocationParams)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -167,13 +164,9 @@ func (server *Server) deleteLocation(ctx *gin.Context) {
 	}
 
 	location, err := server.service.SoftDeleteLocation(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 

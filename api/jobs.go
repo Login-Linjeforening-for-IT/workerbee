@@ -101,10 +101,11 @@ func (server *Server) createJob(ctx *gin.Context) {
 		ApplicationDeadline: req.ApplicationDeadline,
 		BannerImage:         req.BannerImage,
 		Organization:        req.Organization,
-		// ApplicationURL:      req.ApplicationURL.String,
+		ApplicationUrl:      req.ApplicationURL.String,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -124,13 +125,9 @@ func (server *Server) updateJob(ctx *gin.Context) {
 	}
 
 	job, err := server.service.UpdateJob(ctx, req.UpdateJobParams)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -149,13 +146,9 @@ func (server *Server) deleteJob(ctx *gin.Context) {
 	}
 
 	job, err := server.service.SoftDeleteJob(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -180,14 +173,7 @@ func (server *Server) addSkillToJob(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		case *db.UniqueViolationError:
-			server.writeError(ctx, http.StatusConflict, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -212,12 +198,7 @@ func (server *Server) removeSkillFromJob(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -242,14 +223,7 @@ func (server *Server) addCityToJob(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		case *db.UniqueViolationError:
-			server.writeError(ctx, http.StatusConflict, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -274,12 +248,7 @@ func (server *Server) removeCityFromJob(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 

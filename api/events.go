@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 	"time"
 
@@ -146,9 +147,16 @@ func (server *Server) createEvent(ctx *gin.Context) {
 		Parent:             req.Parent,
 		Rule:               req.Rule,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		// TODO: check duplicate (should not be possible), bad values, etc.
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		case *db.UniqueViolationError:
+			server.writeError(ctx, http.StatusConflict, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
 		return
 	}
 
@@ -167,17 +175,22 @@ func (server *Server) updateEvent(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: Check enum validity
+	if req.TimeType.Valid && !db.IsValidTimeTypeEnum(req.TimeType.TimeTypeEnum) {
+		server.writeError(ctx, http.StatusBadRequest, errors.New("invalid time type"))
+		return
+	}
 
 	req.UpdateEventParams.ID = req.ID
 
 	event, err := server.service.UpdateEvent(ctx, req.UpdateEventParams)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
+		switch err.(type) {
+		case *db.ForeignKeyViolationError, *db.NotFoundError:
 			server.writeError(ctx, http.StatusNotFound, err)
 		default:
 			server.writeError(ctx, http.StatusInternalServerError, err)
+
 		}
 		return
 	}
