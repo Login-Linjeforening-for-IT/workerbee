@@ -22,10 +22,10 @@ func NewService(store db.Store) Service {
 }
 
 type EventDetails struct {
-	Event         db.Event          `json:"event"`
-	Category      db.Category       `json:"category"`
-	Rule          *db.Rule          `json:"rule,omitempty"`
-	Location      *db.Location      `json:"location,omitempty"`
-	Organizations []db.Organization `json:"organizations"`
-	Audiences     []db.Audience     `json:"audiences"`
+	Event         db.Event                        `json:"event"`
+	Category      db.Category                     `json:"category"`
+	Rule          *db.Rule                        `json:"rule,omitempty"`
+	Location      *db.Location                    `json:"location,omitempty"`
+	Organizations []db.GetOrganizationsOfEventRow `json:"organizations"`
+	Audiences     []db.Audience                   `json:"audiences"`
 }

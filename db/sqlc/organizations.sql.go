@@ -93,7 +93,7 @@ func (q *Queries) GetOrganization(ctx context.Context, shortname string) (Organi
 }
 
 const getOrganizations = `-- name: GetOrganizations :many
-SELECT "shortname", "name_no", "name_en", "link_homepage", "logo", "updated_at", "deleted_at" IS NOT NULL AS "is_deleted"
+SELECT "shortname", "name_no", "name_en", "link_homepage", "logo", "updated_at", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
 FROM "organization"
 ORDER BY "shortname"
 LIMIT $2::int
@@ -112,7 +112,7 @@ type GetOrganizationsRow struct {
 	LinkHomepage zero.String `json:"link_homepage"`
 	Logo         zero.String `json:"logo"`
 	UpdatedAt    time.Time   `json:"updated_at"`
-	IsDeleted    interface{} `json:"is_deleted"`
+	IsDeleted    bool        `json:"is_deleted"`
 }
 
 func (q *Queries) GetOrganizations(ctx context.Context, arg GetOrganizationsParams) ([]GetOrganizationsRow, error) {
@@ -147,7 +147,7 @@ func (q *Queries) GetOrganizations(ctx context.Context, arg GetOrganizationsPara
 }
 
 const getOrganizationsOfEvent = `-- name: GetOrganizationsOfEvent :many
-SELECT org.shortname, org.name_no, org.name_en, org.description_no, org.description_en, org.link_homepage, org.link_linkedin, org.link_facebook, org.link_instagram, org.logo, org.updated_at, org.created_at, org.deleted_at, "deleted_at" IS NOT NULL AS "is_deleted" FROM "event_organization_relation"
+SELECT org.shortname, org.name_no, org.name_en, org.description_no, org.description_en, org.link_homepage, org.link_linkedin, org.link_facebook, org.link_instagram, org.logo, org.updated_at, org.created_at, org.deleted_at, ("deleted_at" IS NOT NULL)::bool AS "is_deleted" FROM "event_organization_relation"
     INNER JOIN "organization" AS org ON "event_organization_relation"."organization" = org."shortname"
     WHERE "event_organization_relation"."event" = $1::int
 `
@@ -166,7 +166,7 @@ type GetOrganizationsOfEventRow struct {
 	UpdatedAt     time.Time   `json:"updated_at"`
 	CreatedAt     time.Time   `json:"created_at"`
 	DeletedAt     zero.Time   `json:"deleted_at"`
-	IsDeleted     interface{} `json:"is_deleted"`
+	IsDeleted     bool        `json:"is_deleted"`
 }
 
 func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]GetOrganizationsOfEventRow, error) {

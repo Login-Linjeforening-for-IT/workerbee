@@ -1,10 +1,10 @@
 -- name: GetOrganizationsOfEvent :many
-SELECT org.*, "deleted_at" IS NOT NULL AS "is_deleted" FROM "event_organization_relation"
+SELECT org.*, ("deleted_at" IS NOT NULL)::bool AS "is_deleted" FROM "event_organization_relation"
     INNER JOIN "organization" AS org ON "event_organization_relation"."organization" = org."shortname"
     WHERE "event_organization_relation"."event" = sqlc.arg('event_id')::int;
 
 -- name: GetOrganizations :many
-SELECT "shortname", "name_no", "name_en", "link_homepage", "logo", "updated_at", "deleted_at" IS NOT NULL AS "is_deleted"
+SELECT "shortname", "name_no", "name_en", "link_homepage", "logo", "updated_at", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
 FROM "organization"
 ORDER BY "shortname"
 LIMIT sqlc.arg('limit')::int

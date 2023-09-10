@@ -2,7 +2,7 @@
 SELECT * FROM "rule" WHERE "id" = sqlc.arg('id')::int LIMIT 1;
 
 -- name: GetRules :many
-SELECT "id", "name_no", "name_en", "deleted_at" IS NOT NULL AS "is_deleted" FROM "rule"
+SELECT "id", "name_no", "name_en", ("deleted_at" IS NOT NULL)::bool AS "is_deleted" FROM "rule"
     LIMIT sqlc.arg('limit')::int
     OFFSET sqlc.arg('offset')::int;
 

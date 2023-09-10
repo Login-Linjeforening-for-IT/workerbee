@@ -74,7 +74,7 @@ func (q *Queries) CreateLocation(ctx context.Context, arg CreateLocationParams) 
 const getAddressLocations = `-- name: GetAddressLocations :many
 SELECT "id", "name_no", "name_en", 
         "address_street", "address_postcode", "city_name",
-        "updated_at", "url", "deleted_at" IS NOT NULL AS "is_deleted"
+        "updated_at", "url", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
     FROM "location"
     WHERE "type" = 'address'
     LIMIT $2::int
@@ -95,7 +95,7 @@ type GetAddressLocationsRow struct {
 	CityName        zero.String `json:"city_name"`
 	UpdatedAt       time.Time   `json:"updated_at"`
 	Url             zero.String `json:"url"`
-	IsDeleted       interface{} `json:"is_deleted"`
+	IsDeleted       bool        `json:"is_deleted"`
 }
 
 func (q *Queries) GetAddressLocations(ctx context.Context, arg GetAddressLocationsParams) ([]GetAddressLocationsRow, error) {
@@ -134,7 +134,7 @@ func (q *Queries) GetAddressLocations(ctx context.Context, arg GetAddressLocatio
 const getCoordsLocations = `-- name: GetCoordsLocations :many
 SELECT "id", "name_no", "name_en", 
         "coordinate_lat", "coordinate_long",
-        "updated_at", "url", "deleted_at" IS NOT NULL AS "is_deleted"
+        "updated_at", "url", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
     FROM "location"
     WHERE "type" = 'coords'
     LIMIT $2::int
@@ -154,7 +154,7 @@ type GetCoordsLocationsRow struct {
 	CoordinateLong zero.Float  `json:"coordinate_long"`
 	UpdatedAt      time.Time   `json:"updated_at"`
 	Url            zero.String `json:"url"`
-	IsDeleted      interface{} `json:"is_deleted"`
+	IsDeleted      bool        `json:"is_deleted"`
 }
 
 func (q *Queries) GetCoordsLocations(ctx context.Context, arg GetCoordsLocationsParams) ([]GetCoordsLocationsRow, error) {
@@ -217,7 +217,7 @@ func (q *Queries) GetLocation(ctx context.Context, id int32) (Location, error) {
 }
 
 const getLocations = `-- name: GetLocations :many
-SELECT id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at, "deleted_at" IS NOT NULL AS "is_deleted" FROM "location"
+SELECT id, name_no, name_en, type, mazemap_campus_id, mazemap_poi_id, address_street, address_postcode, city_name, coordinate_lat, coordinate_long, url, updated_at, created_at, deleted_at, ("deleted_at" IS NOT NULL)::bool AS "is_deleted" FROM "location"
     LIMIT $2::int
     OFFSET $1::int
 `
@@ -243,7 +243,7 @@ type GetLocationsRow struct {
 	UpdatedAt       time.Time    `json:"updated_at"`
 	CreatedAt       time.Time    `json:"created_at"`
 	DeletedAt       zero.Time    `json:"deleted_at"`
-	IsDeleted       interface{}  `json:"is_deleted"`
+	IsDeleted       bool         `json:"is_deleted"`
 }
 
 func (q *Queries) GetLocations(ctx context.Context, arg GetLocationsParams) ([]GetLocationsRow, error) {
@@ -289,7 +289,7 @@ func (q *Queries) GetLocations(ctx context.Context, arg GetLocationsParams) ([]G
 const getMazemapLocations = `-- name: GetMazemapLocations :many
 SELECT "id", "name_no", "name_en", 
         "mazemap_campus_id", "mazemap_poi_id",
-        "updated_at", "url", "deleted_at" IS NOT NULL AS "is_deleted"
+        "updated_at", "url", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
     FROM "location"
     WHERE "type" = 'mazemap'
     LIMIT $2::int
@@ -309,7 +309,7 @@ type GetMazemapLocationsRow struct {
 	MazemapPoiID    zero.Int    `json:"mazemap_poi_id"`
 	UpdatedAt       time.Time   `json:"updated_at"`
 	Url             zero.String `json:"url"`
-	IsDeleted       interface{} `json:"is_deleted"`
+	IsDeleted       bool        `json:"is_deleted"`
 }
 
 func (q *Queries) GetMazemapLocations(ctx context.Context, arg GetMazemapLocationsParams) ([]GetMazemapLocationsRow, error) {

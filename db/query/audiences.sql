@@ -4,7 +4,7 @@ SELECT aud.* FROM "event_audience_relation"
     WHERE "event_audience_relation"."event" = sqlc.arg('event_id')::int;
 
 -- name: GetAudiences :many
-SELECT "id", "name_no", "name_en", "deleted_at" IS NOT NULL AS "is_deleted"
+SELECT "id", "name_no", "name_en", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
     FROM "audience" ORDER BY "id";
 
 -- name: GetAudience :one

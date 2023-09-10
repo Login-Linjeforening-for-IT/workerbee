@@ -12,7 +12,7 @@ import (
 )
 
 const getCategories = `-- name: GetCategories :many
-SELECT "id", "color", "name_no", "name_en", "deleted_at" IS NOT NULL AS "is_deleted"
+SELECT "id", "color", "name_no", "name_en", ("deleted_at" IS NOT NULL)::bool AS "is_deleted"
     FROM "category" ORDER BY "id"
 `
 
@@ -21,7 +21,7 @@ type GetCategoriesRow struct {
 	Color     string      `json:"color"`
 	NameNo    string      `json:"name_no"`
 	NameEn    zero.String `json:"name_en"`
-	IsDeleted interface{} `json:"is_deleted"`
+	IsDeleted bool        `json:"is_deleted"`
 }
 
 func (q *Queries) GetCategories(ctx context.Context) ([]GetCategoriesRow, error) {

@@ -212,7 +212,7 @@ SELECT e."id", e."visible",
         -- TODO: Add audience
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
         -- TODO: Add organizer
-        e."updated_at", e."deleted_at" IS NOT NULL AS is_deleted
+        e."updated_at", (e."deleted_at" IS NOT NULL)::bool AS is_deleted
         -- deleted_at == null => is_deleted == false
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
@@ -247,7 +247,7 @@ type GetEventsRow struct {
 	LocationNameNo zero.String  `json:"location_name_no"`
 	LocationNameEn zero.String  `json:"location_name_en"`
 	UpdatedAt      time.Time    `json:"updated_at"`
-	IsDeleted      interface{}  `json:"is_deleted"`
+	IsDeleted      bool         `json:"is_deleted"`
 }
 
 func (q *Queries) GetEvents(ctx context.Context, arg GetEventsParams) ([]GetEventsRow, error) {

@@ -7,7 +7,7 @@ SELECT e."id", e."visible",
         -- TODO: Add audience
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
         -- TODO: Add organizer
-        e."updated_at", e."deleted_at" IS NOT NULL AS is_deleted
+        e."updated_at", (e."deleted_at" IS NOT NULL)::bool AS is_deleted
         -- deleted_at == null => is_deleted == false
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
