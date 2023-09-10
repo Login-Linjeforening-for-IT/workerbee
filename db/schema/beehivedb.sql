@@ -1,11 +1,12 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-06T23:02:35.301Z
+-- Generated at: 2023-09-10T23:38:48.889Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
   'no_end',
-  'whole_day'
+  'whole_day',
+  'tbd'
 );
 
 CREATE TYPE "location_type" AS ENUM (

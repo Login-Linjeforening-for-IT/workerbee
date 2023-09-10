@@ -8,7 +8,7 @@ import (
 
 func IsValidTimeTypeEnum[T ~string](t T) bool {
 	switch TimeTypeEnum(t) {
-	case TimeTypeEnumDefault, TimeTypeEnumWholeDay, TimeTypeEnumNoEnd:
+	case TimeTypeEnumDefault, TimeTypeEnumWholeDay, TimeTypeEnumNoEnd, TimeTypeEnumTbd:
 		return true
 	default:
 		return false

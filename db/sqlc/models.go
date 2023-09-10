@@ -106,6 +106,7 @@ const (
 	TimeTypeEnumDefault  TimeTypeEnum = "default"
 	TimeTypeEnumNoEnd    TimeTypeEnum = "no_end"
 	TimeTypeEnumWholeDay TimeTypeEnum = "whole_day"
+	TimeTypeEnumTbd      TimeTypeEnum = "tbd"
 )
 
 func (e *TimeTypeEnum) Scan(src interface{}) error {
