@@ -31,11 +31,11 @@ type Querier interface {
 	GetJob(ctx context.Context, id int32) (GetJobRow, error)
 	GetJobs(ctx context.Context, arg GetJobsParams) ([]GetJobsRow, error)
 	GetLocation(ctx context.Context, id int32) (Location, error)
-	GetLocations(ctx context.Context, arg GetLocationsParams) ([]Location, error)
+	GetLocations(ctx context.Context, arg GetLocationsParams) ([]GetLocationsRow, error)
 	GetMazemapLocations(ctx context.Context, arg GetMazemapLocationsParams) ([]GetMazemapLocationsRow, error)
 	GetOrganization(ctx context.Context, shortname string) (Organization, error)
 	GetOrganizations(ctx context.Context, arg GetOrganizationsParams) ([]GetOrganizationsRow, error)
-	GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]Organization, error)
+	GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]GetOrganizationsOfEventRow, error)
 	GetRule(ctx context.Context, id int32) (Rule, error)
 	GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesRow, error)
 	RemoveAudienceFromEvent(ctx context.Context, arg RemoveAudienceFromEventParams) error

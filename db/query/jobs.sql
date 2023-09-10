@@ -2,7 +2,7 @@
 SELECT job."id", job."title_no", job."title_en", 
         job."position_title_no", job."position_title_en",
         job."job_type", job."time_publish", job."application_deadline",
-        job."application_url", job."updated_at", job."deleted_at", job."visible",
+        job."application_url", job."updated_at", job."visible", job."deleted_at", job."deleted_at" IS NOT NULL AS "is_deleted",
         org."name_no", org."name_en"
     FROM "job_advertisement" AS job
     INNER JOIN "organization" AS org ON job."organization" = org."id"
@@ -53,7 +53,8 @@ WHERE "id" = sqlc.arg('id')::int RETURNING *;
 -- name: SoftDeleteJob :one
 UPDATE "job_advertisement"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "id" = sqlc.arg('id')::int RETURNING *;
 
 -- name: AddCityToJob :exec

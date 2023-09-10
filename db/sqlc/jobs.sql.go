@@ -186,7 +186,7 @@ const getJobs = `-- name: GetJobs :many
 SELECT job."id", job."title_no", job."title_en", 
         job."position_title_no", job."position_title_en",
         job."job_type", job."time_publish", job."application_deadline",
-        job."application_url", job."updated_at", job."deleted_at", job."visible",
+        job."application_url", job."updated_at", job."visible", job."deleted_at", job."deleted_at" IS NOT NULL AS "is_deleted",
         org."name_no", org."name_en"
     FROM "job_advertisement" AS job
     INNER JOIN "organization" AS org ON job."organization" = org."id"
@@ -211,8 +211,9 @@ type GetJobsRow struct {
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	ApplicationUrl      string      `json:"application_url"`
 	UpdatedAt           time.Time   `json:"updated_at"`
-	DeletedAt           zero.Time   `json:"deleted_at"`
 	Visible             bool        `json:"visible"`
+	DeletedAt           zero.Time   `json:"deleted_at"`
+	IsDeleted           interface{} `json:"is_deleted"`
 	NameNo              string      `json:"name_no"`
 	NameEn              zero.String `json:"name_en"`
 }
@@ -237,8 +238,9 @@ func (q *Queries) GetJobs(ctx context.Context, arg GetJobsParams) ([]GetJobsRow,
 			&i.ApplicationDeadline,
 			&i.ApplicationUrl,
 			&i.UpdatedAt,
-			&i.DeletedAt,
 			&i.Visible,
+			&i.DeletedAt,
+			&i.IsDeleted,
 			&i.NameNo,
 			&i.NameEn,
 		); err != nil {
@@ -286,7 +288,8 @@ func (q *Queries) RemoveSkillFromJob(ctx context.Context, arg RemoveSkillFromJob
 const softDeleteJob = `-- name: SoftDeleteJob :one
 UPDATE "job_advertisement"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "id" = $1::int RETURNING id, visible, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 

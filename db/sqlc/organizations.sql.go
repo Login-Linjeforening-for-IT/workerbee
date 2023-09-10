@@ -93,7 +93,7 @@ func (q *Queries) GetOrganization(ctx context.Context, shortname string) (Organi
 }
 
 const getOrganizations = `-- name: GetOrganizations :many
-SELECT "shortname", "name_no", "name_en", "link_homepage", "logo", "updated_at", "deleted_at"
+SELECT "shortname", "name_no", "name_en", "link_homepage", "logo", "updated_at", "deleted_at" IS NOT NULL AS "is_deleted"
 FROM "organization"
 ORDER BY "shortname"
 LIMIT $2::int
@@ -112,7 +112,7 @@ type GetOrganizationsRow struct {
 	LinkHomepage zero.String `json:"link_homepage"`
 	Logo         zero.String `json:"logo"`
 	UpdatedAt    time.Time   `json:"updated_at"`
-	DeletedAt    zero.Time   `json:"deleted_at"`
+	IsDeleted    interface{} `json:"is_deleted"`
 }
 
 func (q *Queries) GetOrganizations(ctx context.Context, arg GetOrganizationsParams) ([]GetOrganizationsRow, error) {
@@ -131,7 +131,7 @@ func (q *Queries) GetOrganizations(ctx context.Context, arg GetOrganizationsPara
 			&i.LinkHomepage,
 			&i.Logo,
 			&i.UpdatedAt,
-			&i.DeletedAt,
+			&i.IsDeleted,
 		); err != nil {
 			return nil, err
 		}
@@ -147,20 +147,37 @@ func (q *Queries) GetOrganizations(ctx context.Context, arg GetOrganizationsPara
 }
 
 const getOrganizationsOfEvent = `-- name: GetOrganizationsOfEvent :many
-SELECT org.shortname, org.name_no, org.name_en, org.description_no, org.description_en, org.link_homepage, org.link_linkedin, org.link_facebook, org.link_instagram, org.logo, org.updated_at, org.created_at, org.deleted_at FROM "event_organization_relation"
+SELECT org.shortname, org.name_no, org.name_en, org.description_no, org.description_en, org.link_homepage, org.link_linkedin, org.link_facebook, org.link_instagram, org.logo, org.updated_at, org.created_at, org.deleted_at, "deleted_at" IS NOT NULL AS "is_deleted" FROM "event_organization_relation"
     INNER JOIN "organization" AS org ON "event_organization_relation"."organization" = org."shortname"
     WHERE "event_organization_relation"."event" = $1::int
 `
 
-func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]Organization, error) {
+type GetOrganizationsOfEventRow struct {
+	Shortname     string      `json:"shortname"`
+	NameNo        string      `json:"name_no"`
+	NameEn        zero.String `json:"name_en"`
+	DescriptionNo string      `json:"description_no"`
+	DescriptionEn zero.String `json:"description_en"`
+	LinkHomepage  zero.String `json:"link_homepage"`
+	LinkLinkedin  zero.String `json:"link_linkedin"`
+	LinkFacebook  zero.String `json:"link_facebook"`
+	LinkInstagram zero.String `json:"link_instagram"`
+	Logo          zero.String `json:"logo"`
+	UpdatedAt     time.Time   `json:"updated_at"`
+	CreatedAt     time.Time   `json:"created_at"`
+	DeletedAt     zero.Time   `json:"deleted_at"`
+	IsDeleted     interface{} `json:"is_deleted"`
+}
+
+func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([]GetOrganizationsOfEventRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOrganizationsOfEvent, eventID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Organization{}
+	items := []GetOrganizationsOfEventRow{}
 	for rows.Next() {
-		var i Organization
+		var i GetOrganizationsOfEventRow
 		if err := rows.Scan(
 			&i.Shortname,
 			&i.NameNo,
@@ -175,6 +192,7 @@ func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([
 			&i.UpdatedAt,
 			&i.CreatedAt,
 			&i.DeletedAt,
+			&i.IsDeleted,
 		); err != nil {
 			return nil, err
 		}
@@ -192,7 +210,8 @@ func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([
 const softDeleteOrganization = `-- name: SoftDeleteOrganization :one
 UPDATE "organization"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "shortname" = $1::text RETURNING shortname, name_no, name_en, description_no, description_en, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
 `
 

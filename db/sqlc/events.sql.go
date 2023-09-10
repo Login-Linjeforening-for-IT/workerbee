@@ -323,7 +323,8 @@ func (q *Queries) RemoveOrganizationFromEvent(ctx context.Context, arg RemoveOrg
 const softDeleteEvent = `-- name: SoftDeleteEvent :one
 UPDATE "event"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "id" = $1::int
 RETURNING id, visible, name_no, name_en, description_no, description_en, informational_no, informational_en, time_type, time_start, time_end, time_publish, time_signup_release, time_signup_deadline, canceled, digital, highlight, image_small, image_banner, link_facebook, link_discord, link_signup, link_stream, capacity, "full", category, location, parent, rule, updated_at, created_at, deleted_at
 `

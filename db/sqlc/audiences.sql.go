@@ -32,13 +32,15 @@ func (q *Queries) GetAudience(ctx context.Context, id int32) (Audience, error) {
 }
 
 const getAudiences = `-- name: GetAudiences :many
-SELECT "id", "name_no", "name_en" FROM "audience" ORDER BY "id"
+SELECT "id", "name_no", "name_en", "deleted_at" IS NOT NULL AS "is_deleted"
+    FROM "audience" ORDER BY "id"
 `
 
 type GetAudiencesRow struct {
-	ID     int32       `json:"id"`
-	NameNo string      `json:"name_no"`
-	NameEn zero.String `json:"name_en"`
+	ID        int32       `json:"id"`
+	NameNo    string      `json:"name_no"`
+	NameEn    zero.String `json:"name_en"`
+	IsDeleted interface{} `json:"is_deleted"`
 }
 
 func (q *Queries) GetAudiences(ctx context.Context) ([]GetAudiencesRow, error) {
@@ -50,7 +52,12 @@ func (q *Queries) GetAudiences(ctx context.Context) ([]GetAudiencesRow, error) {
 	items := []GetAudiencesRow{}
 	for rows.Next() {
 		var i GetAudiencesRow
-		if err := rows.Scan(&i.ID, &i.NameNo, &i.NameEn); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.NameNo,
+			&i.NameEn,
+			&i.IsDeleted,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -4,7 +4,7 @@ SELECT * FROM "location" WHERE "id" = sqlc.arg('id')::int LIMIT 1;
 -- name: GetMazemapLocations :many
 SELECT "id", "name_no", "name_en", 
         "mazemap_campus_id", "mazemap_poi_id",
-        "updated_at", "url"
+        "updated_at", "url", "deleted_at" IS NOT NULL AS "is_deleted"
     FROM "location"
     WHERE "type" = 'mazemap'
     LIMIT sqlc.arg('limit')::int
@@ -13,7 +13,7 @@ SELECT "id", "name_no", "name_en",
 -- name: GetAddressLocations :many
 SELECT "id", "name_no", "name_en", 
         "address_street", "address_postcode", "city_name",
-        "updated_at", "url"
+        "updated_at", "url", "deleted_at" IS NOT NULL AS "is_deleted"
     FROM "location"
     WHERE "type" = 'address'
     LIMIT sqlc.arg('limit')::int
@@ -22,14 +22,14 @@ SELECT "id", "name_no", "name_en",
 -- name: GetCoordsLocations :many
 SELECT "id", "name_no", "name_en", 
         "coordinate_lat", "coordinate_long",
-        "updated_at", "url"
+        "updated_at", "url", "deleted_at" IS NOT NULL AS "is_deleted"
     FROM "location"
     WHERE "type" = 'coords'
     LIMIT sqlc.arg('limit')::int
     OFFSET sqlc.arg('offset')::int;
 
 -- name: GetLocations :many
-SELECT * FROM "location"
+SELECT *, "deleted_at" IS NOT NULL AS "is_deleted" FROM "location"
     LIMIT sqlc.arg('limit')::int
     OFFSET sqlc.arg('offset')::int;
 
@@ -63,6 +63,7 @@ RETURNING *;
 -- name: SoftDeleteLocation :one
 UPDATE "location"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "id" = sqlc.arg('id')::int
 RETURNING *;

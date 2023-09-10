@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"time"
 
 	"github.com/guregu/null/zero"
 )
@@ -68,7 +67,7 @@ func (q *Queries) GetRule(ctx context.Context, id int32) (Rule, error) {
 }
 
 const getRules = `-- name: GetRules :many
-SELECT "id", "name_no", "name_en", "updated_at" FROM "rule"
+SELECT "id", "name_no", "name_en", "deleted_at" IS NOT NULL AS "is_deleted" FROM "rule"
     LIMIT $2::int
     OFFSET $1::int
 `
@@ -82,7 +81,7 @@ type GetRulesRow struct {
 	ID        int32       `json:"id"`
 	NameNo    string      `json:"name_no"`
 	NameEn    zero.String `json:"name_en"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	IsDeleted interface{} `json:"is_deleted"`
 }
 
 func (q *Queries) GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesRow, error) {
@@ -98,7 +97,7 @@ func (q *Queries) GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesR
 			&i.ID,
 			&i.NameNo,
 			&i.NameEn,
-			&i.UpdatedAt,
+			&i.IsDeleted,
 		); err != nil {
 			return nil, err
 		}
@@ -116,7 +115,8 @@ func (q *Queries) GetRules(ctx context.Context, arg GetRulesParams) ([]GetRulesR
 const softDeleteRule = `-- name: SoftDeleteRule :one
 UPDATE "rule"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "id" = $1::int
 RETURNING id, name_no, name_en, description_no, description_en, updated_at, created_at, deleted_at
 `

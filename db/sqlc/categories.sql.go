@@ -12,14 +12,16 @@ import (
 )
 
 const getCategories = `-- name: GetCategories :many
-SELECT "id", "color", "name_no", "name_en" FROM "category" ORDER BY "id"
+SELECT "id", "color", "name_no", "name_en", "deleted_at" IS NOT NULL AS "is_deleted"
+    FROM "category" ORDER BY "id"
 `
 
 type GetCategoriesRow struct {
-	ID     int32       `json:"id"`
-	Color  string      `json:"color"`
-	NameNo string      `json:"name_no"`
-	NameEn zero.String `json:"name_en"`
+	ID        int32       `json:"id"`
+	Color     string      `json:"color"`
+	NameNo    string      `json:"name_no"`
+	NameEn    zero.String `json:"name_en"`
+	IsDeleted interface{} `json:"is_deleted"`
 }
 
 func (q *Queries) GetCategories(ctx context.Context) ([]GetCategoriesRow, error) {
@@ -36,6 +38,7 @@ func (q *Queries) GetCategories(ctx context.Context) ([]GetCategoriesRow, error)
 			&i.Color,
 			&i.NameNo,
 			&i.NameEn,
+			&i.IsDeleted,
 		); err != nil {
 			return nil, err
 		}

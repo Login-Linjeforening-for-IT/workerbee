@@ -75,7 +75,8 @@ RETURNING *;
 -- name: SoftDeleteEvent :one
 UPDATE "event"
 SET
-    "deleted_at" = now()
+    "deleted_at" = now(),
+    "updated_at" = now()
 WHERE "id" = sqlc.arg(id)::int
 RETURNING *;
 
