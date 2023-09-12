@@ -43,18 +43,19 @@ func (q *Queries) AddSkillToJob(ctx context.Context, arg AddSkillToJobParams) er
 
 const createJob = `-- name: CreateJob :one
 INSERT INTO "job_advertisement" (
-    "visible",
+    "visible", "highlight",
     "title_no", "title_en", 
     "position_title_no", "position_title_en", 
     "description_short_no", "description_short_en", 
     "description_long_no", "description_long_en", 
     "job_type", "time_publish", "application_deadline", "banner_image", 
     "organization", "application_url"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id, visible, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 
 type CreateJobParams struct {
 	Visible             bool        `json:"visible"`
+	Highlight           bool        `json:"highlight"`
 	TitleNo             string      `json:"title_no"`
 	TitleEn             zero.String `json:"title_en"`
 	PositionTitleNo     string      `json:"position_title_no"`
@@ -74,6 +75,7 @@ type CreateJobParams struct {
 func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvertisement, error) {
 	row := q.db.QueryRowContext(ctx, createJob,
 		arg.Visible,
+		arg.Highlight,
 		arg.TitleNo,
 		arg.TitleEn,
 		arg.PositionTitleNo,
@@ -93,6 +95,7 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvert
 	err := row.Scan(
 		&i.ID,
 		&i.Visible,
+		&i.Highlight,
 		&i.TitleNo,
 		&i.TitleEn,
 		&i.PositionTitleNo,
@@ -115,7 +118,7 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvert
 }
 
 const getJob = `-- name: GetJob :one
-SELECT job.id, job.visible, job.title_no, job.title_en, job.position_title_no, job.position_title_en, job.description_short_no, job.description_short_en, job.description_long_no, job.description_long_en, job.job_type, job.time_publish, job.application_deadline, job.banner_image, job.organization, job.application_url, job.updated_at, job.created_at, job.deleted_at, org."shortname", org."name_no", org."name_en", 
+SELECT job.id, job.visible, job.highlight, job.title_no, job.title_en, job.position_title_no, job.position_title_en, job.description_short_no, job.description_short_en, job.description_long_no, job.description_long_en, job.job_type, job.time_publish, job.application_deadline, job.banner_image, job.organization, job.application_url, job.updated_at, job.created_at, job.deleted_at, org."shortname", org."name_no", org."name_en", 
 		array(SELECT "skill" FROM "skill" WHERE "ad" = $1::int)::varchar[] AS skills,
 		array(SELECT "city" FROM "ad_city_relation" WHERE "ad" = $1::int)::varchar[] AS cities
     FROM "job_advertisement" AS job
@@ -126,6 +129,7 @@ SELECT job.id, job.visible, job.title_no, job.title_en, job.position_title_no, j
 type GetJobRow struct {
 	ID                  int32       `json:"id"`
 	Visible             bool        `json:"visible"`
+	Highlight           bool        `json:"highlight"`
 	TitleNo             string      `json:"title_no"`
 	TitleEn             zero.String `json:"title_en"`
 	PositionTitleNo     string      `json:"position_title_no"`
@@ -156,6 +160,7 @@ func (q *Queries) GetJob(ctx context.Context, id int32) (GetJobRow, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Visible,
+		&i.Highlight,
 		&i.TitleNo,
 		&i.TitleEn,
 		&i.PositionTitleNo,
@@ -290,7 +295,7 @@ UPDATE "job_advertisement"
 SET
     "deleted_at" = now(),
     "updated_at" = now()
-WHERE "id" = $1::int RETURNING id, visible, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+WHERE "id" = $1::int RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 
 func (q *Queries) SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement, error) {
@@ -299,6 +304,7 @@ func (q *Queries) SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement
 	err := row.Scan(
 		&i.ID,
 		&i.Visible,
+		&i.Highlight,
 		&i.TitleNo,
 		&i.TitleEn,
 		&i.PositionTitleNo,
@@ -324,26 +330,28 @@ const updateJob = `-- name: UpdateJob :one
 UPDATE "job_advertisement"
 SET
     "visible" = COALESCE($1, visible),
-    "title_no" = COALESCE($2, title_no),
-    "title_en" = COALESCE($3, title_en),
-    "position_title_no" = COALESCE($4, position_title_no),
-    "position_title_en" = COALESCE($5, position_title_en),
-    "description_short_no" = COALESCE($6, description_short_no),
-    "description_short_en" = COALESCE($7, description_short_en),
-    "description_long_no" = COALESCE($8, description_long_no),
-    "description_long_en" = COALESCE($9, description_long_en),
-    "job_type" = COALESCE($10, job_type),
-    "time_publish" = COALESCE($11, time_publish),
-    "application_deadline" = COALESCE($12, application_deadline),
-    "banner_image" = COALESCE($13, banner_image),
-    "organization" = COALESCE($14, organization),
-    "application_url" = COALESCE($15, application_url),
+    "highlight" = COALESCE($2, highlight),
+    "title_no" = COALESCE($3, title_no),
+    "title_en" = COALESCE($4, title_en),
+    "position_title_no" = COALESCE($5, position_title_no),
+    "position_title_en" = COALESCE($6, position_title_en),
+    "description_short_no" = COALESCE($7, description_short_no),
+    "description_short_en" = COALESCE($8, description_short_en),
+    "description_long_no" = COALESCE($9, description_long_no),
+    "description_long_en" = COALESCE($10, description_long_en),
+    "job_type" = COALESCE($11, job_type),
+    "time_publish" = COALESCE($12, time_publish),
+    "application_deadline" = COALESCE($13, application_deadline),
+    "banner_image" = COALESCE($14, banner_image),
+    "organization" = COALESCE($15, organization),
+    "application_url" = COALESCE($16, application_url),
     "updated_at" = now()
-WHERE "id" = $16::int RETURNING id, visible, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+WHERE "id" = $17::int RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 
 type UpdateJobParams struct {
 	Visible             zero.Bool   `json:"visible"`
+	Highlight           zero.Bool   `json:"highlight"`
 	TitleNo             zero.String `json:"title_no"`
 	TitleEn             zero.String `json:"title_en"`
 	PositionTitleNo     zero.String `json:"position_title_no"`
@@ -364,6 +372,7 @@ type UpdateJobParams struct {
 func (q *Queries) UpdateJob(ctx context.Context, arg UpdateJobParams) (JobAdvertisement, error) {
 	row := q.db.QueryRowContext(ctx, updateJob,
 		arg.Visible,
+		arg.Highlight,
 		arg.TitleNo,
 		arg.TitleEn,
 		arg.PositionTitleNo,
@@ -384,6 +393,7 @@ func (q *Queries) UpdateJob(ctx context.Context, arg UpdateJobParams) (JobAdvert
 	err := row.Scan(
 		&i.ID,
 		&i.Visible,
+		&i.Highlight,
 		&i.TitleNo,
 		&i.TitleEn,
 		&i.PositionTitleNo,

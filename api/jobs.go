@@ -61,6 +61,7 @@ func (server *Server) getJob(ctx *gin.Context) {
 
 type createJobRequest struct {
 	Visible             bool        `json:"visible"`
+	Highlight           bool        `json:"highlight"`
 	TitleNo             string      `json:"title_no" binding:"required"`
 	TitleEn             zero.String `json:"title_en"`
 	PositionTitleNo     string      `json:"position_title_no" binding:"required"`
@@ -88,6 +89,7 @@ func (server *Server) createJob(ctx *gin.Context) {
 
 	job, err := server.service.CreateJob(ctx, db.CreateJobParams{
 		Visible:             req.Visible,
+		Highlight:           req.Highlight,
 		TitleNo:             req.TitleNo,
 		TitleEn:             req.TitleEn,
 		PositionTitleNo:     req.PositionTitleNo,

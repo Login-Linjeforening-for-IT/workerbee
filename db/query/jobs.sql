@@ -20,19 +20,20 @@ SELECT job.*, org."shortname", org."name_no", org."name_en",
 
 -- name: CreateJob :one
 INSERT INTO "job_advertisement" (
-    "visible",
+    "visible", "highlight",
     "title_no", "title_en", 
     "position_title_no", "position_title_en", 
     "description_short_no", "description_short_en", 
     "description_long_no", "description_long_en", 
     "job_type", "time_publish", "application_deadline", "banner_image", 
     "organization", "application_url"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *;
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *;
 
 -- name: UpdateJob :one
 UPDATE "job_advertisement"
 SET
     "visible" = COALESCE(sqlc.narg(visible), visible),
+    "highlight" = COALESCE(sqlc.narg(highlight), highlight),
     "title_no" = COALESCE(sqlc.narg(title_no), title_no),
     "title_en" = COALESCE(sqlc.narg(title_en), title_en),
     "position_title_no" = COALESCE(sqlc.narg(position_title_no), position_title_no),

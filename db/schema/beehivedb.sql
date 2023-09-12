@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-12T15:14:56.257Z
+-- Generated at: 2023-09-12T23:48:36.208Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -140,6 +140,7 @@ CREATE TABLE "location" (
 CREATE TABLE "job_advertisement" (
   "id" SERIAL PRIMARY KEY,
   "visible" bool NOT NULL DEFAULT false,
+  "highlight" bool NOT NULL DEFAULT false,
   "title_no" varchar NOT NULL,
   "title_en" varchar,
   "position_title_no" varchar NOT NULL,
