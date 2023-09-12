@@ -4,11 +4,18 @@ SELECT e."id", e."visible",
         e."time_type", e."time_start", e."time_end", e."time_publish",
         e."canceled", e."link_signup", e."capacity", e."full",
         c."name_no" AS category_name_no, c."name_en"  AS category_name_en, 
-        -- TODO: Add audience
         l."name_no" AS location_name_no, l."name_en" AS location_name_en,
-        -- TODO: Add organizer
-        e."updated_at", (e."deleted_at" IS NOT NULL)::bool AS is_deleted
-        -- deleted_at == null => is_deleted == false
+        e."updated_at", (e."deleted_at" IS NOT NULL)::bool AS is_deleted,
+        array(
+            SELECT COALESCE(NULLIF("name_en", ''), "name_no") FROM "audience"
+            INNER JOIN "event_audience_relation" AS ear ON ear."audience" = "audience"."id"
+            WHERE ear."event" = e."id"
+		)::varchar[] AS audiences,
+		array(
+			SELECT COALESCE(NULLIF("name_en", ''), "name_no") FROM "organization"
+			INNER JOIN "event_organization_relation" AS eor ON eor."organization" = "organization"."shortname"
+			WHERE eor."event" = e."id"
+		)::varchar[] AS organizers
     FROM "event" AS e
     INNER JOIN "category" AS c ON e."category" = c."id"
     LEFT OUTER JOIN "location" AS l ON e."location" = l."id"
