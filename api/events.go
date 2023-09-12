@@ -74,11 +74,12 @@ type createEventRequest struct {
 	InformationalNo zero.String `json:"informational_no"`
 	InformationalEn zero.String `json:"informational_en"`
 
-	TimeStart          time.Time `json:"time_start" binding:"required"`
-	TimeEnd            zero.Time `json:"time_end"`
-	TimePublish        zero.Time `json:"time_publish"`
-	TimeSignupRelease  zero.Time `json:"time_signup_release"`
-	TimeSignupDeadline zero.Time `json:"time_signup_deadline"`
+	TimeType           db.TimeTypeEnum `json:"time_type" binding:"required,timetypeenum"`
+	TimeStart          time.Time       `json:"time_start" binding:"required"`
+	TimeEnd            zero.Time       `json:"time_end"`
+	TimePublish        zero.Time       `json:"time_publish"`
+	TimeSignupRelease  zero.Time       `json:"time_signup_release"`
+	TimeSignupDeadline zero.Time       `json:"time_signup_deadline"`
 
 	Canceled  bool `json:"canceled"`
 	Digital   bool `json:"digital"`
@@ -113,10 +114,6 @@ func (server *Server) createEvent(ctx *gin.Context) {
 		return
 	}
 
-	// TODO: time type stuff
-	// Is time type required?
-	// time type is inferred
-
 	event, err := server.service.CreateEvent(ctx, db.CreateEventParams{
 		Visible:            req.Visible,
 		NameNo:             req.NameNo,
@@ -125,7 +122,7 @@ func (server *Server) createEvent(ctx *gin.Context) {
 		DescriptionEn:      req.DescriptionEn,
 		InformationalNo:    req.InformationalNo,
 		InformationalEn:    req.InformationalEn,
-		TimeType:           "", // TODO
+		TimeType:           req.TimeType,
 		TimeStart:          req.TimeStart,
 		TimeEnd:            req.TimeEnd,
 		TimePublish:        req.TimePublish,
