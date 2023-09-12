@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-10T23:38:48.889Z
+-- Generated at: 2023-09-12T15:14:56.257Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -43,9 +43,9 @@ CREATE TABLE "event" (
   "highlight" bool NOT NULL DEFAULT false,
   "image_small" varchar NOT NULL,
   "image_banner" varchar NOT NULL,
-  "link_facebook" varchar NOT NULL,
-  "link_discord" varchar NOT NULL,
-  "link_signup" varchar NOT NULL,
+  "link_facebook" varchar,
+  "link_discord" varchar,
+  "link_signup" varchar,
   "link_stream" varchar,
   "capacity" int,
   "full" bool NOT NULL DEFAULT false,
@@ -153,7 +153,7 @@ CREATE TABLE "job_advertisement" (
   "application_deadline" timestamptz NOT NULL,
   "banner_image" varchar,
   "organization" varchar NOT NULL,
-  "application_url" varchar NOT NULL,
+  "application_url" varchar,
   "updated_at" timestamptz NOT NULL DEFAULT (now()),
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz

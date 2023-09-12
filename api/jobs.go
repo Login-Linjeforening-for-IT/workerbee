@@ -101,7 +101,7 @@ func (server *Server) createJob(ctx *gin.Context) {
 		ApplicationDeadline: req.ApplicationDeadline,
 		BannerImage:         req.BannerImage,
 		Organization:        req.Organization,
-		ApplicationUrl:      req.ApplicationURL.String,
+		ApplicationUrl:      req.ApplicationURL,
 	})
 	err = db.ParseError(err)
 	if err != nil {

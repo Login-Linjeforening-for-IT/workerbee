@@ -87,9 +87,9 @@ type createEventRequest struct {
 	ImageSmall  string `json:"image_small"`
 	ImageBanner string `json:"image_banner"`
 
-	LinkFacebook string      `json:"link_facebook" binding:"required"`
-	LinkDiscord  string      `json:"link_discord" binding:"required"` // TODO: should this be optional?
-	LinkSignup   string      `json:"link_signup" binding:"required"`  // TODO: should this be optional?
+	LinkFacebook zero.String `json:"link_facebook" binding:"required"`
+	LinkDiscord  zero.String `json:"link_discord" binding:"required"`
+	LinkSignup   zero.String `json:"link_signup" binding:"required"`
 	LinkStream   zero.String `json:"link_stream"`
 
 	Capacity zero.Int `json:"capacity"`

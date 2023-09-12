@@ -68,7 +68,7 @@ type CreateJobParams struct {
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
-	ApplicationUrl      string      `json:"application_url"`
+	ApplicationUrl      zero.String `json:"application_url"`
 }
 
 func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvertisement, error) {
@@ -139,7 +139,7 @@ type GetJobRow struct {
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
-	ApplicationUrl      string      `json:"application_url"`
+	ApplicationUrl      zero.String `json:"application_url"`
 	UpdatedAt           time.Time   `json:"updated_at"`
 	CreatedAt           time.Time   `json:"created_at"`
 	DeletedAt           zero.Time   `json:"deleted_at"`
@@ -209,7 +209,7 @@ type GetJobsRow struct {
 	JobType             JobType     `json:"job_type"`
 	TimePublish         time.Time   `json:"time_publish"`
 	ApplicationDeadline time.Time   `json:"application_deadline"`
-	ApplicationUrl      string      `json:"application_url"`
+	ApplicationUrl      zero.String `json:"application_url"`
 	UpdatedAt           time.Time   `json:"updated_at"`
 	Visible             bool        `json:"visible"`
 	DeletedAt           zero.Time   `json:"deleted_at"`

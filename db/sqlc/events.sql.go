@@ -78,9 +78,9 @@ type CreateEventParams struct {
 	Highlight          bool         `json:"highlight"`
 	ImageSmall         string       `json:"image_small"`
 	ImageBanner        string       `json:"image_banner"`
-	LinkFacebook       string       `json:"link_facebook"`
-	LinkDiscord        string       `json:"link_discord"`
-	LinkSignup         string       `json:"link_signup"`
+	LinkFacebook       zero.String  `json:"link_facebook"`
+	LinkDiscord        zero.String  `json:"link_discord"`
+	LinkSignup         zero.String  `json:"link_signup"`
 	LinkStream         zero.String  `json:"link_stream"`
 	Capacity           zero.Int     `json:"capacity"`
 	Full               bool         `json:"full"`
@@ -247,7 +247,7 @@ type GetEventsRow struct {
 	TimeEnd        zero.Time    `json:"time_end"`
 	TimePublish    zero.Time    `json:"time_publish"`
 	Canceled       bool         `json:"canceled"`
-	LinkSignup     string       `json:"link_signup"`
+	LinkSignup     zero.String  `json:"link_signup"`
 	Capacity       zero.Int     `json:"capacity"`
 	Full           bool         `json:"full"`
 	CategoryNameNo string       `json:"category_name_no"`

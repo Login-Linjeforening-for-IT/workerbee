@@ -196,9 +196,9 @@ type Event struct {
 	Highlight          bool         `json:"highlight"`
 	ImageSmall         string       `json:"image_small"`
 	ImageBanner        string       `json:"image_banner"`
-	LinkFacebook       string       `json:"link_facebook"`
-	LinkDiscord        string       `json:"link_discord"`
-	LinkSignup         string       `json:"link_signup"`
+	LinkFacebook       zero.String  `json:"link_facebook"`
+	LinkDiscord        zero.String  `json:"link_discord"`
+	LinkSignup         zero.String  `json:"link_signup"`
 	LinkStream         zero.String  `json:"link_stream"`
 	Capacity           zero.Int     `json:"capacity"`
 	Full               bool         `json:"full"`
@@ -237,7 +237,7 @@ type JobAdvertisement struct {
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
-	ApplicationUrl      string      `json:"application_url"`
+	ApplicationUrl      zero.String `json:"application_url"`
 	UpdatedAt           time.Time   `json:"updated_at"`
 	CreatedAt           time.Time   `json:"created_at"`
 	DeletedAt           zero.Time   `json:"deleted_at"`
