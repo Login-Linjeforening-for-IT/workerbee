@@ -22,7 +22,8 @@ func init() {
 }
 
 type Config struct {
-	Port string `config:"PORT" default:"8080"`
+	Port   string `config:"PORT" default:"8080"`
+	Secret string `config:"SECRET" default:"secret"`
 }
 
 type Server struct {
@@ -47,7 +48,7 @@ func NewServer(config *Config, service service.Service) *Server {
 func (server *Server) initRouter() {
 	router := gin.Default()
 
-	api := router.Group("/api", server.authMiddleware)
+	api := router.Group("/api", server.authMiddleware(server.config.Secret))
 	{
 		events := api.Group("/events")
 		{
