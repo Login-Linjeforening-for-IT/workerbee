@@ -5,19 +5,18 @@ import (
 	"fmt"
 
 	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
 	_ "github.com/lib/pq"
 )
 
-type Config struct {
+type DBConfig struct {
 	DBHost string `config:"DB_HOST" default:"localhost"`
 	DBPort string `config:"DB_PORT" default:"5432"`
-	DBUser string `config:"DB_USER" default:"postgres"`
-	DBPass string `config:"DB_PASS" default:"postgres"`
-	DBName string `config:"DB_NAME" default:"postgres"`
-
-	Port string `config:"PORT" default:"8080"`
+	DBUser string `config:"DB_USER" default:"root"`
+	DBPass string `config:"DB_PASS" default:"secret"`
+	DBName string `config:"DB_NAME" default:"beehivedb"`
 }
 
 func guard(err error) {
@@ -27,14 +26,8 @@ func guard(err error) {
 }
 
 func main() {
-	conf := Config{
-		DBHost: "localhost",
-		DBPort: "5432",
-		DBUser: "root",
-		DBPass: "secret",
-		DBName: "beehivedb",
-		Port:   "8080",
-	}
+	conf := config.MustLoad[DBConfig]()
+	apiConf := config.MustLoad[api.Config]()
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
@@ -48,9 +41,7 @@ func main() {
 	store := db.NewStore(conn)
 	service := service.NewService(store)
 
-	server := api.NewServer(&api.Config{
-		Port: conf.Port,
-	}, service)
+	server := api.NewServer(apiConf, service)
 
 	guard(server.Start())
 }
