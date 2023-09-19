@@ -5,6 +5,7 @@ import (
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -24,6 +25,10 @@ func init() {
 type Config struct {
 	Port   string `config:"PORT" default:"8080"`
 	Secret string `config:"SECRET" default:"secret"`
+
+	AllowedHeaders []string `config:"ALLOWED_HEADERS" defult:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
+	AllowedMethods []string `config:"ALLOWED_METHODS" defult:"GET"`
+	AllowedOrigins []string `config:"ALLOWED_ORIGINS" defult:"*"`
 }
 
 type Server struct {
@@ -47,6 +52,18 @@ func NewServer(config *Config, service service.Service) *Server {
 
 func (server *Server) initRouter() {
 	router := gin.Default()
+
+	corsConf := cors.DefaultConfig()
+	if server.config.AllowedOrigins != nil && len(server.config.AllowedOrigins) > 0 {
+		corsConf.AllowOrigins = server.config.AllowedOrigins
+	} else {
+		corsConf.AllowAllOrigins = true
+	}
+	corsConf.AllowCredentials = true
+	corsConf.AllowHeaders = server.config.AllowedHeaders
+	corsConf.AllowMethods = server.config.AllowedMethods
+
+	router.Use(cors.New(corsConf))
 
 	api := router.Group("/api", server.authMiddleware(server.config.Secret))
 	{
