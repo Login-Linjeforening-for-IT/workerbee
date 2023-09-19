@@ -76,7 +76,7 @@ type CreateEventParams struct {
 	Canceled           bool         `json:"canceled"`
 	Digital            bool         `json:"digital"`
 	Highlight          bool         `json:"highlight"`
-	ImageSmall         string       `json:"image_small"`
+	ImageSmall         zero.String  `json:"image_small"`
 	ImageBanner        string       `json:"image_banner"`
 	LinkFacebook       zero.String  `json:"link_facebook"`
 	LinkDiscord        zero.String  `json:"link_discord"`

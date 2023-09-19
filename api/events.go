@@ -85,8 +85,8 @@ type createEventRequest struct {
 	Digital   bool `json:"digital"`
 	Highlight bool `json:"highlight"`
 
-	ImageSmall  string `json:"image_small"`
-	ImageBanner string `json:"image_banner"`
+	ImageSmall  zero.String `json:"image_small"`
+	ImageBanner string      `json:"image_banner"`
 
 	LinkFacebook zero.String `json:"link_facebook" binding:"required"`
 	LinkDiscord  zero.String `json:"link_discord" binding:"required"`

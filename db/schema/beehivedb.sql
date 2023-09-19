@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-12T23:48:36.208Z
+-- Generated at: 2023-09-19T18:44:25.477Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -41,7 +41,7 @@ CREATE TABLE "event" (
   "canceled" bool NOT NULL DEFAULT false,
   "digital" bool NOT NULL DEFAULT false,
   "highlight" bool NOT NULL DEFAULT false,
-  "image_small" varchar NOT NULL,
+  "image_small" varchar,
   "image_banner" varchar NOT NULL,
   "link_facebook" varchar,
   "link_discord" varchar,
