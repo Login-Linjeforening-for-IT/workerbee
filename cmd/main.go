@@ -26,8 +26,8 @@ func guard(err error) {
 }
 
 func main() {
-	conf := config.MustLoad[DBConfig]()
-	apiConf := config.MustLoad[api.Config]()
+	conf := config.MustLoad[DBConfig](config.WithFile(".env"))
+	apiConf := config.MustLoad[api.Config](config.WithFile(".env"))
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
