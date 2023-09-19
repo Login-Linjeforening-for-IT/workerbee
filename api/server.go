@@ -27,7 +27,7 @@ type Config struct {
 	Secret string `config:"SECRET" default:"secret"`
 
 	AllowedHeaders []string `config:"ALLOWED_HEADERS" defult:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
-	AllowedMethods []string `config:"ALLOWED_METHODS" defult:"GET"`
+	AllowedMethods []string `config:"ALLOWED_METHODS" defult:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
 	AllowedOrigins []string `config:"ALLOWED_ORIGINS" defult:"*"`
 }
 
