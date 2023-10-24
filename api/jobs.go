@@ -70,7 +70,7 @@ type createJobRequest struct {
 	DescriptionShortEn  zero.String `json:"description_short_en"`
 	DescriptionLongNo   string      `json:"description_long_no" binding:"required"`
 	DescriptionLongEn   zero.String `json:"description_long_en"`
-	JobType             db.JobType  `json:"job_type" binding:"required,jobtype"`
+	JobType             db.JobType  `json:"job_type" binding:"required"`
 	TimePublish         time.Time   `json:"time_publish" binding:"required"`
 	ApplicationDeadline time.Time   `json:"application_deadline" binding:"required"`
 	BannerImage         zero.String `json:"banner_image"`

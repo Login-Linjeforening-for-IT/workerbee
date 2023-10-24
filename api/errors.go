@@ -82,11 +82,7 @@ func (e *ValidationError) Error() string {
 func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 	if status >= 500 {
 		err = server.redactError(err)
-	} else if status == http.StatusNotFound {
-		err = &NotFoundError{
-			Message: ctx.Request.URL.Path + " not found",
-		}
-	} else {
+	} else if status != http.StatusNotFound {
 		switch uErr := err.(type) {
 		case validator.ValidationErrors:
 			errs := make([]ValidationError, 0, len(uErr))
