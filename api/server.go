@@ -138,6 +138,11 @@ func (server *Server) initRouter() {
 			jobs.POST("/skills", server.addSkillToJob)
 			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
+
+		cities := api.Group("/cities")
+		{
+			cities.GET("/", server.getAllCities)
+		}
 	}
 
 	server.router = router
