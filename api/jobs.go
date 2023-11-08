@@ -126,6 +126,8 @@ func (server *Server) updateJob(ctx *gin.Context) {
 		return
 	}
 
+	req.UpdateJobParams.ID = req.ID
+
 	job, err := server.service.UpdateJob(ctx, req.UpdateJobParams)
 	err = db.ParseError(err)
 	if err != nil {

@@ -20,6 +20,7 @@ func init() {
 
 	db.BindTimeTypeEnumValidator(validator, "timetypeenum")
 	db.BindLocationTypeValidator(validator, "locationtype")
+	db.BindJobTypeValidator(validator, "jobtype")
 }
 
 type Config struct {

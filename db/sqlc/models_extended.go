@@ -49,6 +49,49 @@ func (ns *NullTimeTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func IsValidJobType[T ~string](t T) bool {
+	switch JobType(t) {
+	case JobTypeVerv, JobTypeSummer, JobTypePart, JobTypeFull:
+		return true
+	default:
+		return false
+	}
+}
+
+var validJobType validator.Func = func(fl validator.FieldLevel) bool {
+	return IsValidJobType(fl.Field().String())
+}
+
+func BindJobTypeValidator(validator *validator.Validate, tag string) {
+	validator.RegisterValidation(tag, validJobType)
+}
+
+func (nl NullJobType) MarshalJSON() ([]byte, error) {
+	if nl.Valid {
+		return json.Marshal(nl.JobType)
+	} else {
+		return json.Marshal(nil)
+	}
+}
+
+func (nl *NullJobType) UnmarshalJSON(data []byte) error {
+	switch string(data) {
+	case "null", `""`:
+		nl.Valid = false
+		return nil
+	}
+
+	var v JobType
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+
+	nl.JobType = v
+	nl.Valid = true
+
+	return nil
+}
+
 func IsValidLocationType[T ~string](t T) bool {
 	switch LocationType(t) {
 	case LocationTypeAddress, LocationTypeCoords, LocationTypeMazemap, LocationTypeNone:
