@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: beehive-admin-api
+    environment:
+      - DB_HOST
+      - DB_USER
+      - DB_PASS
+      - DB_NAME
+      - DB_PORT
+      - PORT:-8080
+      - ALLOWED_HEADERS
+      - ALLOWED_METHODS
+      - ALLOWED_ORIGINS
+      - SECRET # TODO: Remove after implementing auth 
+    ports:
+      - ${PORT:-8080}:${PORT:-8080}
+    volumes:
+      - ./.env:/app/.env
