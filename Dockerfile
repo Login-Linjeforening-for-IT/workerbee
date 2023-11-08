@@ -8,7 +8,7 @@ COPY . .
 RUN go build -o bin/main cmd/main.go
 
 # Run stage
-FROM alpine:3.18
+FROM scratch
 
 WORKDIR /app
 
