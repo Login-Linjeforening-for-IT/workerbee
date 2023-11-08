@@ -1,6 +1,7 @@
 package api
 
 import (
+	"net/http"
 	"os"
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
@@ -65,6 +66,8 @@ func (server *Server) initRouter() {
 	corsConf.AllowMethods = server.config.AllowedMethods
 
 	router.Use(cors.New(corsConf))
+
+	router.NoRoute(server.noRoute)
 
 	api := router.Group("/api", server.authMiddleware(server.config.Secret))
 	{
@@ -136,9 +139,20 @@ func (server *Server) initRouter() {
 			jobs.POST("/skills", server.addSkillToJob)
 			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
+
+		cities := api.Group("/cities")
+		{
+			cities.GET("/", server.getAllCities)
+		}
 	}
 
 	server.router = router
+}
+
+func (server *Server) noRoute(ctx *gin.Context) {
+	server.writeError(ctx, http.StatusNotFound, &NotFoundError{
+		Message: ctx.Request.URL.Path + " not found",
+	})
 }
 
 func (server *Server) Start() error {

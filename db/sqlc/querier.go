@@ -20,6 +20,7 @@ type Querier interface {
 	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreateRule(ctx context.Context, arg CreateRuleParams) (Rule, error)
 	GetAddressLocations(ctx context.Context, arg GetAddressLocationsParams) ([]GetAddressLocationsRow, error)
+	GetAllCities(ctx context.Context) ([]string, error)
 	GetAudience(ctx context.Context, id int32) (Audience, error)
 	GetAudiences(ctx context.Context) ([]GetAudiencesRow, error)
 	GetAudiencesOfEvent(ctx context.Context, eventID int32) ([]Audience, error)

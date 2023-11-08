@@ -59,9 +59,16 @@ func (server *Server) getOrganization(ctx *gin.Context) {
 }
 
 type createOrganizationRequest struct {
-	Shortname string      `json:"shortname" binding:"required,min=1"`
-	NameNo    string      `json:"name_no" binding:"required,min=1"`
-	NameEn    zero.String `json:"name_en"`
+	Shortname     string      `json:"shortname" binding:"required,min=1"`
+	NameNo        string      `json:"name_no" binding:"required,min=1"`
+	NameEn        zero.String `json:"name_en"`
+	DescriptionNo string      `json:"description_no"`
+	DescriptionEn zero.String `json:"description_en"`
+	LinkHomepage  zero.String `json:"link_homepage"`
+	LinkLinkedin  zero.String `json:"link_linkedin"`
+	LinkFacebook  zero.String `json:"link_facebook"`
+	LinkInstagram zero.String `json:"link_instagram"`
+	Logo          zero.String `json:"logo"`
 }
 
 func (server *Server) createOrganization(ctx *gin.Context) {
@@ -72,9 +79,16 @@ func (server *Server) createOrganization(ctx *gin.Context) {
 	}
 
 	organization, err := server.service.CreateOrganization(ctx, db.CreateOrganizationParams{
-		Shortname: req.Shortname,
-		NameNo:    req.NameNo,
-		NameEn:    req.NameEn,
+		Shortname:     req.Shortname,
+		NameNo:        req.NameNo,
+		NameEn:        req.NameEn,
+		DescriptionNo: req.DescriptionNo,
+		DescriptionEn: req.DescriptionEn,
+		LinkHomepage:  req.LinkHomepage,
+		LinkLinkedin:  req.LinkLinkedin,
+		LinkFacebook:  req.LinkFacebook,
+		LinkInstagram: req.LinkInstagram,
+		Logo:          req.Logo,
 	})
 	err = db.ParseError(err)
 	if err != nil {
