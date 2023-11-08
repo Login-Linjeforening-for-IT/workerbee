@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 
 	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
@@ -25,9 +26,17 @@ func guard(err error) {
 	}
 }
 
+var (
+	configFile = flag.String("config", ".env", "path to config file")
+)
+
+func init() {
+	flag.Parse()
+}
+
 func main() {
-	conf := config.MustLoad[DBConfig](config.WithFile(".env"))
-	apiConf := config.MustLoad[api.Config](config.WithFile(".env"))
+	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
+	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
