@@ -17,10 +17,10 @@ SELECT "id", "color", "name_no", "name_en"
 `
 
 type GetCategoriesRow struct {
-	ID        int32       `json:"id"`
-	Color     string      `json:"color"`
-	NameNo    string      `json:"name_no"`
-	NameEn    zero.String `json:"name_en"`
+	ID     int32       `json:"id"`
+	Color  string      `json:"color"`
+	NameNo string      `json:"name_no"`
+	NameEn zero.String `json:"name_en"`
 }
 
 func (q *Queries) GetCategories(ctx context.Context) ([]GetCategoriesRow, error) {

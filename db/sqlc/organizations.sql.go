@@ -17,9 +17,10 @@ INSERT INTO "organization" (
     "shortname",
     "name_no", "name_en",
     "description_no", "description_en",
+    "type",
     "link_homepage", "link_linkedin", "link_facebook", "link_instagram",
     "logo"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING shortname, name_no, name_en, description_no, description_en, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING shortname, name_no, name_en, description_no, description_en, type, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
 `
 
 type CreateOrganizationParams struct {
@@ -28,6 +29,7 @@ type CreateOrganizationParams struct {
 	NameEn        zero.String `json:"name_en"`
 	DescriptionNo string      `json:"description_no"`
 	DescriptionEn zero.String `json:"description_en"`
+	Type          int32       `json:"type"`
 	LinkHomepage  zero.String `json:"link_homepage"`
 	LinkLinkedin  zero.String `json:"link_linkedin"`
 	LinkFacebook  zero.String `json:"link_facebook"`
@@ -42,6 +44,7 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		arg.NameEn,
 		arg.DescriptionNo,
 		arg.DescriptionEn,
+		arg.Type,
 		arg.LinkHomepage,
 		arg.LinkLinkedin,
 		arg.LinkFacebook,
@@ -55,6 +58,7 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 		&i.NameEn,
 		&i.DescriptionNo,
 		&i.DescriptionEn,
+		&i.Type,
 		&i.LinkHomepage,
 		&i.LinkLinkedin,
 		&i.LinkFacebook,
@@ -68,7 +72,7 @@ func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganization
 }
 
 const getOrganization = `-- name: GetOrganization :one
-SELECT shortname, name_no, name_en, description_no, description_en, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at FROM "organization" WHERE "shortname" = $1::text LIMIT 1
+SELECT shortname, name_no, name_en, description_no, description_en, type, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at FROM "organization" WHERE "shortname" = $1::text LIMIT 1
 `
 
 func (q *Queries) GetOrganization(ctx context.Context, shortname string) (Organization, error) {
@@ -80,6 +84,7 @@ func (q *Queries) GetOrganization(ctx context.Context, shortname string) (Organi
 		&i.NameEn,
 		&i.DescriptionNo,
 		&i.DescriptionEn,
+		&i.Type,
 		&i.LinkHomepage,
 		&i.LinkLinkedin,
 		&i.LinkFacebook,
@@ -147,7 +152,7 @@ func (q *Queries) GetOrganizations(ctx context.Context, arg GetOrganizationsPara
 }
 
 const getOrganizationsOfEvent = `-- name: GetOrganizationsOfEvent :many
-SELECT org.shortname, org.name_no, org.name_en, org.description_no, org.description_en, org.link_homepage, org.link_linkedin, org.link_facebook, org.link_instagram, org.logo, org.updated_at, org.created_at, org.deleted_at, ("deleted_at" IS NOT NULL)::bool AS "is_deleted" FROM "event_organization_relation"
+SELECT org.shortname, org.name_no, org.name_en, org.description_no, org.description_en, org.type, org.link_homepage, org.link_linkedin, org.link_facebook, org.link_instagram, org.logo, org.updated_at, org.created_at, org.deleted_at, ("deleted_at" IS NOT NULL)::bool AS "is_deleted" FROM "event_organization_relation"
     INNER JOIN "organization" AS org ON "event_organization_relation"."organization" = org."shortname"
     WHERE "event_organization_relation"."event" = $1::int
 `
@@ -158,6 +163,7 @@ type GetOrganizationsOfEventRow struct {
 	NameEn        zero.String `json:"name_en"`
 	DescriptionNo string      `json:"description_no"`
 	DescriptionEn zero.String `json:"description_en"`
+	Type          int32       `json:"type"`
 	LinkHomepage  zero.String `json:"link_homepage"`
 	LinkLinkedin  zero.String `json:"link_linkedin"`
 	LinkFacebook  zero.String `json:"link_facebook"`
@@ -184,6 +190,7 @@ func (q *Queries) GetOrganizationsOfEvent(ctx context.Context, eventID int32) ([
 			&i.NameEn,
 			&i.DescriptionNo,
 			&i.DescriptionEn,
+			&i.Type,
 			&i.LinkHomepage,
 			&i.LinkLinkedin,
 			&i.LinkFacebook,
@@ -212,7 +219,7 @@ UPDATE "organization"
 SET
     "deleted_at" = now(),
     "updated_at" = now()
-WHERE "shortname" = $1::text RETURNING shortname, name_no, name_en, description_no, description_en, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
+WHERE "shortname" = $1::text RETURNING shortname, name_no, name_en, description_no, description_en, type, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
 `
 
 func (q *Queries) SoftDeleteOrganization(ctx context.Context, shortname string) (Organization, error) {
@@ -224,6 +231,7 @@ func (q *Queries) SoftDeleteOrganization(ctx context.Context, shortname string) 
 		&i.NameEn,
 		&i.DescriptionNo,
 		&i.DescriptionEn,
+		&i.Type,
 		&i.LinkHomepage,
 		&i.LinkLinkedin,
 		&i.LinkFacebook,
@@ -243,13 +251,14 @@ SET
     "name_en" = COALESCE($2, name_en),
     "description_no" = COALESCE($3, description_no),
     "description_en" = COALESCE($4, description_en),
-    "link_homepage" = COALESCE($5, link_homepage),
-    "link_linkedin" = COALESCE($6, link_linkedin),
-    "link_facebook" = COALESCE($7, link_facebook),
-    "link_instagram" = COALESCE($8, link_instagram),
-    "logo" = COALESCE($9, logo),
+    "type" = COALESCE($5, "type"),
+    "link_homepage" = COALESCE($6, link_homepage),
+    "link_linkedin" = COALESCE($7, link_linkedin),
+    "link_facebook" = COALESCE($8, link_facebook),
+    "link_instagram" = COALESCE($9, link_instagram),
+    "logo" = COALESCE($10, logo),
     "updated_at" = now()
-WHERE "shortname" = $10::text RETURNING shortname, name_no, name_en, description_no, description_en, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
+WHERE "shortname" = $11::text RETURNING shortname, name_no, name_en, description_no, description_en, type, link_homepage, link_linkedin, link_facebook, link_instagram, logo, updated_at, created_at, deleted_at
 `
 
 type UpdateOrganizationParams struct {
@@ -257,6 +266,7 @@ type UpdateOrganizationParams struct {
 	NameEn        zero.String `json:"name_en"`
 	DescriptionNo zero.String `json:"description_no"`
 	DescriptionEn zero.String `json:"description_en"`
+	Type          zero.Int    `json:"type"`
 	LinkHomepage  zero.String `json:"link_homepage"`
 	LinkLinkedin  zero.String `json:"link_linkedin"`
 	LinkFacebook  zero.String `json:"link_facebook"`
@@ -271,6 +281,7 @@ func (q *Queries) UpdateOrganization(ctx context.Context, arg UpdateOrganization
 		arg.NameEn,
 		arg.DescriptionNo,
 		arg.DescriptionEn,
+		arg.Type,
 		arg.LinkHomepage,
 		arg.LinkLinkedin,
 		arg.LinkFacebook,
@@ -285,6 +296,7 @@ func (q *Queries) UpdateOrganization(ctx context.Context, arg UpdateOrganization
 		&i.NameEn,
 		&i.DescriptionNo,
 		&i.DescriptionEn,
+		&i.Type,
 		&i.LinkHomepage,
 		&i.LinkLinkedin,
 		&i.LinkFacebook,

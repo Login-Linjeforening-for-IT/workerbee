@@ -64,6 +64,7 @@ type createOrganizationRequest struct {
 	NameEn        zero.String `json:"name_en"`
 	DescriptionNo string      `json:"description_no"`
 	DescriptionEn zero.String `json:"description_en"`
+	Type          zero.Int    `json:"type"`
 	LinkHomepage  zero.String `json:"link_homepage"`
 	LinkLinkedin  zero.String `json:"link_linkedin"`
 	LinkFacebook  zero.String `json:"link_facebook"`
@@ -84,6 +85,7 @@ func (server *Server) createOrganization(ctx *gin.Context) {
 		NameEn:        req.NameEn,
 		DescriptionNo: req.DescriptionNo,
 		DescriptionEn: req.DescriptionEn,
+		Type:          int32(req.Type.Int64),
 		LinkHomepage:  req.LinkHomepage,
 		LinkLinkedin:  req.LinkLinkedin,
 		LinkFacebook:  req.LinkFacebook,

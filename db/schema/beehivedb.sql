@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-19T18:44:25.477Z
+-- Generated at: 2023-11-14T18:13:03.028Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -103,6 +103,7 @@ CREATE TABLE "organization" (
   "name_en" varchar,
   "description_no" varchar NOT NULL,
   "description_en" varchar,
+  "type" int NOT NULL DEFAULT 1,
   "link_homepage" varchar,
   "link_linkedin" varchar,
   "link_facebook" varchar,
@@ -211,6 +212,8 @@ CREATE INDEX ON "rule" ("updated_at");
 CREATE INDEX ON "rule" ("created_at");
 
 CREATE INDEX ON "rule" ("deleted_at");
+
+CREATE INDEX ON "organization" ("type");
 
 CREATE INDEX ON "organization" ("updated_at");
 

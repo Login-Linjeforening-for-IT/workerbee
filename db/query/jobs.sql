@@ -5,7 +5,7 @@ SELECT job."id", job."title_no", job."title_en",
         job."application_url", job."updated_at", job."visible", job."deleted_at", (job."deleted_at" IS NOT NULL)::bool AS "is_deleted",
         org."name_no", org."name_en"
     FROM "job_advertisement" AS job
-    INNER JOIN "organization" AS org ON job."organization" = org."id"
+    INNER JOIN "organization" AS org ON job."organization" = org."shortname"
     ORDER BY job."id"
     LIMIT sqlc.arg('limit')::int
     OFFSET sqlc.arg('offset')::int;

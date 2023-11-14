@@ -18,9 +18,10 @@ INSERT INTO "organization" (
     "shortname",
     "name_no", "name_en",
     "description_no", "description_en",
+    "type",
     "link_homepage", "link_linkedin", "link_facebook", "link_instagram",
     "logo"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *;
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *;
 
 -- name: UpdateOrganization :one
 UPDATE "organization"
@@ -29,6 +30,7 @@ SET
     "name_en" = COALESCE(sqlc.narg(name_en), name_en),
     "description_no" = COALESCE(sqlc.narg(description_no), description_no),
     "description_en" = COALESCE(sqlc.narg(description_en), description_en),
+    "type" = COALESCE(sqlc.narg('type'), "type"),
     "link_homepage" = COALESCE(sqlc.narg(link_homepage), link_homepage),
     "link_linkedin" = COALESCE(sqlc.narg(link_linkedin), link_linkedin),
     "link_facebook" = COALESCE(sqlc.narg(link_facebook), link_facebook),
