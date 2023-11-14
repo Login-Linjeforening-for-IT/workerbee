@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-11-14T18:13:03.028Z
+-- Generated at: 2023-11-14T19:57:44.866Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -34,7 +34,7 @@ CREATE TABLE "event" (
   "informational_en" varchar,
   "time_type" time_type_enum NOT NULL DEFAULT 'default',
   "time_start" timestamptz NOT NULL,
-  "time_end" timestamptz,
+  "time_end" timestamptz NOT NULL,
   "time_publish" timestamptz,
   "time_signup_release" timestamptz,
   "time_signup_deadline" timestamptz,

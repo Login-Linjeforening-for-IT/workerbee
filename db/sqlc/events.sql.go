@@ -69,7 +69,7 @@ type CreateEventParams struct {
 	InformationalEn    zero.String  `json:"informational_en"`
 	TimeType           TimeTypeEnum `json:"time_type"`
 	TimeStart          time.Time    `json:"time_start"`
-	TimeEnd            zero.Time    `json:"time_end"`
+	TimeEnd            time.Time    `json:"time_end"`
 	TimePublish        zero.Time    `json:"time_publish"`
 	TimeSignupRelease  zero.Time    `json:"time_signup_release"`
 	TimeSignupDeadline zero.Time    `json:"time_signup_deadline"`
@@ -244,7 +244,7 @@ type GetEventsRow struct {
 	NameEn         zero.String  `json:"name_en"`
 	TimeType       TimeTypeEnum `json:"time_type"`
 	TimeStart      time.Time    `json:"time_start"`
-	TimeEnd        zero.Time    `json:"time_end"`
+	TimeEnd        time.Time    `json:"time_end"`
 	TimePublish    zero.Time    `json:"time_publish"`
 	Canceled       bool         `json:"canceled"`
 	LinkSignup     zero.String  `json:"link_signup"`

@@ -187,7 +187,7 @@ type Event struct {
 	InformationalEn    zero.String  `json:"informational_en"`
 	TimeType           TimeTypeEnum `json:"time_type"`
 	TimeStart          time.Time    `json:"time_start"`
-	TimeEnd            zero.Time    `json:"time_end"`
+	TimeEnd            time.Time    `json:"time_end"`
 	TimePublish        zero.Time    `json:"time_publish"`
 	TimeSignupRelease  zero.Time    `json:"time_signup_release"`
 	TimeSignupDeadline zero.Time    `json:"time_signup_deadline"`
