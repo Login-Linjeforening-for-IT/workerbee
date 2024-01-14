@@ -144,6 +144,11 @@ func (server *Server) initRouter() {
 		{
 			cities.GET("/", server.getAllCities)
 		}
+
+		images := api.Group("/images")
+		{
+			images.POST("/events", server.uploadEventImageRequest)
+		}
 	}
 
 	server.router = router
