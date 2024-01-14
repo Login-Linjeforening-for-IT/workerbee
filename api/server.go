@@ -84,6 +84,8 @@ func (server *Server) initRouter() {
 
 			events.POST("/audiences", server.addAudienceToEvent)
 			events.DELETE("/audiences", server.removeAudienceFromEvent)
+
+			events.POST("/image", server.uploadEventImageRequest)
 		}
 
 		rules := api.Group("/rules")
@@ -143,11 +145,6 @@ func (server *Server) initRouter() {
 		cities := api.Group("/cities")
 		{
 			cities.GET("/", server.getAllCities)
-		}
-
-		images := api.Group("/images")
-		{
-			images.POST("/events", server.uploadEventImageRequest)
 		}
 	}
 
