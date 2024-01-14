@@ -14,7 +14,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func uploadToS3(filePath, fileName string) error {
+func uploadToS3(localFilePath, fileName, doPath string) error {
 	if err := godotenv.Load(); err != nil {
 		fmt.Print("No .env file found")
 	}
@@ -32,7 +32,7 @@ func uploadToS3(filePath, fileName string) error {
 	newSession := session.New(s3Config)
 	s3Client := s3.New(newSession)
 
-	file, err := os.Open(filePath)
+	file, err := os.Open(localFilePath)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func uploadToS3(filePath, fileName string) error {
 
 	object := s3.PutObjectInput{
 		Bucket: aws.String("beehive"),
-		Key:    aws.String("img/organizations/" + fileName),
+		Key:    aws.String(doPath + fileName),
 		Body:   file,
 		ACL:    aws.String("public-read"),
 		Metadata: map[string]*string{
@@ -52,7 +52,7 @@ func uploadToS3(filePath, fileName string) error {
 	return err
 }
 
-func (server *Server) uploadEventImageRequest(ctx *gin.Context) {
+func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string) {
 	// Get the file from the request
 	file, header, err := ctx.Request.FormFile("file")
 	if err != nil {
@@ -78,11 +78,27 @@ func (server *Server) uploadEventImageRequest(ctx *gin.Context) {
 	}
 
 	// Upload the file to S3
-	err = uploadToS3(tempFile.Name(), header.Filename)
+	err = uploadToS3(tempFile.Name(), header.Filename, folderPath)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file to S3"})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
+}
+
+func (server *Server) uploadEventImageBanner(ctx *gin.Context) {
+	server.uploadImageRequest(ctx, "img/events/banner/")
+}
+
+func (server *Server) uploadEventImageSmall(ctx *gin.Context) {
+	server.uploadImageRequest(ctx, "img/events/small/")
+}
+
+func (server *Server) uploadAdImage(ctx *gin.Context) {
+	server.uploadImageRequest(ctx, "img/ads/")
+}
+
+func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
+	server.uploadImageRequest(ctx, "img/organizations/")
 }

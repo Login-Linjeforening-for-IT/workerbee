@@ -85,7 +85,8 @@ func (server *Server) initRouter() {
 			events.POST("/audiences", server.addAudienceToEvent)
 			events.DELETE("/audiences", server.removeAudienceFromEvent)
 
-			events.POST("/image", server.uploadEventImageRequest)
+			events.POST("/imagebanner", server.uploadEventImageBanner)
+			events.POST("/imagesmall", server.uploadEventImageSmall)
 		}
 
 		rules := api.Group("/rules")
@@ -113,6 +114,8 @@ func (server *Server) initRouter() {
 			organizations.POST("/", server.createOrganization)
 			organizations.PATCH("/", server.updateOrganization)
 			organizations.DELETE("/:shortname", server.deleteOrganization)
+
+			organization.POST("/image", server.uploadOrganizationImage)
 		}
 
 		categories := api.Group("/categories")
@@ -140,6 +143,8 @@ func (server *Server) initRouter() {
 
 			jobs.POST("/skills", server.addSkillToJob)
 			jobs.DELETE("/skills", server.removeSkillFromJob)
+
+			jobs.POST("/image", server.uploadAdImage)
 		}
 
 		cities := api.Group("/cities")
