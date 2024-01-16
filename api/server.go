@@ -115,7 +115,7 @@ func (server *Server) initRouter() {
 			organizations.PATCH("/", server.updateOrganization)
 			organizations.DELETE("/:shortname", server.deleteOrganization)
 
-			organization.POST("/image", server.uploadOrganizationImage)
+			organizations.POST("/image", server.uploadOrganizationImage)
 		}
 
 		categories := api.Group("/categories")
