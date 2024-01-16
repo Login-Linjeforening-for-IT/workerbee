@@ -28,9 +28,12 @@ type Config struct {
 	Port   string `config:"PORT" default:"8080"`
 	Secret string `config:"SECRET" default:"secret"`
 
-	AllowedHeaders []string `config:"ALLOWED_HEADERS" defult:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
-	AllowedMethods []string `config:"ALLOWED_METHODS" defult:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
-	AllowedOrigins []string `config:"ALLOWED_ORIGINS" defult:"*"`
+	AllowedHeaders []string `config:"ALLOWED_HEADERS" default:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
+	AllowedMethods []string `config:"ALLOWED_METHODS" default:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
+	AllowedOrigins []string `config:"ALLOWED_ORIGINS" default:"*"`
+
+	DOKey    string `config:"DO_ACCESS_KEY_ID"`
+	DOSecret string `config:"DO_SECRET_ACCESS_KEY"`
 }
 
 type Server struct {

@@ -1,7 +1,11 @@
 package api
 
 import (
+	"errors"
 	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"net/http"
 	"os"
@@ -11,19 +15,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
-func uploadToS3(localFilePath, fileName, doPath string) error {
-	if err := godotenv.Load(); err != nil {
-		fmt.Print("No .env file found")
-	}
-
-	key := os.Getenv("ACCESS_KEY_ID")
-	secret := os.Getenv("SECRET_ACCESS_KEY")
-
+func (server *Server) uploadToS3(localFilePath, fileName, doPath string) error {
 	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(key, secret, ""),
+		Credentials:      credentials.NewStaticCredentials(server.config.DOKey, server.config.DOSecret, ""),
 		Endpoint:         aws.String("https://ams3.digitaloceanspaces.com"),
 		S3ForcePathStyle: aws.Bool(false),
 		Region:           aws.String("ams3"),
@@ -52,7 +48,75 @@ func uploadToS3(localFilePath, fileName, doPath string) error {
 	return err
 }
 
-func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string) {
+func checkFileType(file *os.File) error {
+	// Check image type
+	if _, err := file.Seek(0, 0); err != nil {
+		return errors.New("failed to seek to the beginning of the file")
+	}
+
+	// Detect Content-Type using net/http
+	buffer := make([]byte, 512) // Read the first 512 bytes to detect Content-Type
+	_, err := file.Read(buffer)
+	if err != nil {
+		return errors.New("failed to read file for Content-Type detection")
+	}
+
+	contentType := http.DetectContentType(buffer)
+	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" && contentType != "image/svg+xml" {
+		return errors.New("invalid image type")
+	}
+
+	return nil
+}
+
+func checkFileRatio(file *os.File, ratioW, ratioH int) error {
+	// Print or log information about the file
+	fmt.Println("Checking file for ratio:", file.Name())
+
+	// Seek to the beginning of the file
+	_, err := file.Seek(0, 0)
+	if err != nil {
+		return err
+	}
+
+	// Open the file
+	imageFile, _, err := image.Decode(file)
+	if err != nil {
+		return errors.New("failed to decode image")
+	}
+
+	// Get image dimensions
+	bounds := imageFile.Bounds()
+	width := bounds.Dx()
+	height := bounds.Dy()
+
+	// Check image ratio (example: allow images with w:h ratio)
+	allowedRatio := float64(ratioW) / float64(ratioH)
+	actualRatio := float64(width) / float64(height)
+
+	if actualRatio != allowedRatio {
+		return errors.New("invalid image ratio")
+	}
+
+	return nil
+}
+
+func checkUploadedImage(file *os.File, ratioW, ratioH int) error {
+	/*err := checkFileType(file)
+	if err != nil {
+		return err
+	}
+	*/
+
+	err := checkFileRatio(file, ratioW, ratioH)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string, ratioW, ratioH int) {
 	// Get the file from the request
 	file, header, err := ctx.Request.FormFile("file")
 	if err != nil {
@@ -67,6 +131,7 @@ func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create temporary file"})
 		return
 	}
+
 	defer os.Remove(tempFile.Name())
 	defer tempFile.Close()
 
@@ -77,8 +142,14 @@ func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string) {
 		return
 	}
 
+	// Check that the file follows our rules
+	if err := checkUploadedImage(tempFile, ratioW, ratioH); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("File check failed: %s", err.Error())})
+		return
+	}
+
 	// Upload the file to S3
-	err = uploadToS3(tempFile.Name(), header.Filename, folderPath)
+	err = server.uploadToS3(tempFile.Name(), header.Filename, folderPath)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file to S3"})
 		return
@@ -88,17 +159,17 @@ func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string) {
 }
 
 func (server *Server) uploadEventImageBanner(ctx *gin.Context) {
-	server.uploadImageRequest(ctx, "img/events/banner/")
+	server.uploadImageRequest(ctx, "img/events/banner/", 10, 4)
 }
 
 func (server *Server) uploadEventImageSmall(ctx *gin.Context) {
-	server.uploadImageRequest(ctx, "img/events/small/")
+	server.uploadImageRequest(ctx, "img/events/small/", 10, 4)
 }
 
 func (server *Server) uploadAdImage(ctx *gin.Context) {
-	server.uploadImageRequest(ctx, "img/ads/")
+	server.uploadImageRequest(ctx, "img/ads/", 3, 2)
 }
 
 func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
-	server.uploadImageRequest(ctx, "img/organizations/")
+	server.uploadImageRequest(ctx, "img/organizations/", 3, 2)
 }
