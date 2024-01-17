@@ -71,9 +71,6 @@ func checkFileType(file *os.File) (string, error) {
 }
 
 func checkFileRatio(file *os.File, ratioW, ratioH int) error {
-	// Print or log information about the file
-	fmt.Println("Checking file for ratio:", file.Name())
-
 	// Seek to the beginning of the file
 	_, err := file.Seek(0, 0)
 	if err != nil {
