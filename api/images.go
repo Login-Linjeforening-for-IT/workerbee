@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
@@ -48,25 +49,25 @@ func (server *Server) uploadToS3(localFilePath, fileName, doPath string) error {
 	return err
 }
 
-func checkFileType(file *os.File) error {
+func checkFileType(file *os.File) (string, error) {
 	// Check image type
 	if _, err := file.Seek(0, 0); err != nil {
-		return errors.New("failed to seek to the beginning of the file")
+		return "", errors.New("failed to seek to the beginning of the file")
 	}
 
 	// Detect Content-Type using net/http
 	buffer := make([]byte, 512) // Read the first 512 bytes to detect Content-Type
 	_, err := file.Read(buffer)
 	if err != nil {
-		return errors.New("failed to read file for Content-Type detection")
+		return "", errors.New("failed to read file for Content-Type detection")
 	}
 
 	contentType := http.DetectContentType(buffer)
-	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" && contentType != "image/svg+xml" {
-		return errors.New("invalid image type")
+	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
+		return "", errors.New("invalid image type")
 	}
 
-	return nil
+	return contentType, nil
 }
 
 func checkFileRatio(file *os.File, ratioW, ratioH int) error {
@@ -94,21 +95,58 @@ func checkFileRatio(file *os.File, ratioW, ratioH int) error {
 	allowedRatio := float64(ratioW) / float64(ratioH)
 	actualRatio := float64(width) / float64(height)
 
-	if actualRatio != allowedRatio {
+	// Check that the image has the correct aspect ratio, within some margin
+	margin := allowedRatio * 0.05
+	if !(actualRatio < (allowedRatio+margin) && actualRatio > (allowedRatio-margin)) {
 		return errors.New("invalid image ratio")
 	}
 
 	return nil
 }
 
-func checkUploadedImage(file *os.File, ratioW, ratioH int) error {
-	/*err := checkFileType(file)
+func checkFileSize(file *os.File, fileType string) error {
+	// Get file information
+	fileInfo, err := file.Stat()
 	if err != nil {
 		return err
 	}
-	*/
 
-	err := checkFileRatio(file, ratioW, ratioH)
+	// Check file size
+	sizeBytes := fileInfo.Size()
+	switch fileType {
+	case "image/jpeg", "image/jpg":
+		if sizeBytes > 500*1024 {
+			return errors.New("file size exceeds maximum allowed size")
+		}
+	case "image/png":
+		if sizeBytes > 500*1024 {
+			return errors.New("file size exceeds maximum allowed size")
+		}
+	case "image/gif":
+		if sizeBytes > 2000*1024 {
+			return errors.New("file size exceeds maximum allowed size")
+		}
+	default:
+		if sizeBytes > 500*1024 {
+			return errors.New("file size exceeds maximum allowed size")
+		}
+	}
+
+	return nil
+}
+
+func checkUploadedImage(file *os.File, ratioW, ratioH int) error {
+	fileType, err := checkFileType(file)
+	if err != nil {
+		return err
+	}
+
+	err = checkFileSize(file, fileType)
+	if err != nil {
+		return err
+	}
+
+	err = checkFileRatio(file, ratioW, ratioH)
 	if err != nil {
 		return err
 	}
