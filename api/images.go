@@ -270,7 +270,7 @@ func (server *Server) uploadEventImageSmall(ctx *gin.Context) {
 	server.uploadImageRequest(ctx, "img/events/small/", 10, 4)
 }
 
-func (server *Server) uploadAdImage(ctx *gin.Context) {
+func (server *Server) uploadJobsImage(ctx *gin.Context) {
 	server.uploadImageRequest(ctx, "img/ads/", 3, 2)
 }
 
@@ -280,4 +280,16 @@ func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
 
 func (server *Server) fetchEventsBannerList(ctx *gin.Context) {
 	server.fetchImageList(ctx, "img/events/banner/")
+}
+
+func (server *Server) fetchEventsSmallList(ctx *gin.Context) {
+	server.fetchImageList(ctx, "img/events/small/")
+}
+
+func (server *Server) fetchJobsList(ctx *gin.Context) {
+	server.fetchImageList(ctx, "img/ads/")
+}
+
+func (server *Server) fetchOrganizationsList(ctx *gin.Context) {
+	server.fetchImageList(ctx, "img/organizations/")
 }

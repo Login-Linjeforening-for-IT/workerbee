@@ -151,10 +151,13 @@ func (server *Server) initRouter() {
 		images := api.Group("/images")
 		{
 			images.GET("/events/banner", server.fetchEventsBannerList)
+			images.GET("/events/small", server.fetchEventsSmallList)
+			images.GET("/jobs", server.fetchJobsList)
+			images.GET("/organizations", server.fetchOrganizationsList)
 
 			images.POST("/events/banner", server.uploadEventImageBanner)
 			images.POST("/events/small", server.uploadEventImageSmall)
-			images.POST("/jobs", server.uploadAdImage)
+			images.POST("/jobs", server.uploadJobsImage)
 			images.POST("/organizations", server.uploadOrganizationImage)
 		}
 	}
