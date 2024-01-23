@@ -154,6 +154,11 @@ func (server *Server) initRouter() {
 		{
 			cities.GET("/", server.getAllCities)
 		}
+
+		images := api.Group("/images")
+		{
+			images.GET("/events/banner", server.fetchEventsBannerList)
+		}
 	}
 
 	server.router = router

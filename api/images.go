@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -193,6 +194,74 @@ func (server *Server) uploadImageRequest(ctx *gin.Context, folderPath string, ra
 	ctx.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
 }
 
+type DropDownFileItem struct {
+	Name     string `json:"name"`
+	Size     string `json:"size"`
+	Filepath string `json:"filepath"`
+}
+
+func (server *Server) fetchImageList(ctx *gin.Context, prefix string) {
+	s3Config := &aws.Config{
+		Credentials:      credentials.NewStaticCredentials(server.config.DOKey, server.config.DOSecret, ""),
+		Endpoint:         aws.String("https://ams3.digitaloceanspaces.com"),
+		S3ForcePathStyle: aws.Bool(false),
+		Region:           aws.String("ams3"),
+	}
+
+	newSession := session.New(s3Config)
+	s3Client := s3.New(newSession)
+
+	// List objects in the specified bucket with the given prefix
+	input := s3.ListObjectsInput{
+		Bucket: aws.String("beehive"),
+		Prefix: aws.String(prefix),
+	}
+
+	result, err := s3Client.ListObjects(&input)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to list objects: %s", err.Error())})
+		return
+	}
+
+	var images []DropDownFileItem
+
+	for _, object := range result.Contents {
+		// Extract file information from the object metadata
+		name := removePrefix(*object.Key, prefix)
+
+		// Skip items representing the folder itself
+		if name == "" {
+			continue
+		}
+
+		// Check if the Size field is not nil
+		var size string
+		if object.Size != nil {
+			size = byteConverter(*object.Size, 2)
+		} else {
+			size = "0 B" // Default value if Size is nil
+		}
+
+		filepath := *object.Key
+
+		images = append(images, DropDownFileItem{name, size, filepath})
+	}
+
+	ctx.JSON(http.StatusOK, images)
+}
+
+func removePrefix(s, prefix string) string {
+	return strings.TrimPrefix(s, prefix)
+}
+
+func byteConverter(size int64, precision int) string {
+	const unit = 1024
+	if size > unit*unit {
+		return fmt.Sprintf("%.*f MiB", precision, float64(size)/(float64(unit)*float64(unit)))
+	}
+	return fmt.Sprintf("%.*f KiB", precision, float64(size)/float64(unit))
+}
+
 func (server *Server) uploadEventImageBanner(ctx *gin.Context) {
 	server.uploadImageRequest(ctx, "img/events/banner/", 10, 4)
 }
@@ -207,4 +276,8 @@ func (server *Server) uploadAdImage(ctx *gin.Context) {
 
 func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
 	server.uploadImageRequest(ctx, "img/organizations/", 3, 2)
+}
+
+func (server *Server) fetchEventsBannerList(ctx *gin.Context) {
+	server.fetchImageList(ctx, "img/events/banner/")
 }
