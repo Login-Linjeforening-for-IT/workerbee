@@ -51,7 +51,6 @@ func (server *Server) uploadToS3(localFilePath, fileName, doPath string) error {
 }
 
 func checkFileType(file *os.File) (string, error) {
-	// Check image type
 	if _, err := file.Seek(0, 0); err != nil {
 		return "", errors.New("failed to seek to the beginning of the file")
 	}
@@ -64,6 +63,7 @@ func checkFileType(file *os.File) (string, error) {
 	}
 
 	contentType := http.DetectContentType(buffer)
+	// Check if the contentType is of the allowed formats
 	if contentType != "image/jpeg" && contentType != "image/png" && contentType != "image/gif" {
 		return "", errors.New("invalid image type")
 	}
@@ -250,6 +250,8 @@ func (server *Server) fetchImageList(ctx *gin.Context, prefix string) {
 	ctx.JSON(http.StatusOK, images)
 }
 
+// Removes the prefix from the full path to the file. F.ex the prefix img/events/small from the full filepath
+// img/events/small/testfile.png, and returns just the filename.
 func removePrefix(s, prefix string) string {
 	return strings.TrimPrefix(s, prefix)
 }
