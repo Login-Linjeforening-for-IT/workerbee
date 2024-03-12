@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-11-14T19:57:44.866Z
+-- Generated at: 2024-03-05T16:32:35.959Z
 
 CREATE TYPE "time_type_enum" AS ENUM (
   'default',
@@ -60,7 +60,7 @@ CREATE TABLE "event" (
 
 CREATE TABLE "category" (
   "id" SERIAL PRIMARY KEY,
-  "color" char(6) NOT NULL,
+  "color" varchar NOT NULL,
   "name_no" varchar NOT NULL,
   "name_en" varchar,
   "description_no" text NOT NULL,
@@ -152,6 +152,7 @@ CREATE TABLE "job_advertisement" (
   "description_long_en" varchar,
   "job_type" job_type NOT NULL DEFAULT 'full',
   "time_publish" timestamptz NOT NULL DEFAULT (now()),
+  "time_expire" timestamptz NOT NULL,
   "application_deadline" timestamptz NOT NULL,
   "banner_image" varchar,
   "organization" varchar NOT NULL,
@@ -244,8 +245,6 @@ CREATE INDEX ON "ad_city_relation" ("city");
 CREATE INDEX ON "skill" ("ad");
 
 CREATE INDEX ON "skill" ("skill");
-
-COMMENT ON COLUMN "category"."color" IS 'hex color';
 
 ALTER TABLE "event" ADD FOREIGN KEY ("category") REFERENCES "category" ("id");
 

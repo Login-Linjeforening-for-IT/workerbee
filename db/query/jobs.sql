@@ -25,9 +25,9 @@ INSERT INTO "job_advertisement" (
     "position_title_no", "position_title_en", 
     "description_short_no", "description_short_en", 
     "description_long_no", "description_long_en", 
-    "job_type", "time_publish", "application_deadline", "banner_image", 
+    "job_type", "time_publish", "time_expire", "application_deadline", "banner_image", 
     "organization", "application_url"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *;
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *;
 
 -- name: UpdateJob :one
 UPDATE "job_advertisement"
@@ -44,6 +44,7 @@ SET
     "description_long_en" = COALESCE(sqlc.narg(description_long_en), description_long_en),
     "job_type" = COALESCE(sqlc.narg(job_type), job_type),
     "time_publish" = COALESCE(sqlc.narg(time_publish), time_publish),
+    "time_expire" = COALESCE(sqlc.narg(time_expire), time_expire),
     "application_deadline" = COALESCE(sqlc.narg(application_deadline), application_deadline),
     "banner_image" = COALESCE(sqlc.narg(banner_image), banner_image),
     "organization" = COALESCE(sqlc.narg(organization), organization),

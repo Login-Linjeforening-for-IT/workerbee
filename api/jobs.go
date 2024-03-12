@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 	"time"
 
@@ -15,6 +14,18 @@ type getJobsRequest struct {
 	Offset int32 `form:"offset"`
 }
 
+// getJobs godoc
+//
+//	@Summary		Get jobs
+//	@Description	Get a list of jobs
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			limit	query		int	false	"Limit"
+//	@Param			offset	query		int	false	"Offset"
+//	@Success		200		{array}		db.GetJobsRow
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/jobs [get]
 func (server *Server) getJobs(ctx *gin.Context) {
 	var req getJobsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -26,8 +37,9 @@ func (server *Server) getJobs(ctx *gin.Context) {
 		Limit:  req.Limit,
 		Offset: req.Offset,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -38,6 +50,18 @@ type getJobRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// getJob godoc
+//
+//	@Summary		Get job
+//	@Description	Get a job by ID
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			id	path		int	true	"Job ID"
+//	@Success		200	{object}	db.GetJobRow
+//	@Failure		400	{object}	errorResponse
+//	@Failure		404	{object}	errorResponse
+//	@Failure		500	{object}	errorResponse
+//	@Router			/jobs/{id} [get]
 func (server *Server) getJob(ctx *gin.Context) {
 	var req getJobRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -46,13 +70,9 @@ func (server *Server) getJob(ctx *gin.Context) {
 	}
 
 	job, err := server.service.GetJob(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -72,14 +92,26 @@ type createJobRequest struct {
 	DescriptionLongEn   zero.String `json:"description_long_en"`
 	JobType             db.JobType  `json:"job_type" binding:"required"`
 	TimePublish         time.Time   `json:"time_publish" binding:"required"`
+	TimeExpire          time.Time   `json:"time_expire" binding:"required"`
 	ApplicationDeadline time.Time   `json:"application_deadline" binding:"required"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
-	ApplicationURL      zero.String `json:"application_url"` // TODO: Make nullable in db
+	ApplicationURL      zero.String `json:"application_url"`
 
 	// TODO: consider adding skills and audiences here
 }
 
+// createJob godoc
+//
+//	@Summary		Create job
+//	@Description	Create a new job
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			request	body		createJobRequest	true	"Job details"
+//	@Success		200		{object}	db.GetJobRow
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/jobs [post]
 func (server *Server) createJob(ctx *gin.Context) {
 	var req createJobRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -100,6 +132,7 @@ func (server *Server) createJob(ctx *gin.Context) {
 		DescriptionLongEn:   req.DescriptionLongEn,
 		JobType:             req.JobType,
 		TimePublish:         req.TimePublish,
+		TimeExpire:          req.TimeExpire,
 		ApplicationDeadline: req.ApplicationDeadline,
 		BannerImage:         req.BannerImage,
 		Organization:        req.Organization,
@@ -111,7 +144,7 @@ func (server *Server) createJob(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, job)
+	ctx.JSON(http.StatusCreated, job)
 }
 
 type updateJobRequest struct {
@@ -119,6 +152,18 @@ type updateJobRequest struct {
 	db.UpdateJobParams
 }
 
+// updateJob godoc
+//
+//	@Summary		Update job
+//	@Description	Update a job by ID
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			id		path		int					true	"Job ID"
+//	@Param			request	body		db.UpdateJobParams	true	"Job details"
+//	@Success		200		{object}	db.GetJobRow
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/jobs [patch]
 func (server *Server) updateJob(ctx *gin.Context) {
 	var req updateJobRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -142,6 +187,17 @@ type deleteJobRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// deleteJob godoc
+//
+//	@Summary		Delete job
+//	@Description	Delete a job by ID
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			id	path		int	true	"Job ID"
+//	@Success		200	{object}	db.GetJobRow
+//	@Failure		400	{object}	errorResponse
+//	@Failure		500	{object}	errorResponse
+//	@Router			/jobs/{id} [delete]
 func (server *Server) deleteJob(ctx *gin.Context) {
 	var req deleteJobRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -164,6 +220,17 @@ type addSkillToJobRequest struct {
 	Skill string `json:"skill" binding:"required,min=1"`
 }
 
+// addSkillToJob godoc
+//
+//	@Summary		Add skill to job
+//	@Description	Add a skill to a job
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			body	body		addSkillToJobRequest	true	"Job ID and skill"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/jobs/skills [post]
 func (server *Server) addSkillToJob(ctx *gin.Context) {
 	var req addSkillToJobRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -181,7 +248,7 @@ func (server *Server) addSkillToJob(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.Status(http.StatusNoContent)
 }
 
 type removeSkillFromJobRequest struct {
@@ -189,6 +256,16 @@ type removeSkillFromJobRequest struct {
 	Skill string `json:"skill" binding:"required,min=1"`
 }
 
+// removeSkillFromJob godoc
+//
+//	@Summary		Remove skill from job
+//	@Description	Remove a skill from a job
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			body	body		removeSkillFromJobRequest	true	"Job ID and skill"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
 func (server *Server) removeSkillFromJob(ctx *gin.Context) {
 	var req removeSkillFromJobRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -214,6 +291,17 @@ type addCityToJobRequest struct {
 	City  string `json:"city" binding:"required,min=1"`
 }
 
+// addCityToJob godoc
+//
+//	@Summary		Add city to job
+//	@Description	Add a city to a job
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			body	body		addCityToJobRequest	true	"Job ID and city"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/jobs/cities [post]
 func (server *Server) addCityToJob(ctx *gin.Context) {
 	var req addCityToJobRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -231,7 +319,7 @@ func (server *Server) addCityToJob(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.Status(http.StatusNoContent)
 }
 
 type removeCityFromJobRequest struct {
@@ -239,6 +327,17 @@ type removeCityFromJobRequest struct {
 	City  string `json:"city" binding:"required,min=1"`
 }
 
+// removeCityFromJob godoc
+//
+//	@Summary		Remove city from job
+//	@Description	Remove a city from a job
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			body	body		removeCityFromJobRequest	true	"Job ID and city"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/jobs/cities [delete]
 func (server *Server) removeCityFromJob(ctx *gin.Context) {
 	var req removeCityFromJobRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

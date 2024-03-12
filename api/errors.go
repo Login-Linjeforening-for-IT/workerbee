@@ -13,6 +13,16 @@ import (
 	"github.com/google/uuid"
 )
 
+func errorType(err error) string {
+	t := reflect.TypeOf(err).String()
+	t = strings.TrimPrefix(t, "*")
+	switch t {
+	case "errors.errorString":
+		return "generic"
+	}
+	return t
+}
+
 type errorResponse struct {
 	Status int    `json:"status"`
 	Error  string `json:"error"`
@@ -26,10 +36,21 @@ func newErrorResponse(status int, err error) errorResponse {
 
 	if err != nil {
 		res.Error = err.Error()
-		res.Type = reflect.TypeOf(err).String()
+		res.Type = errorType(err)
 	}
 
 	return res
+}
+
+func (server *Server) CustomRecovery() gin.RecoveryFunc {
+	return func(ctx *gin.Context, err interface{}) {
+
+		if _, ok := err.(error); !ok {
+			err = fmt.Errorf("%v", err)
+		}
+
+		server.writeError(ctx, http.StatusInternalServerError, err.(error))
+	}
 }
 
 type RedactedError struct {
@@ -82,7 +103,11 @@ func (e *ValidationError) Error() string {
 func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 	if status >= 500 {
 		err = server.redactError(err)
-	} else if status != http.StatusNotFound {
+	} else if status == http.StatusNotFound {
+		err = &NotFoundError{
+			Message: err.Error(),
+		}
+	} else {
 		switch uErr := err.(type) {
 		case validator.ValidationErrors:
 			errs := make([]ValidationError, 0, len(uErr))
@@ -159,7 +184,12 @@ func (server *Server) redactError(err error) error {
 		errChain = append(errChain, chainErr.Error())
 	}
 
-	server.logger.Error().Err(err).Str("error-id", id).Str("error-chain", strings.Join(errChain, " -- ")).Int("error-chain-length", len(errChain)).Send()
+	server.logger.Error().Err(err).
+		Str("error-id", id).
+		Str("error-chain", strings.Join(errChain, " -- ")).
+		Int("error-chain-length", len(errChain)).
+		Str("type", reflect.TypeOf(err).String()).
+		Send()
 
 	return &RedactedError{
 		ID:      id,

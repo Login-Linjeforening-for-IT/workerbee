@@ -11,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func init() {
@@ -47,13 +49,17 @@ func NewServer(config *Config, service service.Service) *Server {
 		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
 	}
 
+	server.setSwaggerInfo()
+
 	server.initRouter()
 
 	return server
 }
 
 func (server *Server) initRouter() {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Logger())
+	router.Use(gin.CustomRecoveryWithWriter(nil, server.CustomRecovery()))
 
 	corsConf := cors.DefaultConfig()
 	if server.config.AllowedOrigins != nil && len(server.config.AllowedOrigins) > 0 {
@@ -66,8 +72,6 @@ func (server *Server) initRouter() {
 	corsConf.AllowMethods = server.config.AllowedMethods
 
 	router.Use(cors.New(corsConf))
-
-	router.NoRoute(server.noRoute)
 
 	api := router.Group("/api", server.authMiddleware(server.config.Secret))
 	{
@@ -146,15 +150,22 @@ func (server *Server) initRouter() {
 		}
 	}
 
-	server.router = router
-}
-
-func (server *Server) noRoute(ctx *gin.Context) {
-	server.writeError(ctx, http.StatusNotFound, &NotFoundError{
-		Message: ctx.Request.URL.Path + " not found",
+	router.GET("/docs", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "pong")
+	})
+
+	server.router = router
 }
 
 func (server *Server) Start() error {
 	return server.router.Run(":" + server.config.Port)
+}
+
+func (server *Server) StartTLS(certFile, keyFile string) error {
+	return server.router.RunTLS(":"+server.config.Port, certFile, keyFile)
 }

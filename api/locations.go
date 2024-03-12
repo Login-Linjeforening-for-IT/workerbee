@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
@@ -15,6 +14,22 @@ type getLocationsRequest struct {
 	Type   string `form:"type"`
 }
 
+// getLocations godoc
+//
+//	@ID				get-locations
+//	@Summary		Get locations
+//	@Description	Get a list of locations
+//	@Tags			locations
+//	@Produce		json
+//	@Param			params	query		getLocationsRequest			false	"Parameters"
+//	@Success		200		{array}		db.GetMazemapLocationsRow	"OK - mazemap"
+//	@Success		200		{array}		db.GetCoordsLocationsRow	"OK - coords"
+//	@Success		200		{array}		db.GetAddressLocationsRow	"OK - address"
+//	@Success		200		{array}		db.GetLocationsRow			"OK - other"
+//	@Failure		400		{object}	errorResponse
+//	@Failure		404		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/locations [get]
 func (server *Server) getLocations(ctx *gin.Context) {
 	var req getLocationsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -48,8 +63,9 @@ func (server *Server) getLocations(ctx *gin.Context) {
 		})
 	}
 
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -60,6 +76,18 @@ type getLocationRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// getLocation godoc
+//
+//	@Summary		Get location
+//	@Description	Get a location by ID
+//	@Tags			locations
+//	@Produce		json
+//	@Param			id	path		int	true	"Location ID"
+//	@Success		200	{object}	db.Location
+//	@Failure		400	{object}	errorResponse
+//	@Failure		404	{object}	errorResponse
+//	@Failure		500	{object}	errorResponse
+//	@Router			/locations/{id} [get]
 func (server *Server) getLocation(ctx *gin.Context) {
 	var req getLocationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -68,13 +96,9 @@ func (server *Server) getLocation(ctx *gin.Context) {
 	}
 
 	location, err := server.service.GetLocation(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -99,6 +123,18 @@ type createLocationRequest struct {
 	URL zero.String `json:"url"`
 }
 
+// createLocation godoc
+//
+//	@Summary		Create location
+//	@Description	Create a new location
+//	@Tags			locations
+//	@Accept			json
+//	@Produce		json
+//	@Param			location	body		createLocationRequest	true	"Location data"
+//	@Success		200			{object}	db.Location
+//	@Failure		400			{object}	errorResponse
+//	@Failure		500			{object}	errorResponse
+//	@Router			/locations [post]
 func (server *Server) createLocation(ctx *gin.Context) {
 	var req createLocationRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -133,6 +169,19 @@ type updateLocationRequest struct {
 	db.UpdateLocationParams
 }
 
+// updateLocation godoc
+//
+//	@Summary		Update location
+//	@Description	Update a location by ID
+//	@Tags			locations
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int						true	"Location ID"
+//	@Param			request	body		db.UpdateLocationParams	true	"Location details"
+//	@Success		200		{object}	db.Location
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/locations [patch]
 func (server *Server) updateLocation(ctx *gin.Context) {
 	var req updateLocationRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -156,6 +205,17 @@ type deleteLocationRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// deleteLocation godoc
+//
+//	@Summary		Delete location
+//	@Description	Delete a location by ID
+//	@Tags			locations
+//	@Produce		json
+//	@Param			id	path		int	true	"Location ID"
+//	@Success		200	{object}	db.Location
+//	@Failure		400	{object}	errorResponse
+//	@Failure		500	{object}	errorResponse
+//	@Router			/locations/{id} [delete]
 func (server *Server) deleteLocation(ctx *gin.Context) {
 	var req deleteLocationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
