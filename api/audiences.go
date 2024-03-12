@@ -19,8 +19,9 @@ import (
 //	@Router			/audiences [get]
 func (server *Server) getAudiences(ctx *gin.Context) {
 	audiences, err := server.service.GetAudiences(ctx)
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 

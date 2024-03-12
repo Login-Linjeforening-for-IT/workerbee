@@ -19,8 +19,9 @@ import (
 //	@Router			/categories [get]
 func (server *Server) getCategories(ctx *gin.Context) {
 	categories, err := server.service.GetCategories(ctx)
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
