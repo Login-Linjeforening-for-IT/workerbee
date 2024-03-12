@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"errors"
 	"net/http"
 	"time"
@@ -17,6 +16,18 @@ type getEventsRequest struct {
 	Historical bool  `form:"historical"`
 }
 
+// getEvents godoc
+//
+//	@ID				get-events
+//	@Summary		Get all events
+//	@Description	Get all events
+//	@Tags			events
+//	@Produce		json
+//	@Param			params	query		getEventsRequest	true	"Event parameters"
+//	@Success		200		{array}		db.GetEventsRow
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events [get]
 func (server *Server) getEvents(ctx *gin.Context) {
 	var req getEventsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -29,8 +40,9 @@ func (server *Server) getEvents(ctx *gin.Context) {
 		Offset:     req.Offset,
 		Limit:      req.Limit,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -41,6 +53,18 @@ type getEventRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// getEvent godoc
+//
+//	@ID				get-event
+//	@Summary		Get event by ID
+//	@Description	Get event by ID
+//	@Tags			events
+//	@Produce		json
+//	@Param			params	path		getEventRequest	true	"Event ID"
+//	@Success		200		{object}	service.EventDetails
+//	@Failure		404		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events/{id} [get]
 func (server *Server) getEvent(ctx *gin.Context) {
 	var req getEventRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -49,13 +73,9 @@ func (server *Server) getEvent(ctx *gin.Context) {
 	}
 
 	event, err := server.service.GetEventDetails(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -107,6 +127,21 @@ type createEventRequest struct {
 	*/
 }
 
+// createEvent godoc
+//
+//	@ID				create-event
+//	@Summary		Create event
+//	@Description	Create event
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		createEventRequest	true	"Event parameters"
+//	@Success		201		{object}	db.Event
+//	@Failure		400		{object}	errorResponse	"Invalid input"
+//	@Failure		404		{object}	errorResponse	"Foreign key violation"
+//	@Failure		409		{object}	errorResponse	"Event already exists"
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events [post]
 func (server *Server) createEvent(ctx *gin.Context) {
 	var req createEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -146,14 +181,7 @@ func (server *Server) createEvent(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		case *db.UniqueViolationError:
-			server.writeError(ctx, http.StatusConflict, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -165,6 +193,20 @@ type updateEventRequest struct {
 	db.UpdateEventParams
 }
 
+// updateEvent godoc
+//
+//	@ID				update-event
+//	@Summary		Update event
+//	@Description	Update event
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		updateEventRequest	true	"Event parameters"
+//	@Success		200		{object}	db.Event
+//	@Failure		400		{object}	errorResponse	"Invalid input"
+//	@Failure		404		{object}	errorResponse	"Foreign key violation"
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events [patch]
 func (server *Server) updateEvent(ctx *gin.Context) {
 	var req updateEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -172,7 +214,7 @@ func (server *Server) updateEvent(ctx *gin.Context) {
 		return
 	}
 
-	if req.TimeType.Valid && !db.IsValidTimeTypeEnum(req.TimeType.TimeTypeEnum) {
+	if req.TimeType.Valid && !(req.TimeType.TimeTypeEnum).Valid() {
 		server.writeError(ctx, http.StatusBadRequest, errors.New("invalid time type"))
 		return
 	}
@@ -182,13 +224,7 @@ func (server *Server) updateEvent(ctx *gin.Context) {
 	event, err := server.service.UpdateEvent(ctx, req.UpdateEventParams)
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -199,6 +235,18 @@ type deleteEventRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// deleteEvent godoc
+//
+//	@ID				delete-event
+//	@Summary		Delete event by ID
+//	@Description	Delete event by ID
+//	@Tags			events
+//	@Produce		json
+//	@Param			params	path		deleteEventRequest	true	"Event ID"
+//	@Success		200		{object}	db.Event
+//	@Failure		404		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events/{id} [delete]
 func (server *Server) deleteEvent(ctx *gin.Context) {
 	var req deleteEventRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -207,13 +255,9 @@ func (server *Server) deleteEvent(ctx *gin.Context) {
 	}
 
 	event, err := server.service.SoftDeleteEvent(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -225,6 +269,21 @@ type addOrganizationToEventRequest struct {
 	Organization string `json:"organization" binding:"required"`
 }
 
+// addOrganizationToEvent godoc
+//
+//	@ID				add-organization-to-event
+//	@Summary		Add organization to event
+//	@Description	Add organization to event
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		addOrganizationToEventRequest	true	"Organization parameters"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	errorResponse	"Invalid input"
+//	@Failure		404		{object}	errorResponse	"Foreign key violation"
+//	@Failure		409		{object}	errorResponse	"Organization already exists"
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events/organizations [post]
 func (server *Server) addOrganizationToEvent(ctx *gin.Context) {
 	var req addOrganizationToEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -238,18 +297,11 @@ func (server *Server) addOrganizationToEvent(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		case *db.UniqueViolationError:
-			server.writeError(ctx, http.StatusConflict, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.Status(http.StatusNoContent)
 }
 
 type removeOrganizationFromEventRequest struct {
@@ -257,6 +309,19 @@ type removeOrganizationFromEventRequest struct {
 	Organization string `json:"organization" binding:"required"`
 }
 
+// removeOrganizationFromEvent godoc
+//
+//	@ID				remove-organization-from-event
+//	@Summary		Remove organization from event
+//	@Description	Remove organization from event
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		removeOrganizationFromEventRequest	true	"Organization parameters"
+//	@Success		204		{object}	nil
+//	@Failure		404		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events/organizations [delete]
 func (server *Server) removeOrganizationFromEvent(ctx *gin.Context) {
 	var req removeOrganizationFromEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -270,16 +335,11 @@ func (server *Server) removeOrganizationFromEvent(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }
 
 type addAudienceToEventRequest struct {
@@ -287,6 +347,21 @@ type addAudienceToEventRequest struct {
 	Audience int32 `json:"audience" binding:"required,min=1"`
 }
 
+// addAudienceToEvent godoc
+//
+//	@ID				add-audience-to-event
+//	@Summary		Add audience to event
+//	@Description	Add audience to event
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		addAudienceToEventRequest	true	"Audience parameters"
+//	@Success		204		{object}	nil
+//	@Failure		400		{object}	errorResponse	"Invalid input"
+//	@Failure		404		{object}	errorResponse	"Foreign key violation"
+//	@Failure		409		{object}	errorResponse	"Audience already exists"
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events/audiences [post]
 func (server *Server) addAudienceToEvent(ctx *gin.Context) {
 	var req addAudienceToEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -300,18 +375,11 @@ func (server *Server) addAudienceToEvent(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		case *db.UniqueViolationError:
-			server.writeError(ctx, http.StatusConflict, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.Status(http.StatusNoContent)
 }
 
 type removeAudienceFromEventRequest struct {
@@ -319,6 +387,19 @@ type removeAudienceFromEventRequest struct {
 	Audience int32 `json:"audience" binding:"required,min=1"`
 }
 
+// removeAudienceFromEvent godoc
+//
+//	@ID				remove-audience-from-event
+//	@Summary		Remove audience from event
+//	@Description	Remove audience from event
+//	@Tags			events
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		removeAudienceFromEventRequest	true	"Audience parameters"
+//	@Success		204		{object}	nil
+//	@Failure		404		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/events/audiences [delete]
 func (server *Server) removeAudienceFromEvent(ctx *gin.Context) {
 	var req removeAudienceFromEventRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -332,14 +413,9 @@ func (server *Server) removeAudienceFromEvent(ctx *gin.Context) {
 	})
 	err = db.ParseError(err)
 	if err != nil {
-		switch err.(type) {
-		case *db.ForeignKeyViolationError, *db.NotFoundError:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 }

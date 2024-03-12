@@ -12,6 +12,7 @@ sql:
         emit_interface: true
         emit_exact_table_names: false
         emit_empty_slices: true
+        emit_enum_valid_method: true
         overrides:
           - db_type: pg_catalog.varchar
             go_type: github.com/guregu/null/zero.String

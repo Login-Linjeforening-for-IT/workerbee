@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
@@ -14,6 +13,17 @@ type getOrganizationsRequest struct {
 	Offset int32 `form:"offset"`
 }
 
+// getOrganizations godoc
+//
+//	@Summary		Get organizations
+//	@Description	Get a list of organizations
+//	@Tags			organizations
+//	@Produce		json
+//	@Param			params	query		getOrganizationsRequest	false	"Parameters"
+//	@Success		200		{array}		db.GetOrganizationsRow	"OK"
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/organizations [get]
 func (server *Server) getOrganizations(ctx *gin.Context) {
 	var req getOrganizationsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -25,8 +35,9 @@ func (server *Server) getOrganizations(ctx *gin.Context) {
 		Limit:  req.Limit,
 		Offset: req.Offset,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -37,6 +48,18 @@ type getOrganizationRequest struct {
 	Shortname string `uri:"shortname" binding:"required,min=1"`
 }
 
+// getOrganization godoc
+//
+//	@Summary		Get organization
+//	@Description	Get an organization by shortname
+//	@Tags			organizations
+//	@Produce		json
+//	@Param			shortname	path		string	true	"Shortname"
+//	@Success		200			{object}	db.Organization
+//	@Failure		400			{object}	errorResponse
+//	@Failure		404			{object}	errorResponse
+//	@Failure		500			{object}	errorResponse
+//	@Router			/organizations/{shortname} [get]
 func (server *Server) getOrganization(ctx *gin.Context) {
 	var req getOrganizationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -45,13 +68,9 @@ func (server *Server) getOrganization(ctx *gin.Context) {
 	}
 
 	organization, err := server.service.GetOrganization(ctx, req.Shortname)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -72,6 +91,19 @@ type createOrganizationRequest struct {
 	Logo          zero.String `json:"logo"`
 }
 
+// createOrganization godoc
+//
+//	@Summary		Create organization
+//	@Description	Create a new organization
+//	@Tags			organizations
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		createOrganizationRequest	true	"Request"
+//	@Success		200		{object}	db.Organization
+//	@Failure		400		{object}	errorResponse
+//	@Failure		409		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/organizations [post]
 func (server *Server) createOrganization(ctx *gin.Context) {
 	var req createOrganizationRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -106,6 +138,19 @@ type updateOrganizationRequest struct {
 	db.UpdateOrganizationParams
 }
 
+// updateOrganization godoc
+//
+//	@Summary		Update organization
+//	@Description	Update an organization by shortname
+//	@Tags			organizations
+//	@Accept			json
+//	@Produce		json
+//	@Param			shortname	path		string						true	"Shortname"
+//	@Param			request		body		db.UpdateOrganizationParams	true	"Request"
+//	@Success		200			{object}	db.Organization
+//	@Failure		400			{object}	errorResponse
+//	@Failure		500			{object}	errorResponse
+//	@Router			/organizations/{shortname} [patch]
 func (server *Server) updateOrganization(ctx *gin.Context) {
 	var req updateOrganizationRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -129,6 +174,17 @@ type deleteOrganizationRequest struct {
 	Shortname string `uri:"shortname" binding:"required,min=1"`
 }
 
+// deleteOrganization godoc
+//
+//	@Summary		Delete organization
+//	@Description	Delete an organization by shortname
+//	@Tags			organizations
+//	@Produce		json
+//	@Param			shortname	path		string	true	"Shortname"
+//	@Success		200			{object}	db.Organization
+//	@Failure		400			{object}	errorResponse
+//	@Failure		500			{object}	errorResponse
+//	@Router			/organizations/{shortname} [delete]
 func (server *Server) deleteOrganization(ctx *gin.Context) {
 	var req deleteOrganizationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {

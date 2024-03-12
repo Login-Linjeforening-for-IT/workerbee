@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"net/http"
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
@@ -14,6 +13,17 @@ type getRulesRequest struct {
 	Offset int32 `form:"offset"`
 }
 
+// getRules godoc
+//
+//	@Summary		Get rules
+//	@Description	Get a list of rules
+//	@Tags			rules
+//	@Produce		json
+//	@Param			params	query		getRulesRequest	false	"Parameters"
+//	@Success		200		{array}		db.GetRulesRow	"OK"
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/rules [get]
 func (server *Server) getRules(ctx *gin.Context) {
 	var req getRulesRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -25,8 +35,9 @@ func (server *Server) getRules(ctx *gin.Context) {
 		Limit:  req.Limit,
 		Offset: req.Offset,
 	})
+	err = db.ParseError(err)
 	if err != nil {
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -37,6 +48,18 @@ type getRuleRequest struct {
 	ID int32 `uri:"id" binding:"required,min=1"`
 }
 
+// getRule godoc
+//
+//	@Summary		Get rule
+//	@Description	Get a rule by ID
+//	@Tags			rules
+//	@Produce		json
+//	@Param			id	path		int	true	"Rule ID"
+//	@Success		200	{object}	db.Rule
+//	@Failure		400	{object}	errorResponse
+//	@Failure		404	{object}	errorResponse
+//	@Failure		500	{object}	errorResponse
+//	@Router			/rules/{id} [get]
 func (server *Server) getRule(ctx *gin.Context) {
 	var req getRuleRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -45,13 +68,9 @@ func (server *Server) getRule(ctx *gin.Context) {
 	}
 
 	rule, err := server.service.GetRule(ctx, req.ID)
+	err = db.ParseError(err)
 	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			server.writeError(ctx, http.StatusNotFound, err)
-		default:
-			server.writeError(ctx, http.StatusInternalServerError, err)
-		}
+		server.writeDBError(ctx, err)
 		return
 	}
 
@@ -65,6 +84,18 @@ type createRuleRequest struct {
 	DescriptionEn zero.String `json:"description_en"`
 }
 
+// createRule godoc
+//
+//	@Summary		Create rule
+//	@Description	Create a new rule
+//	@Tags			rules
+//	@Accept			json
+//	@Produce		json
+//	@Param			params	body		createRuleRequest	true	"Parameters"
+//	@Success		200		{object}	db.Rule
+//	@Failure		400		{object}	errorResponse
+//	@Failure		500		{object}	errorResponse
+//	@Router			/rules [post]
 func (server *Server) createRule(ctx *gin.Context) {
 	var req createRuleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {

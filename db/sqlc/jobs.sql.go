@@ -48,9 +48,9 @@ INSERT INTO "job_advertisement" (
     "position_title_no", "position_title_en", 
     "description_short_no", "description_short_en", 
     "description_long_no", "description_long_en", 
-    "job_type", "time_publish", "application_deadline", "banner_image", 
+    "job_type", "time_publish", "time_expire", "application_deadline", "banner_image", 
     "organization", "application_url"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, time_expire, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 
 type CreateJobParams struct {
@@ -66,6 +66,7 @@ type CreateJobParams struct {
 	DescriptionLongEn   zero.String `json:"description_long_en"`
 	JobType             JobType     `json:"job_type"`
 	TimePublish         time.Time   `json:"time_publish"`
+	TimeExpire          time.Time   `json:"time_expire"`
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
@@ -86,6 +87,7 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvert
 		arg.DescriptionLongEn,
 		arg.JobType,
 		arg.TimePublish,
+		arg.TimeExpire,
 		arg.ApplicationDeadline,
 		arg.BannerImage,
 		arg.Organization,
@@ -106,6 +108,7 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvert
 		&i.DescriptionLongEn,
 		&i.JobType,
 		&i.TimePublish,
+		&i.TimeExpire,
 		&i.ApplicationDeadline,
 		&i.BannerImage,
 		&i.Organization,
@@ -118,7 +121,7 @@ func (q *Queries) CreateJob(ctx context.Context, arg CreateJobParams) (JobAdvert
 }
 
 const getJob = `-- name: GetJob :one
-SELECT job.id, job.visible, job.highlight, job.title_no, job.title_en, job.position_title_no, job.position_title_en, job.description_short_no, job.description_short_en, job.description_long_no, job.description_long_en, job.job_type, job.time_publish, job.application_deadline, job.banner_image, job.organization, job.application_url, job.updated_at, job.created_at, job.deleted_at, org."shortname", org."name_no", org."name_en", 
+SELECT job.id, job.visible, job.highlight, job.title_no, job.title_en, job.position_title_no, job.position_title_en, job.description_short_no, job.description_short_en, job.description_long_no, job.description_long_en, job.job_type, job.time_publish, job.time_expire, job.application_deadline, job.banner_image, job.organization, job.application_url, job.updated_at, job.created_at, job.deleted_at, org."shortname", org."name_no", org."name_en", 
 		array(SELECT "skill" FROM "skill" WHERE "ad" = $1::int)::varchar[] AS skills,
 		array(SELECT "city" FROM "ad_city_relation" WHERE "ad" = $1::int)::varchar[] AS cities
     FROM "job_advertisement" AS job
@@ -140,6 +143,7 @@ type GetJobRow struct {
 	DescriptionLongEn   zero.String `json:"description_long_en"`
 	JobType             JobType     `json:"job_type"`
 	TimePublish         time.Time   `json:"time_publish"`
+	TimeExpire          time.Time   `json:"time_expire"`
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
@@ -171,6 +175,7 @@ func (q *Queries) GetJob(ctx context.Context, id int32) (GetJobRow, error) {
 		&i.DescriptionLongEn,
 		&i.JobType,
 		&i.TimePublish,
+		&i.TimeExpire,
 		&i.ApplicationDeadline,
 		&i.BannerImage,
 		&i.Organization,
@@ -295,7 +300,7 @@ UPDATE "job_advertisement"
 SET
     "deleted_at" = now(),
     "updated_at" = now()
-WHERE "id" = $1::int RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+WHERE "id" = $1::int RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, time_expire, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 
 func (q *Queries) SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement, error) {
@@ -315,6 +320,7 @@ func (q *Queries) SoftDeleteJob(ctx context.Context, id int32) (JobAdvertisement
 		&i.DescriptionLongEn,
 		&i.JobType,
 		&i.TimePublish,
+		&i.TimeExpire,
 		&i.ApplicationDeadline,
 		&i.BannerImage,
 		&i.Organization,
@@ -341,12 +347,13 @@ SET
     "description_long_en" = COALESCE($10, description_long_en),
     "job_type" = COALESCE($11, job_type),
     "time_publish" = COALESCE($12, time_publish),
-    "application_deadline" = COALESCE($13, application_deadline),
-    "banner_image" = COALESCE($14, banner_image),
-    "organization" = COALESCE($15, organization),
-    "application_url" = COALESCE($16, application_url),
+    "time_expire" = COALESCE($13, time_expire),
+    "application_deadline" = COALESCE($14, application_deadline),
+    "banner_image" = COALESCE($15, banner_image),
+    "organization" = COALESCE($16, organization),
+    "application_url" = COALESCE($17, application_url),
     "updated_at" = now()
-WHERE "id" = $17::int RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
+WHERE "id" = $18::int RETURNING id, visible, highlight, title_no, title_en, position_title_no, position_title_en, description_short_no, description_short_en, description_long_no, description_long_en, job_type, time_publish, time_expire, application_deadline, banner_image, organization, application_url, updated_at, created_at, deleted_at
 `
 
 type UpdateJobParams struct {
@@ -362,6 +369,7 @@ type UpdateJobParams struct {
 	DescriptionLongEn   zero.String `json:"description_long_en"`
 	JobType             NullJobType `json:"job_type"`
 	TimePublish         zero.Time   `json:"time_publish"`
+	TimeExpire          zero.Time   `json:"time_expire"`
 	ApplicationDeadline zero.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        zero.String `json:"organization"`
@@ -383,6 +391,7 @@ func (q *Queries) UpdateJob(ctx context.Context, arg UpdateJobParams) (JobAdvert
 		arg.DescriptionLongEn,
 		arg.JobType,
 		arg.TimePublish,
+		arg.TimeExpire,
 		arg.ApplicationDeadline,
 		arg.BannerImage,
 		arg.Organization,
@@ -404,6 +413,7 @@ func (q *Queries) UpdateJob(ctx context.Context, arg UpdateJobParams) (JobAdvert
 		&i.DescriptionLongEn,
 		&i.JobType,
 		&i.TimePublish,
+		&i.TimeExpire,
 		&i.ApplicationDeadline,
 		&i.BannerImage,
 		&i.Organization,
