@@ -4,11 +4,14 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"log"
+	"time"
 
 	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	_ "github.com/lib/pq"
 )
 
@@ -26,6 +29,21 @@ type TLSConfig struct {
 	Key     string `config:"TLS_KEY" default:"key.pem"`
 }
 
+type TokenConfig struct {
+	AccessTokenSymmetricKey  string        `config:"TOKEN_ACCESS_TOKEN_SYMMETRIC_KEY"`
+	RefreshTokenSymmetricKey string        `config:"TOKEN_REFRESH_TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration      time.Duration `config:"TOKEN_ACCESS_TOKEN_DURATION" default:"15m"`
+	RefreshTokenDuration     time.Duration `config:"TOKEN_REFRESH_TOKEN_DURATION" default:"720h"`
+}
+
+type Oauth2Config struct {
+	ClientID     string `config:"OAUTH2_CLIENT_ID"`
+	ClientSecret string `config:"OAUTH2_CLIENT_SECRET"`
+	RedirectURL  string `config:"OAUTH2_REDIRECT_URL"`
+
+	AuthentikBaseURL string `env:"OAUTH2_AUTHENTIK_BASE_URL" default:"https://authentik.login.no"`
+}
+
 var (
 	configFile = flag.String("config", ".env", "path to config file")
 )
@@ -41,10 +59,27 @@ func guard(err error) {
 }
 
 func main() {
-	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
-	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
-	tlsConf := config.MustLoad[TLSConfig](config.WithFile(*configFile))
+	// Load config
+	log.Println("Loading config...")
+	fileopt := config.WithFile(*configFile)
+	conf := config.MustLoad[DBConfig](fileopt)
+	apiConf := config.MustLoad[api.Config](fileopt)
+	tlsConf := config.MustLoad[TLSConfig](fileopt)
+	tokenConf := config.MustLoad[TokenConfig](fileopt)
+	oauth2Conf := config.MustLoad[Oauth2Config](fileopt)
 
+	// Auth and tokens
+	log.Println("Creating token makers...")
+	accessTokenMaker, err := token.NewPasetoMaker(tokenConf.AccessTokenSymmetricKey, token.AccessToken, tokenConf.AccessTokenDuration)
+	guard(err)
+
+	refreshTokenMaker, err := token.NewPasetoMaker(tokenConf.RefreshTokenSymmetricKey, token.RefreshToken, tokenConf.RefreshTokenDuration)
+	guard(err)
+
+	authentik := api.AuthentikOauth2Config(oauth2Conf.AuthentikBaseURL, oauth2Conf.ClientID, oauth2Conf.ClientSecret, oauth2Conf.RedirectURL)
+
+	// Connect to database
+	log.Println("Connecting to database...")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
@@ -58,7 +93,9 @@ func main() {
 	store := db.NewStore(conn)
 	service := service.NewService(store)
 
-	server := api.NewServer(apiConf, service)
+	// Start server
+	log.Println("Starting server...")
+	server := api.NewServer(apiConf, service, authentik, accessTokenMaker, refreshTokenMaker)
 
 	if tlsConf.Enabled {
 		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))

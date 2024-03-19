@@ -6,6 +6,7 @@ import (
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -30,9 +31,9 @@ type Config struct {
 	Port   string `config:"PORT" default:"8080"`
 	Secret string `config:"SECRET" default:"secret"`
 
-	AllowedHeaders []string `config:"ALLOWED_HEADERS" defult:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
-	AllowedMethods []string `config:"ALLOWED_METHODS" defult:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
-	AllowedOrigins []string `config:"ALLOWED_ORIGINS" defult:"*"`
+	AllowedHeaders []string `config:"ALLOWED_HEADERS" default:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
+	AllowedMethods []string `config:"ALLOWED_METHODS" default:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
+	AllowedOrigins []string `config:"ALLOWED_ORIGINS" default:"*"`
 }
 
 type Server struct {
@@ -40,13 +41,27 @@ type Server struct {
 	router  *gin.Engine
 	service service.Service
 	logger  zerolog.Logger
+
+	oauth2Config      *oauth2Config
+	accessTokenMaker  token.Maker
+	refreshTokenMaker token.Maker
 }
 
-func NewServer(config *Config, service service.Service) *Server {
+func NewServer(
+	config *Config,
+	service service.Service,
+	oauth2Conf *oauth2Config,
+	accessTokenMaker token.Maker,
+	refreshTokenMaker token.Maker,
+) *Server {
 	server := &Server{
 		config:  config,
 		service: service,
 		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
+
+		oauth2Config:      oauth2Conf,
+		accessTokenMaker:  accessTokenMaker,
+		refreshTokenMaker: refreshTokenMaker,
 	}
 
 	server.setSwaggerInfo()
@@ -59,7 +74,7 @@ func NewServer(config *Config, service service.Service) *Server {
 func (server *Server) initRouter() {
 	router := gin.New()
 	router.Use(gin.Logger())
-	router.Use(gin.CustomRecoveryWithWriter(nil, server.CustomRecovery()))
+	router.Use(gin.CustomRecoveryWithWriter(os.Stdout, server.CustomRecovery()))
 
 	corsConf := cors.DefaultConfig()
 	if server.config.AllowedOrigins != nil && len(server.config.AllowedOrigins) > 0 {
@@ -73,9 +88,10 @@ func (server *Server) initRouter() {
 
 	router.Use(cors.New(corsConf))
 
-	api := router.Group("/api", server.authMiddleware(server.config.Secret))
+	api := router.Group("/api")
+	authRoutes := api.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: proper auth check
 	{
-		events := api.Group("/events")
+		events := authRoutes.Group("/events")
 		{
 			events.GET("/", server.getEvents)
 			events.GET("/:id", server.getEvent)
@@ -90,7 +106,7 @@ func (server *Server) initRouter() {
 			events.DELETE("/audiences", server.removeAudienceFromEvent)
 		}
 
-		rules := api.Group("/rules")
+		rules := authRoutes.Group("/rules")
 		{
 			rules.GET("/", server.getRules)
 			rules.GET("/:id", server.getRule)
@@ -99,7 +115,7 @@ func (server *Server) initRouter() {
 			rules.DELETE("/:id", server.deleteRule)
 		}
 
-		locations := api.Group("/locations")
+		locations := authRoutes.Group("/locations")
 		{
 			locations.GET("/", server.getLocations)
 			locations.GET("/:id", server.getLocation)
@@ -108,7 +124,7 @@ func (server *Server) initRouter() {
 			locations.DELETE("/:id", server.deleteLocation)
 		}
 
-		organizations := api.Group("/organizations")
+		organizations := authRoutes.Group("/organizations")
 		{
 			organizations.GET("/", server.getOrganizations)
 			organizations.GET("/:shortname", server.getOrganization)
@@ -117,19 +133,19 @@ func (server *Server) initRouter() {
 			organizations.DELETE("/:shortname", server.deleteOrganization)
 		}
 
-		categories := api.Group("/categories")
+		categories := authRoutes.Group("/categories")
 		{
 			categories.GET("/", server.getCategories)
 			categories.GET("/:id", server.getCategory)
 		}
 
-		audiences := api.Group("/audiences")
+		audiences := authRoutes.Group("/audiences")
 		{
 			audiences.GET("/", server.getAudiences)
 			audiences.GET("/:id", server.getAudience)
 		}
 
-		jobs := api.Group("/jobs")
+		jobs := authRoutes.Group("/jobs")
 		{
 			jobs.GET("/", server.getJobs)
 			jobs.GET("/:id", server.getJob)
@@ -144,11 +160,14 @@ func (server *Server) initRouter() {
 			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
 
-		cities := api.Group("/cities")
+		cities := authRoutes.Group("/cities")
 		{
 			cities.GET("/", server.getAllCities)
 		}
 	}
+
+	api.GET("/oauth2/login", server.oauth2Login)
+	router.GET("/oauth2/callback", server.authentikCallback()) // TODO: swap to api group
 
 	router.GET("/docs", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
