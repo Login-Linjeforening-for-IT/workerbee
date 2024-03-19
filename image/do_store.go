@@ -1,16 +1,29 @@
 package image
 
-type Store struct {
+import (
+	"fmt"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+)
+
+type Store interface {
+	Requester
 }
 
-func NewDOStore() Store {
-	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(server.config.DOKey, server.config.DOSecret, ""),
-		Endpoint:         aws.String("https://ams3.digitaloceanspaces.com"),
-		S3ForcePathStyle: aws.Bool(false),
-		Region:           aws.String("ams3"),
+type DOStore struct {
+	DO_client *s3.S3
+	*Requester
+}
+
+func NewDOStore(DOConfig *aws.Config) *DOStore {
+	new_session, err := session.NewSession(DOConfig)
+	if err != nil {
+		fmt.Println("Could not create new session!\n")
 	}
 
-	newSession := session.New(s3Config)
-	s3Client := s3.New(newSession)
+	return &DOStore{
+		DO_client: s3.New(new_session),
+	}
 }

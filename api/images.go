@@ -1,21 +1,11 @@
 package api
 
 import (
-	"errors"
-	"fmt"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-	"io"
-	"net/http"
-	"os"
-	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +26,7 @@ func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
 }
 
 func (server *Server) fetchEventsBannerList(ctx *gin.Context) {
-	server.fetchImageList(ctx, "img/events/banner/")
+	image.FetchImageList(ctx, "img/events/banner/")
 }
 
 func (server *Server) fetchEventsSmallList(ctx *gin.Context) {

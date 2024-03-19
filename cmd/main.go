@@ -8,7 +8,10 @@ import (
 	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/image"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	_ "github.com/lib/pq"
 )
 
@@ -18,6 +21,13 @@ type DBConfig struct {
 	DBUser string `config:"DB_USER" default:"root"`
 	DBPass string `config:"DB_PASS" default:"secret"`
 	DBName string `config:"DB_NAME" default:"beehivedb"`
+}
+
+type DOConfig struct {
+	DOKey     string `config:"DO_ACCESS_KEY_ID"`
+	DOSecret  string `config:"DO_SECRET_ACCESS_KEY"`
+	DORegion  string `config:"DO_REGION" default:"ams3"`
+	DOBaseURL string `config:"DO_BASE_URL" default:"https://ams3.digitaloceanspaces.com"`
 }
 
 func guard(err error) {
@@ -37,6 +47,7 @@ func init() {
 func main() {
 	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
 	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
+	doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
@@ -50,7 +61,16 @@ func main() {
 	store := db.NewStore(conn)
 	service := service.NewService(store)
 
-	server := api.NewServer(apiConf, service)
+	s3Config := &aws.Config{
+		Credentials:      credentials.NewStaticCredentials(doConf.DOKey, doConf.DOSecret, ""),
+		Endpoint:         aws.String(doConf.DOBaseURL),
+		S3ForcePathStyle: aws.Bool(false),
+		Region:           aws.String(doConf.DORegion),
+	}
+
+	doStore := image.NewDOStore(s3Config)
+
+	server := api.NewServer(apiConf, service, doStore)
 
 	guard(server.Start())
 }

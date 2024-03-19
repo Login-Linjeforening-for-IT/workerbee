@@ -5,6 +5,7 @@ import (
 	"os"
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/image"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -39,14 +40,16 @@ type Config struct {
 type Server struct {
 	config  *Config
 	router  *gin.Engine
+	doStore *image.DOStore
 	service service.Service
 	logger  zerolog.Logger
 }
 
-func NewServer(config *Config, service service.Service) *Server {
+func NewServer(config *Config, service service.Service, doStore *image.DOStore) *Server {
 	server := &Server{
 		config:  config,
 		service: service,
+		doStore: doStore,
 		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
 	}
 
