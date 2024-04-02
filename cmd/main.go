@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -11,8 +12,10 @@ import (
 	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	_ "github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
 )
 
 type DBConfig struct {
@@ -62,7 +65,8 @@ func main() {
 	// Load config
 	log.Println("Loading config...")
 	fileopt := config.WithFile(*configFile)
-	conf := config.MustLoad[DBConfig](fileopt)
+	dbConf := config.MustLoad[DBConfig](fileopt)
+	sessionStoreConf := config.MustLoad[sessionstore.RedisConfig](fileopt)
 	apiConf := config.MustLoad[api.Config](fileopt)
 	tlsConf := config.MustLoad[TLSConfig](fileopt)
 	tokenConf := config.MustLoad[TokenConfig](fileopt)
@@ -81,21 +85,35 @@ func main() {
 	// Connect to database
 	log.Println("Connecting to database...")
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
+		dbConf.DBUser, dbConf.DBPass, dbConf.DBHost, dbConf.DBPort, dbConf.DBName)
 
 	conn, err := sql.Open("postgres", dsn)
 	guard(err)
 	defer conn.Close()
-
-	err = conn.Ping()
-	guard(err)
+	guard(conn.Ping())
 
 	store := db.NewStore(conn)
 	service := service.NewService(store)
 
+	// Connect to session store
+	log.Println("Connecting to session store...")
+	client := redis.NewClient(&redis.Options{
+		Addr:     sessionStoreConf.Addr,
+		Username: sessionStoreConf.Username,
+		Password: sessionStoreConf.Password,
+		DB:       sessionStoreConf.DB,
+	})
+	guard(client.Ping(context.Background()).Err())
+
+	sessionStore := sessionstore.New(client)
+
 	// Start server
 	log.Println("Starting server...")
-	server := api.NewServer(apiConf, service, authentik, accessTokenMaker, refreshTokenMaker)
+	server := api.NewServer(apiConf,
+		service, sessionStore,
+		authentik,
+		accessTokenMaker, refreshTokenMaker,
+	)
 
 	if tlsConf.Enabled {
 		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))

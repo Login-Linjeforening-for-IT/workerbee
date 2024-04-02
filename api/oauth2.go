@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
 	"golang.org/x/oauth2"
@@ -30,13 +31,8 @@ type oauth2Config struct {
 var stateExpiration = 20 * time.Minute
 
 func (conf *oauth2Config) generateStateOauthCookie(ctx *gin.Context) string {
-	// expiration := time.Now().Add(conf.stateExpiration)
 	state := generateOauthState()
-
-	// cookie := http.Cookie{Name: "oauthstate", Value: state, Expires: expiration}
-	// http.SetCookie(w, &cookie)
 	ctx.SetCookie("oauthstate", state, int(conf.stateExpiration.Seconds()), "/", "", false, true)
-
 	return state
 }
 
@@ -62,6 +58,20 @@ func (server *Server) oauth2Login(ctx *gin.Context) {
 
 type getUserInfoFunc func(ctx context.Context, token *oauth2.Token) (userInfo, error)
 
+type oauth2FallbackResponse struct {
+	AccessToken           string                     `json:"access_token"`
+	AccessTokenExpiresAt  time.Time                  `json:"access_token_expires_at"`
+	RefreshToken          string                     `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time                  `json:"refresh_token_expires_at"`
+	User                  oauth2FallbackResponseUser `json:"user"`
+}
+
+type oauth2FallbackResponseUser struct {
+	ID    string   `json:"id"`
+	Name  string   `json:"name"`
+	Roles []string `json:"roles"`
+}
+
 func (server *Server) oauth2Fallback(provider string, getUserInfo getUserInfoFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		oauthState, err := ctx.Request.Cookie("oauthstate")
@@ -85,7 +95,7 @@ func (server *Server) oauth2Fallback(provider string, getUserInfo getUserInfoFun
 			return
 		}
 
-		// TODO(session-store): Find a solution for this
+		// TODO(session-store): Consider upserting user
 		// user, err := server.service.UpsertUser(ctx, db.UpsertUserParams{
 		// 	Provider:       provider,
 		// 	ProviderUserID: userInfo.ID,
@@ -97,49 +107,43 @@ func (server *Server) oauth2Fallback(provider string, getUserInfo getUserInfoFun
 		// 	return
 		// }
 
-		// TODO(session-store): swap userInfo for user when session store is implemented
 		accessToken, accessTokenPayload, err := server.createAccessToken(ctx, userInfo.ID, userInfo.Roles)
 		if err != nil {
 			server.writeError(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
-		// TODO(session-store): swap userInfo for user when session store is implemented
 		refreshToken, refreshTokenPayload, err := server.createRefreshToken(ctx, userInfo.ID, userInfo.Roles)
 		if err != nil {
 			server.writeError(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
-		// TODO(session-store): Find a solution for this
-		// err = server.service.CreateSession(ctx, db.CreateSessionParams{
-		// 	ID:           refreshTokenPayload.ID,
-		// 	UserID:       user.ID,
-		// 	RefreshToken: refreshToken,
-		// 	UserAgent:    ctx.Request.UserAgent(),
-		// 	ClientIp:     ctx.ClientIP(),
-		// 	ExpiresAt:    refreshTokenPayload.ExpiresAt,
-		// })
-		// if err != nil {
-		// 	server.writeDBError(ctx, err)
-		// 	return
-		// }
+		err = server.sessionstore.CreateSession(ctx, sessionstore.CreateSessionParams{
+			ID:           refreshTokenPayload.ID,
+			UID:          userInfo.ID,
+			RefreshToken: refreshToken,
+			UserAgent:    ctx.Request.UserAgent(),
+			ClientIP:     ctx.ClientIP(),
+			ExpiresAt:    refreshTokenPayload.ExpiresAt,
+		})
+		if err != nil {
+			server.writeDBError(ctx, err)
+			return
+		}
 
 		setAccessTokenCookie(ctx, accessToken, accessTokenPayload)
 		setRefreshTokenCookie(ctx, refreshToken, refreshTokenPayload)
 
-		// ctx.Redirect(http.StatusTemporaryRedirect, "/users/me")
-
-		// TODO(session-store): swap userInfo for user when session store is implemented
-		ctx.JSON(http.StatusOK, gin.H{
-			"access_token":             accessToken,
-			"access_token_expires_at":  accessTokenPayload.ExpiresAt,
-			"refresh_token":            refreshToken,
-			"refresh_token_expires_at": refreshTokenPayload.ExpiresAt,
-			"user": gin.H{
-				"id":    userInfo.ID,
-				"name":  userInfo.Name,
-				"roles": accessTokenPayload.Roles,
+		ctx.JSON(http.StatusOK, oauth2FallbackResponse{
+			AccessToken:           accessToken,
+			AccessTokenExpiresAt:  accessTokenPayload.ExpiresAt,
+			RefreshToken:          refreshToken,
+			RefreshTokenExpiresAt: refreshTokenPayload.ExpiresAt,
+			User: oauth2FallbackResponseUser{
+				ID:    userInfo.ID,
+				Name:  userInfo.Name,
+				Roles: accessTokenPayload.Roles,
 			},
 		})
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 
 	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 
@@ -116,42 +117,36 @@ func (server *Server) refreshAccessToken(ctx *gin.Context) (*token.Payload, erro
 		return nil, ErrUnauthenticated
 	}
 
-	// TODO(session-store): Find a solution for this
-	// session, err := server.store.GetSessionByID(ctx, refreshTokenPayload.ID)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	session, err := server.sessionstore.GetSession(ctx, refreshTokenPayload.ID)
+	if err != nil {
+		return nil, err
+	}
 
-	// // validate refresh token against session
-	// if session.RefreshToken != refreshToken {
-	// 	return nil, fmt.Errorf("refresh token not matching: %w", ErrUnauthenticated)
-	// }
+	// validate refresh token against session
+	if session.RefreshToken != refreshToken {
+		return nil, fmt.Errorf("refresh token not matching: %w", ErrUnauthenticated)
+	}
 
-	// if session.UserID != refreshTokenPayload.UID {
-	// 	return nil, fmt.Errorf("user id not matching: %w", ErrUnauthenticated)
-	// }
+	if session.UID != refreshTokenPayload.UID {
+		return nil, fmt.Errorf("user id not matching: %w", ErrUnauthenticated)
+	}
 
-	// if session.ExpiresAt.Before(time.Now()) {
-	// 	return nil, fmt.Errorf("refresh token expired: %w", ErrUnauthenticated)
-	// }
+	if session.ExpiresAt.Before(time.Now()) {
+		return nil, fmt.Errorf("refresh token expired: %w", ErrUnauthenticated)
+	}
 
-	// if session.BlockedAt.Valid {
-	// 	return nil, fmt.Errorf("refresh token blocked: %w", ErrUnauthenticated)
-	// }
+	if !session.BlockedAt.IsZero() {
+		return nil, fmt.Errorf("refresh token blocked: %w", ErrUnauthenticated)
+	}
 
-	// if session.UserAgent != ctx.Request.UserAgent() {
-	// 	return nil, fmt.Errorf("user agent not matching: %w", ErrUnauthenticated)
-	// }
+	if session.UserAgent != ctx.Request.UserAgent() {
+		return nil, fmt.Errorf("user agent not matching: %w", ErrUnauthenticated)
+	}
 
-	// if session.ClientIp != ctx.ClientIP() {
-	// 	return nil, fmt.Errorf("client ip not matching: %w", ErrUnauthenticated)
-	// }
+	if session.ClientIP != ctx.ClientIP() {
+		return nil, fmt.Errorf("client ip not matching: %w", ErrUnauthenticated)
+	}
 
-	// create new access token
-	// roles, err := server.store.GetRoleOfUser(ctx, refreshTokenPayload.UID)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	accessToken, accessTokenPayload, err := server.createAccessToken(ctx, refreshTokenPayload.UID, refreshTokenPayload.Roles)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create access token: %w", err)

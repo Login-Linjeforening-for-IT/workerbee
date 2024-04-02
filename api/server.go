@@ -6,6 +6,7 @@ import (
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -37,11 +38,15 @@ type Config struct {
 }
 
 type Server struct {
-	config  *Config
-	router  *gin.Engine
-	service service.Service
-	logger  zerolog.Logger
+	config *Config
+	router *gin.Engine
+	logger zerolog.Logger
 
+	// data
+	service      service.Service
+	sessionstore sessionstore.Store
+
+	// auth
 	oauth2Config      *oauth2Config
 	accessTokenMaker  token.Maker
 	refreshTokenMaker token.Maker
@@ -50,14 +55,16 @@ type Server struct {
 func NewServer(
 	config *Config,
 	service service.Service,
+	sessionstore sessionstore.Store,
 	oauth2Conf *oauth2Config,
 	accessTokenMaker token.Maker,
 	refreshTokenMaker token.Maker,
 ) *Server {
 	server := &Server{
-		config:  config,
-		service: service,
-		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
+		config:       config,
+		service:      service,
+		sessionstore: sessionstore,
+		logger:       zerolog.New(os.Stdout).With().Timestamp().Logger(),
 
 		oauth2Config:      oauth2Conf,
 		accessTokenMaker:  accessTokenMaker,
@@ -89,7 +96,7 @@ func (server *Server) initRouter() {
 	router.Use(cors.New(corsConf))
 
 	api := router.Group("/api")
-	authRoutes := api.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: proper auth check
+	authRoutes := api.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: correct after roles are defined
 	{
 		events := authRoutes.Group("/events")
 		{
@@ -167,7 +174,7 @@ func (server *Server) initRouter() {
 	}
 
 	api.GET("/oauth2/login", server.oauth2Login)
-	router.GET("/oauth2/callback", server.authentikCallback()) // TODO: swap to api group
+	api.GET("/oauth2/callback", server.authentikCallback())
 
 	router.GET("/docs", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
