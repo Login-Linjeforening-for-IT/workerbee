@@ -95,8 +95,8 @@ func (server *Server) initRouter() {
 
 	router.Use(cors.New(corsConf))
 
-	api := router.Group("/api")
-	authRoutes := api.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: correct after roles are defined
+	v1 := router.Group("/v1")
+	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: correct after roles are defined
 	{
 		events := authRoutes.Group("/events")
 		{
@@ -113,7 +113,7 @@ func (server *Server) initRouter() {
 			events.DELETE("/audiences", server.removeAudienceFromEvent)
 		}
 
-		rules := authRoutes.Group("/rules")
+		rules := v1.Group("/rules")
 		{
 			rules.GET("/", server.getRules)
 			rules.GET("/:id", server.getRule)
@@ -122,7 +122,7 @@ func (server *Server) initRouter() {
 			rules.DELETE("/:id", server.deleteRule)
 		}
 
-		locations := authRoutes.Group("/locations")
+		locations := v1.Group("/locations")
 		{
 			locations.GET("/", server.getLocations)
 			locations.GET("/:id", server.getLocation)
@@ -131,7 +131,7 @@ func (server *Server) initRouter() {
 			locations.DELETE("/:id", server.deleteLocation)
 		}
 
-		organizations := authRoutes.Group("/organizations")
+		organizations := v1.Group("/organizations")
 		{
 			organizations.GET("/", server.getOrganizations)
 			organizations.GET("/:shortname", server.getOrganization)
@@ -140,19 +140,19 @@ func (server *Server) initRouter() {
 			organizations.DELETE("/:shortname", server.deleteOrganization)
 		}
 
-		categories := authRoutes.Group("/categories")
+		categories := v1.Group("/categories")
 		{
 			categories.GET("/", server.getCategories)
 			categories.GET("/:id", server.getCategory)
 		}
 
-		audiences := authRoutes.Group("/audiences")
+		audiences := v1.Group("/audiences")
 		{
 			audiences.GET("/", server.getAudiences)
 			audiences.GET("/:id", server.getAudience)
 		}
 
-		jobs := authRoutes.Group("/jobs")
+		jobs := v1.Group("/jobs")
 		{
 			jobs.GET("/", server.getJobs)
 			jobs.GET("/:id", server.getJob)
@@ -167,14 +167,14 @@ func (server *Server) initRouter() {
 			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
 
-		cities := authRoutes.Group("/cities")
+		cities := v1.Group("/cities")
 		{
 			cities.GET("/", server.getAllCities)
 		}
 	}
 
-	api.GET("/oauth2/login", server.oauth2Login)
-	api.GET("/oauth2/callback", server.authentikCallback())
+	v1.GET("/oauth2/login", server.oauth2Login)
+	v1.GET("/oauth2/callback", server.authentikCallback())
 
 	router.GET("/docs", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
