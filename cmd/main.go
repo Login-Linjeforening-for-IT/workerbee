@@ -21,6 +21,7 @@ type DBConfig struct {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 type DOConfig struct {
 	DOKey     string `config:"DO_ACCESS_KEY_ID"`
 	DOSecret  string `config:"DO_SECRET_ACCESS_KEY"`
@@ -34,6 +35,8 @@ type TLSConfig struct {
 	Key     string `config:"TLS_KEY" default:"key.pem"`
 }
 
+=======
+>>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 =======
 >>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 func guard(err error) {
@@ -59,8 +62,11 @@ func main() {
 	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
 	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
 <<<<<<< HEAD
+<<<<<<< HEAD
 	doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
 	tlsConf := config.MustLoad[TLSConfig](config.WithFile(*configFile))
+=======
+>>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 =======
 >>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 
@@ -79,9 +85,13 @@ func main() {
 
 	server := api.NewServer(apiConf, service)
 
+<<<<<<< HEAD
 	if tlsConf.Enabled {
 		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))
 	} else {
 		guard(server.Start())
 	}
+=======
+	guard(server.Start())
+>>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 }
