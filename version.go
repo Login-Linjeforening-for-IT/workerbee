@@ -1,6 +1,20 @@
 package adminapi
 
-import _ "embed"
+import "os"
 
-//go:embed version.txt
-var Version string
+var version string = ""
+
+func init() {
+	if version == "" {
+		v := os.Getenv("API_VERSION")
+		if v != "" {
+			version = v
+			return
+		}
+		version = "unknown"
+	}
+}
+
+func Version() string {
+	return version
+}
