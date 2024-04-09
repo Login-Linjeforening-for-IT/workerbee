@@ -56,6 +56,17 @@ func (ns NullJobType) Value() (driver.Value, error) {
 	return string(ns.JobType), nil
 }
 
+func (e JobType) Valid() bool {
+	switch e {
+	case JobTypeFull,
+		JobTypePart,
+		JobTypeSummer,
+		JobTypeVerv:
+		return true
+	}
+	return false
+}
+
 type LocationType string
 
 const (
@@ -98,6 +109,17 @@ func (ns NullLocationType) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return string(ns.LocationType), nil
+}
+
+func (e LocationType) Valid() bool {
+	switch e {
+	case LocationTypeMazemap,
+		LocationTypeCoords,
+		LocationTypeAddress,
+		LocationTypeNone:
+		return true
+	}
+	return false
 }
 
 type TimeTypeEnum string
@@ -144,6 +166,17 @@ func (ns NullTimeTypeEnum) Value() (driver.Value, error) {
 	return string(ns.TimeTypeEnum), nil
 }
 
+func (e TimeTypeEnum) Valid() bool {
+	switch e {
+	case TimeTypeEnumDefault,
+		TimeTypeEnumNoEnd,
+		TimeTypeEnumWholeDay,
+		TimeTypeEnumTbd:
+		return true
+	}
+	return false
+}
+
 type AdCityRelation struct {
 	Ad   int32  `json:"ad"`
 	City string `json:"city"`
@@ -161,8 +194,7 @@ type Audience struct {
 }
 
 type Category struct {
-	ID int32 `json:"id"`
-	// hex color
+	ID            int32       `json:"id"`
 	Color         string      `json:"color"`
 	NameNo        string      `json:"name_no"`
 	NameEn        zero.String `json:"name_en"`
@@ -235,6 +267,7 @@ type JobAdvertisement struct {
 	DescriptionLongEn   zero.String `json:"description_long_en"`
 	JobType             JobType     `json:"job_type"`
 	TimePublish         time.Time   `json:"time_publish"`
+	TimeExpire          time.Time   `json:"time_expire"`
 	ApplicationDeadline time.Time   `json:"application_deadline"`
 	BannerImage         zero.String `json:"banner_image"`
 	Organization        string      `json:"organization"`
@@ -279,6 +312,65 @@ type Organization struct {
 	DeletedAt     zero.Time   `json:"deleted_at"`
 }
 
+type PublicEvent struct {
+	ID                 int32        `json:"id"`
+	Visible            bool         `json:"visible"`
+	NameNo             string       `json:"name_no"`
+	NameEn             zero.String  `json:"name_en"`
+	DescriptionNo      string       `json:"description_no"`
+	DescriptionEn      zero.String  `json:"description_en"`
+	InformationalNo    zero.String  `json:"informational_no"`
+	InformationalEn    zero.String  `json:"informational_en"`
+	TimeType           TimeTypeEnum `json:"time_type"`
+	TimeStart          time.Time    `json:"time_start"`
+	TimeEnd            time.Time    `json:"time_end"`
+	TimePublish        zero.Time    `json:"time_publish"`
+	TimeSignupRelease  zero.Time    `json:"time_signup_release"`
+	TimeSignupDeadline zero.Time    `json:"time_signup_deadline"`
+	Canceled           bool         `json:"canceled"`
+	Digital            bool         `json:"digital"`
+	Highlight          bool         `json:"highlight"`
+	ImageSmall         zero.String  `json:"image_small"`
+	ImageBanner        string       `json:"image_banner"`
+	LinkFacebook       zero.String  `json:"link_facebook"`
+	LinkDiscord        zero.String  `json:"link_discord"`
+	LinkSignup         zero.String  `json:"link_signup"`
+	LinkStream         zero.String  `json:"link_stream"`
+	Capacity           zero.Int     `json:"capacity"`
+	Full               bool         `json:"full"`
+	Category           int32        `json:"category"`
+	Location           zero.Int     `json:"location"`
+	Parent             zero.Int     `json:"parent"`
+	Rule               zero.Int     `json:"rule"`
+	UpdatedAt          time.Time    `json:"updated_at"`
+	CreatedAt          time.Time    `json:"created_at"`
+	DeletedAt          zero.Time    `json:"deleted_at"`
+}
+
+type PublicJob struct {
+	ID                  int32       `json:"id"`
+	Visible             bool        `json:"visible"`
+	Highlight           bool        `json:"highlight"`
+	TitleNo             string      `json:"title_no"`
+	TitleEn             zero.String `json:"title_en"`
+	PositionTitleNo     string      `json:"position_title_no"`
+	PositionTitleEn     zero.String `json:"position_title_en"`
+	DescriptionShortNo  string      `json:"description_short_no"`
+	DescriptionShortEn  zero.String `json:"description_short_en"`
+	DescriptionLongNo   string      `json:"description_long_no"`
+	DescriptionLongEn   zero.String `json:"description_long_en"`
+	JobType             JobType     `json:"job_type"`
+	TimePublish         time.Time   `json:"time_publish"`
+	TimeExpire          time.Time   `json:"time_expire"`
+	ApplicationDeadline time.Time   `json:"application_deadline"`
+	BannerImage         zero.String `json:"banner_image"`
+	Organization        string      `json:"organization"`
+	ApplicationUrl      zero.String `json:"application_url"`
+	UpdatedAt           time.Time   `json:"updated_at"`
+	CreatedAt           time.Time   `json:"created_at"`
+	DeletedAt           zero.Time   `json:"deleted_at"`
+}
+
 type Rule struct {
 	ID            int32       `json:"id"`
 	NameNo        string      `json:"name_no"`
@@ -293,4 +385,63 @@ type Rule struct {
 type Skill struct {
 	Ad    int32  `json:"ad"`
 	Skill string `json:"skill"`
+}
+
+type VisibleEvent struct {
+	ID                 int32        `json:"id"`
+	Visible            bool         `json:"visible"`
+	NameNo             string       `json:"name_no"`
+	NameEn             zero.String  `json:"name_en"`
+	DescriptionNo      string       `json:"description_no"`
+	DescriptionEn      zero.String  `json:"description_en"`
+	InformationalNo    zero.String  `json:"informational_no"`
+	InformationalEn    zero.String  `json:"informational_en"`
+	TimeType           TimeTypeEnum `json:"time_type"`
+	TimeStart          time.Time    `json:"time_start"`
+	TimeEnd            time.Time    `json:"time_end"`
+	TimePublish        zero.Time    `json:"time_publish"`
+	TimeSignupRelease  zero.Time    `json:"time_signup_release"`
+	TimeSignupDeadline zero.Time    `json:"time_signup_deadline"`
+	Canceled           bool         `json:"canceled"`
+	Digital            bool         `json:"digital"`
+	Highlight          bool         `json:"highlight"`
+	ImageSmall         zero.String  `json:"image_small"`
+	ImageBanner        string       `json:"image_banner"`
+	LinkFacebook       zero.String  `json:"link_facebook"`
+	LinkDiscord        zero.String  `json:"link_discord"`
+	LinkSignup         zero.String  `json:"link_signup"`
+	LinkStream         zero.String  `json:"link_stream"`
+	Capacity           zero.Int     `json:"capacity"`
+	Full               bool         `json:"full"`
+	Category           int32        `json:"category"`
+	Location           zero.Int     `json:"location"`
+	Parent             zero.Int     `json:"parent"`
+	Rule               zero.Int     `json:"rule"`
+	UpdatedAt          time.Time    `json:"updated_at"`
+	CreatedAt          time.Time    `json:"created_at"`
+	DeletedAt          zero.Time    `json:"deleted_at"`
+}
+
+type VisibleJob struct {
+	ID                  int32       `json:"id"`
+	Visible             bool        `json:"visible"`
+	Highlight           bool        `json:"highlight"`
+	TitleNo             string      `json:"title_no"`
+	TitleEn             zero.String `json:"title_en"`
+	PositionTitleNo     string      `json:"position_title_no"`
+	PositionTitleEn     zero.String `json:"position_title_en"`
+	DescriptionShortNo  string      `json:"description_short_no"`
+	DescriptionShortEn  zero.String `json:"description_short_en"`
+	DescriptionLongNo   string      `json:"description_long_no"`
+	DescriptionLongEn   zero.String `json:"description_long_en"`
+	JobType             JobType     `json:"job_type"`
+	TimePublish         time.Time   `json:"time_publish"`
+	TimeExpire          time.Time   `json:"time_expire"`
+	ApplicationDeadline time.Time   `json:"application_deadline"`
+	BannerImage         zero.String `json:"banner_image"`
+	Organization        string      `json:"organization"`
+	ApplicationUrl      zero.String `json:"application_url"`
+	UpdatedAt           time.Time   `json:"updated_at"`
+	CreatedAt           time.Time   `json:"created_at"`
+	DeletedAt           zero.Time   `json:"deleted_at"`
 }

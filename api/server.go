@@ -12,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func init() {
@@ -53,13 +55,17 @@ func NewServer(config *Config, service service.Service, doStore *image.DOStore) 
 		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
 	}
 
+	server.setSwaggerInfo()
+
 	server.initRouter()
 
 	return server
 }
 
 func (server *Server) initRouter() {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Logger())
+	router.Use(gin.CustomRecoveryWithWriter(nil, server.CustomRecovery()))
 
 	corsConf := cors.DefaultConfig()
 	if server.config.AllowedOrigins != nil && len(server.config.AllowedOrigins) > 0 {
@@ -73,11 +79,9 @@ func (server *Server) initRouter() {
 
 	router.Use(cors.New(corsConf))
 
-	router.NoRoute(server.noRoute)
-
-	api := router.Group("/api", server.authMiddleware(server.config.Secret))
+	v1 := router.Group("/v1", server.authMiddleware(server.config.Secret))
 	{
-		events := api.Group("/events")
+		events := v1.Group("/events")
 		{
 			events.GET("/", server.getEvents)
 			events.GET("/:id", server.getEvent)
@@ -92,7 +96,7 @@ func (server *Server) initRouter() {
 			events.DELETE("/audiences", server.removeAudienceFromEvent)
 		}
 
-		rules := api.Group("/rules")
+		rules := v1.Group("/rules")
 		{
 			rules.GET("/", server.getRules)
 			rules.GET("/:id", server.getRule)
@@ -101,7 +105,7 @@ func (server *Server) initRouter() {
 			rules.DELETE("/:id", server.deleteRule)
 		}
 
-		locations := api.Group("/locations")
+		locations := v1.Group("/locations")
 		{
 			locations.GET("/", server.getLocations)
 			locations.GET("/:id", server.getLocation)
@@ -110,7 +114,7 @@ func (server *Server) initRouter() {
 			locations.DELETE("/:id", server.deleteLocation)
 		}
 
-		organizations := api.Group("/organizations")
+		organizations := v1.Group("/organizations")
 		{
 			organizations.GET("/", server.getOrganizations)
 			organizations.GET("/:shortname", server.getOrganization)
@@ -119,19 +123,19 @@ func (server *Server) initRouter() {
 			organizations.DELETE("/:shortname", server.deleteOrganization)
 		}
 
-		categories := api.Group("/categories")
+		categories := v1.Group("/categories")
 		{
 			categories.GET("/", server.getCategories)
 			categories.GET("/:id", server.getCategory)
 		}
 
-		audiences := api.Group("/audiences")
+		audiences := v1.Group("/audiences")
 		{
 			audiences.GET("/", server.getAudiences)
 			audiences.GET("/:id", server.getAudience)
 		}
 
-		jobs := api.Group("/jobs")
+		jobs := v1.Group("/jobs")
 		{
 			jobs.GET("/", server.getJobs)
 			jobs.GET("/:id", server.getJob)
@@ -146,12 +150,12 @@ func (server *Server) initRouter() {
 			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
 
-		cities := api.Group("/cities")
+		cities := v1.Group("/cities")
 		{
 			cities.GET("/", server.getAllCities)
 		}
 
-		images := api.Group("/images")
+		images := v1.Group("/images")
 		{
 			images.GET("/events/banner", server.fetchEventsBannerList)
 			images.GET("/events/small", server.fetchEventsSmallList)
@@ -165,15 +169,22 @@ func (server *Server) initRouter() {
 		}
 	}
 
-	server.router = router
-}
-
-func (server *Server) noRoute(ctx *gin.Context) {
-	server.writeError(ctx, http.StatusNotFound, &NotFoundError{
-		Message: ctx.Request.URL.Path + " not found",
+	router.GET("/docs", func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
 	})
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "pong")
+	})
+
+	server.router = router
 }
 
 func (server *Server) Start() error {
 	return server.router.Run(":" + server.config.Port)
+}
+
+func (server *Server) StartTLS(certFile, keyFile string) error {
+	return server.router.RunTLS(":"+server.config.Port, certFile, keyFile)
 }

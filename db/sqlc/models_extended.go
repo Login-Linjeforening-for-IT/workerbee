@@ -6,17 +6,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func IsValidTimeTypeEnum[T ~string](t T) bool {
-	switch TimeTypeEnum(t) {
-	case TimeTypeEnumDefault, TimeTypeEnumWholeDay, TimeTypeEnumNoEnd, TimeTypeEnumTbd:
-		return true
-	default:
-		return false
-	}
-}
-
 var validTimeTypeEnum validator.Func = func(fl validator.FieldLevel) bool {
-	return IsValidTimeTypeEnum(fl.Field().String())
+	return TimeTypeEnum(fl.Field().String()).Valid()
 }
 
 func BindTimeTypeEnumValidator(validator *validator.Validate, tag string) {
@@ -49,17 +40,8 @@ func (ns *NullTimeTypeEnum) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func IsValidJobType[T ~string](t T) bool {
-	switch JobType(t) {
-	case JobTypeVerv, JobTypeSummer, JobTypePart, JobTypeFull:
-		return true
-	default:
-		return false
-	}
-}
-
 var validJobType validator.Func = func(fl validator.FieldLevel) bool {
-	return IsValidJobType(fl.Field().String())
+	return JobType(fl.Field().String()).Valid()
 }
 
 func BindJobTypeValidator(validator *validator.Validate, tag string) {
@@ -92,17 +74,8 @@ func (nl *NullJobType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func IsValidLocationType[T ~string](t T) bool {
-	switch LocationType(t) {
-	case LocationTypeAddress, LocationTypeCoords, LocationTypeMazemap, LocationTypeNone:
-		return true
-	default:
-		return false
-	}
-}
-
 var validLocationType validator.Func = func(fl validator.FieldLevel) bool {
-	return IsValidLocationType(fl.Field().String())
+	return LocationType(fl.Field().String()).Valid()
 }
 
 func BindLocationTypeValidator(validator *validator.Validate, tag string) {

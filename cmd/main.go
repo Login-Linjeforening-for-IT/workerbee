@@ -30,11 +30,16 @@ type DOConfig struct {
 	DOBaseURL string `config:"DO_BASE_URL" default:"https://ams3.digitaloceanspaces.com"`
 }
 
+type TLSConfig struct {
+	Enabled bool   `config:"TLS_ENABLED" default:"true"`
+	Cert    string `config:"TLS_CERT" default:"cert.pem"`
+	Key     string `config:"TLS_KEY" default:"key.pem"`
+}
+
 func guard(err error) {
 	if err != nil {
 		panic(fmt.Errorf("%T %w", err, err))
 	}
-}
 
 var (
 	configFile = flag.String("config", ".env", "path to config file")
@@ -44,12 +49,20 @@ func init() {
 	flag.Parse()
 }
 
+func guard(err error) {
+	if err != nil {
+		panic(fmt.Errorf("%T %w", err, err))
+	}
+}
+
 func main() {
 	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
 	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
 	doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
+	tlsConf := config.MustLoad[TLSConfig](config.WithFile(*configFile))
 
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
 
 	conn, err := sql.Open("postgres", dsn)
 	guard(err)
@@ -72,5 +85,9 @@ func main() {
 
 	server := api.NewServer(apiConf, service, doStore)
 
-	guard(server.Start())
+	if tlsConf.Enabled {
+		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))
+	} else {
+		guard(server.Start())
+	}
 }

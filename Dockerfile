@@ -5,7 +5,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o bin/main cmd/main.go
+RUN go build \
+    -ldflags="-X 'git.logntnu.no/tekkom/web/beehive/admin-api.version=${IMAGE_VERSION}'" \
+    -o bin/main \
+    cmd/main.go
 
 # Run stage
 FROM scratch
