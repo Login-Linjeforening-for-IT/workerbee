@@ -1,39 +1,6 @@
 package image
 
-import (
-	"context"
-	"errors"
-	"fmt"
-	"image"
-	"io"
-	"net/http"
-	"os"
-	"strings"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
-)
-
-type Requests interface {
-	UploadImage(ctx context.Context, it imageType, file *os.File, fileName string)
-	FetchImageList(ctx context.Context)
-}
-
-type Manager struct {
-	do *DOStore.doStore
-	*Store
-}
-
-type imageType int
-
-const (
-	ImageTypeJobs imageType = iota
-	ImageTypeEventsBanner
-	ImageTypeEventsSmall
-	ImageTypeOrg
-)
-
-func (reqs *Requests) uploadToS3(localFilePath, fileName, doPath string) error {
+func (server *Server) uploadToS3(localFilePath, fileName, doPath string) error {
 	file, err := os.Open(localFilePath)
 	if err != nil {
 		return err
@@ -54,33 +21,46 @@ func (reqs *Requests) uploadToS3(localFilePath, fileName, doPath string) error {
 	return err
 }
 
-func (server *Server) UploadImage() error {
+func (server *Server) UploadImageRequest(ctx *gin.Context, folderPath string, ratioW, ratioH int) {
+	// Get the file from the request
+	file, header, err := ctx.Request.FormFile("file")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	defer file.Close()
+
 	// Create a temporary file to store the uploaded file
 	tempFile, err := os.CreateTemp("", "uploaded-*.png")
 	if err != nil {
-		return errors.New("failed to create temporary file")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create temporary file"})
+		return
 	}
+
 	defer os.Remove(tempFile.Name())
 	defer tempFile.Close()
 
 	// Copy the file to the temporary file
 	_, err = io.Copy(tempFile, file)
 	if err != nil {
-		return errors.New("failed to copy file")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to copy file"})
+		return
 	}
 
 	// Check that the file follows our rules
 	if err := checkUploadedImage(tempFile, ratioW, ratioH); err != nil {
-		return fmt.Errorf("file check failed: %s", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("File check failed: %s", err.Error())})
+		return
 	}
 
 	// Upload the file to S3
-	err = server.uploadToS3(tempFile.Name(), fileName, folderPath)
+	err = server.uploadToS3(tempFile.Name(), header.Filename, folderPath)
 	if err != nil {
-		return errors.New("failed to upload file to S3")
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to upload file to S3"})
+		return
 	}
 
-	return nil
+	ctx.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully"})
 }
 
 type DropDownFileItem struct {
@@ -89,7 +69,7 @@ type DropDownFileItem struct {
 	Filepath string `json:"filepath"`
 }
 
-func (server *Server) FetchImageList(prefix string) ([]DropDownFileItem, error) {
+func (server *Server) FetchImageList(ctx *gin.Context, prefix string) {
 	// List objects in the specified bucket with the given prefix
 	input := s3.ListObjectsInput{
 		Bucket: aws.String("beehive"),
@@ -98,7 +78,8 @@ func (server *Server) FetchImageList(prefix string) ([]DropDownFileItem, error) 
 
 	result, err := s3Client.ListObjects(&input)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list objects: %s", err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to list objects: %s", err.Error())})
+		return
 	}
 
 	var images []DropDownFileItem
@@ -125,7 +106,7 @@ func (server *Server) FetchImageList(prefix string) ([]DropDownFileItem, error) 
 		images = append(images, DropDownFileItem{name, size, filepath})
 	}
 
-	return images, nil
+	ctx.JSON(http.StatusOK, images)
 }
 
 // Removes the prefix from the full path to the file. F.ex the prefix img/events/small from the full filepath

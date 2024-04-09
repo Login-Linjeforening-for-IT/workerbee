@@ -8,10 +8,7 @@ import (
 	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/image"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	_ "github.com/lib/pq"
 )
 
@@ -23,6 +20,7 @@ type DBConfig struct {
 	DBName string `config:"DB_NAME" default:"beehivedb"`
 }
 
+<<<<<<< HEAD
 type DOConfig struct {
 	DOKey     string `config:"DO_ACCESS_KEY_ID"`
 	DOSecret  string `config:"DO_SECRET_ACCESS_KEY"`
@@ -36,6 +34,8 @@ type TLSConfig struct {
 	Key     string `config:"TLS_KEY" default:"key.pem"`
 }
 
+=======
+>>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 func guard(err error) {
 	if err != nil {
 		panic(fmt.Errorf("%T %w", err, err))
@@ -58,8 +58,11 @@ func guard(err error) {
 func main() {
 	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
 	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
+<<<<<<< HEAD
 	doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
 	tlsConf := config.MustLoad[TLSConfig](config.WithFile(*configFile))
+=======
+>>>>>>> parent of b5ab644 (Checkpoint, dont look at this)
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		conf.DBUser, conf.DBPass, conf.DBHost, conf.DBPort, conf.DBName)
@@ -74,16 +77,7 @@ func main() {
 	store := db.NewStore(conn)
 	service := service.NewService(store)
 
-	s3Config := &aws.Config{
-		Credentials:      credentials.NewStaticCredentials(doConf.DOKey, doConf.DOSecret, ""),
-		Endpoint:         aws.String(doConf.DOBaseURL),
-		S3ForcePathStyle: aws.Bool(false),
-		Region:           aws.String(doConf.DORegion),
-	}
-
-	doStore := image.NewDOStore(s3Config)
-
-	server := api.NewServer(apiConf, service, doStore)
+	server := api.NewServer(apiConf, service)
 
 	if tlsConf.Enabled {
 		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))
