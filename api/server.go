@@ -73,9 +73,9 @@ func (server *Server) initRouter() {
 
 	router.Use(cors.New(corsConf))
 
-	api := router.Group("/api", server.authMiddleware(server.config.Secret))
+	v1 := router.Group("/v1", server.authMiddleware(server.config.Secret))
 	{
-		events := api.Group("/events")
+		events := v1.Group("/events")
 		{
 			events.GET("/", server.getEvents)
 			events.GET("/:id", server.getEvent)
@@ -90,7 +90,7 @@ func (server *Server) initRouter() {
 			events.DELETE("/audiences", server.removeAudienceFromEvent)
 		}
 
-		rules := api.Group("/rules")
+		rules := v1.Group("/rules")
 		{
 			rules.GET("/", server.getRules)
 			rules.GET("/:id", server.getRule)
@@ -99,7 +99,7 @@ func (server *Server) initRouter() {
 			rules.DELETE("/:id", server.deleteRule)
 		}
 
-		locations := api.Group("/locations")
+		locations := v1.Group("/locations")
 		{
 			locations.GET("/", server.getLocations)
 			locations.GET("/:id", server.getLocation)
@@ -108,7 +108,7 @@ func (server *Server) initRouter() {
 			locations.DELETE("/:id", server.deleteLocation)
 		}
 
-		organizations := api.Group("/organizations")
+		organizations := v1.Group("/organizations")
 		{
 			organizations.GET("/", server.getOrganizations)
 			organizations.GET("/:shortname", server.getOrganization)
@@ -117,19 +117,19 @@ func (server *Server) initRouter() {
 			organizations.DELETE("/:shortname", server.deleteOrganization)
 		}
 
-		categories := api.Group("/categories")
+		categories := v1.Group("/categories")
 		{
 			categories.GET("/", server.getCategories)
 			categories.GET("/:id", server.getCategory)
 		}
 
-		audiences := api.Group("/audiences")
+		audiences := v1.Group("/audiences")
 		{
 			audiences.GET("/", server.getAudiences)
 			audiences.GET("/:id", server.getAudience)
 		}
 
-		jobs := api.Group("/jobs")
+		jobs := v1.Group("/jobs")
 		{
 			jobs.GET("/", server.getJobs)
 			jobs.GET("/:id", server.getJob)
@@ -144,7 +144,7 @@ func (server *Server) initRouter() {
 			jobs.DELETE("/skills", server.removeSkillFromJob)
 		}
 
-		cities := api.Group("/cities")
+		cities := v1.Group("/cities")
 		{
 			cities.GET("/", server.getAllCities)
 		}
