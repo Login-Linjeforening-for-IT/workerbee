@@ -8,6 +8,7 @@ import (
 	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/images"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
 	_ "github.com/lib/pq"
 )
@@ -50,7 +51,7 @@ func guard(err error) {
 func main() {
 	conf := config.MustLoad[DBConfig](config.WithFile(*configFile))
 	apiConf := config.MustLoad[api.Config](config.WithFile(*configFile))
-	doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
+	// doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
 	tlsConf := config.MustLoad[TLSConfig](config.WithFile(*configFile))
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
@@ -66,7 +67,9 @@ func main() {
 	store := db.NewStore(conn)
 	service := service.NewService(store)
 
-	server := api.NewServer(apiConf, service)
+	imageStore := images.NewFileStore("./testimages") // TODO: Implement DO store
+
+	server := api.NewServer(apiConf, service, imageStore)
 
 	if tlsConf.Enabled {
 		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))

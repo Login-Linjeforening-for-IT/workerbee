@@ -1,6 +1,7 @@
-package api
+package images
 
 import (
+	"image"
 	"os"
 	"testing"
 )
@@ -33,7 +34,7 @@ func TestByteConverter(t *testing.T) {
 
 func TestCheckFileSize(t *testing.T) {
 	t.Run("SizeTest", func(t *testing.T) {
-		testImageFolder := "../assets/img/"
+		testImageFolder := "../testdata/images/"
 
 		testCases := []struct {
 			fileName  string
@@ -56,7 +57,12 @@ func TestCheckFileSize(t *testing.T) {
 				}
 				defer f.Close()
 
-				err = checkFileSize(f, tc.fileType)
+				info, err := f.Stat()
+				if err != nil {
+					t.Fatalf("Failed to get file info for %s: %s", filePath, err)
+				}
+
+				err = checkFileSize(info.Size(), tc.fileType)
 
 				if tc.expectErr && err == nil {
 					t.Errorf("Expected error for file %s, but got none", filePath)
@@ -72,7 +78,7 @@ func TestCheckFileSize(t *testing.T) {
 
 func TestCheckFileRatio(t *testing.T) {
 	t.Run("RatioTests", func(t *testing.T) {
-		testImageFolder := "../assets/img/"
+		testImageFolder := "../testdata/images/"
 
 		testCases := []struct {
 			fileName  string
@@ -98,61 +104,19 @@ func TestCheckFileRatio(t *testing.T) {
 				}
 				defer f.Close()
 
-				err = checkFileRatio(f, tc.ratioW, tc.ratioH)
-
-				if tc.expectErr && err == nil {
-					t.Errorf("Expected error for file %s, but got none", filePath)
-				}
-
-				if !tc.expectErr && err != nil {
-					t.Errorf("Unexpected error for file %s: %s", filePath, err)
-				}
-			})
-		}
-	})
-}
-
-func TestCheckFileType(t *testing.T) {
-	t.Run("FiletypeTest", func(t *testing.T) {
-		testImageFolder := "../assets/img/"
-
-		testCases := []struct {
-			fileName  string
-			fileType  string
-			expectErr bool
-		}{
-			{"badratio_4867kb.gif", "image/gif", false},
-			{"goodratio_20kb.jpg", "image/jpeg", false},
-			{"goodratio_1390kb.jpg", "image/jpeg", false},
-			{"goodratio_23kb.png", "image/png", false},
-			{"i_like_bits.bmp", "image/bmp", true},
-		}
-
-		for _, tc := range testCases {
-			t.Run(tc.fileName, func(t *testing.T) {
-				filePath := testImageFolder + tc.fileName
-				f, err := os.Open(filePath)
+				img, _, err := image.Decode(f)
 				if err != nil {
-					t.Fatalf("Failed to open file %s: %s", filePath, err)
+					t.Fatalf("Failed to decode image %s: %s", filePath, err)
 				}
-				defer f.Close()
 
-				fType, err := checkFileType(f)
+				err = checkFileRatio(img, tc.ratioW, tc.ratioH)
 
 				if tc.expectErr && err == nil {
 					t.Errorf("Expected error for file %s, but got none", filePath)
-
-					if fType != "" {
-						t.Errorf("Expected empty string, but got %s", fType)
-					}
 				}
 
 				if !tc.expectErr && err != nil {
 					t.Errorf("Unexpected error for file %s: %s", filePath, err)
-
-					if fType != tc.fileType {
-						t.Errorf("Expected %s, but got %s", tc.fileType, fType)
-					}
 				}
 			})
 		}

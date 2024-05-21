@@ -5,6 +5,7 @@ import (
 	"os"
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/images"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -43,13 +44,20 @@ type Server struct {
 	router  *gin.Engine
 	service service.Service
 	logger  zerolog.Logger
+
+	imageStore images.Store
 }
 
-func NewServer(config *Config, service service.Service) *Server {
+func NewServer(
+	config *Config,
+	service service.Service,
+	imageStore images.Store,
+) *Server {
 	server := &Server{
-		config:  config,
-		service: service,
-		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
+		config:     config,
+		service:    service,
+		logger:     zerolog.New(os.Stdout).With().Timestamp().Logger(),
+		imageStore: imageStore,
 	}
 
 	server.setSwaggerInfo()
@@ -152,17 +160,21 @@ func (server *Server) initRouter() {
 			cities.GET("/", server.getAllCities)
 		}
 
-		images := v1.Group("/images")
-		{
-			images.GET("/events/banner", server.fetchEventsBannerList)
-			images.GET("/events/small", server.fetchEventsSmallList)
-			images.GET("/jobs", server.fetchJobsList)
-			images.GET("/organizations", server.fetchOrganizationsList)
+		if server.imageStore != nil {
+			images := v1.Group("/images")
+			{
+				images.GET("/events/banner", server.fetchEventsBannerList)
+				images.GET("/events/small", server.fetchEventsSmallList)
+				images.GET("/jobs", server.fetchJobsList)
+				images.GET("/organizations", server.fetchOrganizationsList)
 
-			images.POST("/events/banner", server.uploadEventImageBanner)
-			images.POST("/events/small", server.uploadEventImageSmall)
-			images.POST("/jobs", server.uploadJobsImage)
-			images.POST("/organizations", server.uploadOrganizationImage)
+				images.POST("/events/banner", server.uploadEventImageBanner)
+				images.POST("/events/small", server.uploadEventImageSmall)
+				images.POST("/jobs", server.uploadJobsImage)
+				images.POST("/organizations", server.uploadOrganizationImage)
+			}
+		} else {
+			server.logger.Warn().Msg("Image routes are not registered because image store is not set")
 		}
 	}
 
