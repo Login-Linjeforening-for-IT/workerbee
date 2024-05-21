@@ -44,7 +44,7 @@ type Oauth2Config struct {
 	ClientSecret string `config:"OAUTH2_CLIENT_SECRET"`
 	RedirectURL  string `config:"OAUTH2_REDIRECT_URL"`
 
-	AuthentikBaseURL string `env:"OAUTH2_AUTHENTIK_BASE_URL" default:"https://authentik.login.no"`
+	AuthentikBaseURL string `config:"OAUTH2_AUTHENTIK_BASE_URL" default:"https://authentik.login.no"`
 }
 
 var (
