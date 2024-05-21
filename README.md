@@ -1,2 +1,3 @@
 # Beehive Admin API
-lol2
+
+https://wiki.login.no/en/tekkom/projects/beehive/docs/backend/admin-api
