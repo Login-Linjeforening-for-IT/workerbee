@@ -6,6 +6,8 @@ import (
 
 	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
+	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -30,23 +32,43 @@ type Config struct {
 	Port   string `config:"PORT" default:"8080"`
 	Secret string `config:"SECRET" default:"secret"`
 
-	AllowedHeaders []string `config:"ALLOWED_HEADERS" defult:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
-	AllowedMethods []string `config:"ALLOWED_METHODS" defult:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
-	AllowedOrigins []string `config:"ALLOWED_ORIGINS" defult:"*"`
+	AllowedHeaders []string `config:"ALLOWED_HEADERS" default:"Content-Type,Authorization,Accept,Accept-Encoding,Accept-Language"`
+	AllowedMethods []string `config:"ALLOWED_METHODS" default:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
+	AllowedOrigins []string `config:"ALLOWED_ORIGINS" default:"*"`
 }
 
 type Server struct {
-	config  *Config
-	router  *gin.Engine
-	service service.Service
-	logger  zerolog.Logger
+	config *Config
+	router *gin.Engine
+	logger zerolog.Logger
+
+	// data
+	service      service.Service
+	sessionstore sessionstore.Store
+
+	// auth
+	oauth2Config      *oauth2Config
+	accessTokenMaker  token.Maker
+	refreshTokenMaker token.Maker
 }
 
-func NewServer(config *Config, service service.Service) *Server {
+func NewServer(
+	config *Config,
+	service service.Service,
+	sessionstore sessionstore.Store,
+	oauth2Conf *oauth2Config,
+	accessTokenMaker token.Maker,
+	refreshTokenMaker token.Maker,
+) *Server {
 	server := &Server{
-		config:  config,
-		service: service,
-		logger:  zerolog.New(os.Stdout).With().Timestamp().Logger(),
+		config:       config,
+		service:      service,
+		sessionstore: sessionstore,
+		logger:       zerolog.New(os.Stdout).With().Timestamp().Logger(),
+
+		oauth2Config:      oauth2Conf,
+		accessTokenMaker:  accessTokenMaker,
+		refreshTokenMaker: refreshTokenMaker,
 	}
 
 	server.setSwaggerInfo()
@@ -59,7 +81,7 @@ func NewServer(config *Config, service service.Service) *Server {
 func (server *Server) initRouter() {
 	router := gin.New()
 	router.Use(gin.Logger())
-	router.Use(gin.CustomRecoveryWithWriter(nil, server.CustomRecovery()))
+	router.Use(gin.CustomRecoveryWithWriter(os.Stdout, server.CustomRecovery()))
 
 	corsConf := cors.DefaultConfig()
 	if server.config.AllowedOrigins != nil && len(server.config.AllowedOrigins) > 0 {
@@ -73,9 +95,10 @@ func (server *Server) initRouter() {
 
 	router.Use(cors.New(corsConf))
 
-	v1 := router.Group("/v1", server.authMiddleware(server.config.Secret))
+	v1 := router.Group("/v1")
+	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: correct after roles are defined
 	{
-		events := v1.Group("/events")
+		events := authRoutes.Group("/events")
 		{
 			events.GET("/", server.getEvents)
 			events.GET("/:id", server.getEvent)
@@ -149,6 +172,9 @@ func (server *Server) initRouter() {
 			cities.GET("/", server.getAllCities)
 		}
 	}
+
+	v1.GET("/oauth2/login", server.oauth2Login)
+	v1.GET("/oauth2/callback", server.authentikCallback())
 
 	router.GET("/docs", func(ctx *gin.Context) {
 		ctx.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
