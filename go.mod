@@ -1,4 +1,4 @@
-module git.logntnu.no/tekkom/web/beehive/admin-api
+module gitlab.login.no/tekkom/web/beehive/admin-api
 
 go 1.21.0
 

@@ -4,10 +4,6 @@ import (
 	"net/http"
 	"os"
 
-	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -15,6 +11,10 @@ import (
 	"github.com/rs/zerolog"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/service"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/sessionstore"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
 )
 
 func init() {

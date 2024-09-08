@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
 
 	"github.com/gin-gonic/gin"
 )

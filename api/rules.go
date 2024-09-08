@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"github.com/gin-gonic/gin"
 	"github.com/guregu/null/zero"
+	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
 )
 
 type getRulesRequest struct {

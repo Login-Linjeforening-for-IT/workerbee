@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/sessionstore"
 	"golang.org/x/oauth2"
 )
 

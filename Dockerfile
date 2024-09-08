@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 RUN go build \
-    -ldflags="-X 'git.logntnu.no/tekkom/web/beehive/admin-api.version=${IMAGE_VERSION}'" \
+    -ldflags="-X 'gitlab.login.no/tekkom/web/beehive/admin-api.version=${IMAGE_VERSION}'" \
     -o bin/main \
     cmd/main.go
 

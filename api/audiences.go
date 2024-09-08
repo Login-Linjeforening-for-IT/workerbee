@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"github.com/gin-gonic/gin"
+	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
 )
 
 // getAudiences godoc

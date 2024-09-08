@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"strings"
 
-	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
 )
 
 func errorType(err error) string {
@@ -101,9 +101,10 @@ func (e *ValidationError) Error() string {
 }
 
 func (server *Server) writeError(ctx *gin.Context, status int, err error) {
-	if status >= 500 {
-		err = server.redactError(err)
-	} else if status == http.StatusNotFound {
+	// if status >= 500 {
+	// 	err = server.redactError(err)
+	// } else 
+	if status == http.StatusNotFound {
 		err = &NotFoundError{
 			Message: err.Error(),
 		}

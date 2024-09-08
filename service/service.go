@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
+	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
 )
 
 type Service interface {

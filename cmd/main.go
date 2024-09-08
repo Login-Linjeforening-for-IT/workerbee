@@ -8,14 +8,14 @@ import (
 	"log"
 	"time"
 
-	"git.logntnu.no/tekkom/web/beehive/admin-api/api"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/config"
-	db "git.logntnu.no/tekkom/web/beehive/admin-api/db/sqlc"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/service"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/sessionstore"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/token"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/api"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/config"
+	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/service"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/sessionstore"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
 )
 
 type DBConfig struct {

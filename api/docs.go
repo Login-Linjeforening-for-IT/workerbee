@@ -1,8 +1,8 @@
 package api
 
 import (
-	adminapi "git.logntnu.no/tekkom/web/beehive/admin-api"
-	"git.logntnu.no/tekkom/web/beehive/admin-api/docs"
+	adminapi "gitlab.login.no/tekkom/web/beehive/admin-api"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/docs"
 )
 
 func (server *Server) setSwaggerInfo() {

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"git.logntnu.no/tekkom/web/beehive/admin-api/utils/require"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/utils/require"
 )
 
 func Test__NewPayload(t *testing.T) {
