@@ -112,7 +112,8 @@ func main() {
 	server := api.NewServer(apiConf,
 		service, sessionStore,
 		authentik,
-		accessTokenMaker, refreshTokenMaker,
+		accessTokenMaker, 
+		refreshTokenMaker,
 	)
 
 	if tlsConf.Enabled {

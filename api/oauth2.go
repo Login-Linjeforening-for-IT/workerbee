@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"crypto/tls"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
@@ -40,14 +41,30 @@ func generateOauthState() string {
 	return xid.New().String()
 }
 
+// Custom HTTP client with TLS verification disabled
+func selfSignedClient() *http.Client {
+    return &http.Client{
+        Transport: &http.Transport{
+            TLSClientConfig: &tls.Config{
+                InsecureSkipVerify: true,
+            },
+        },
+    }
+}
+
 // exchange code for token
 func (conf oauth2Config) getToken(code string) (*oauth2.Token, error) {
-	token, err := conf.Exchange(context.Background(), code)
-	if err != nil {
-		return nil, fmt.Errorf("code exchange wrong: %w", err)
-	}
+    // Create a context with a custom HTTP client
+    insecureClient := selfSignedClient()
+    ctx := context.WithValue(context.Background(), oauth2.HTTPClient, insecureClient)
 
-	return token, nil
+    // Exchange the code for a token
+    token, err := conf.Exchange(ctx, code)
+    if err != nil {
+        return nil, fmt.Errorf("code exchange wrong: %w", err)
+    }
+
+    return token, nil
 }
 
 func (server *Server) oauth2Login(ctx *gin.Context) {
