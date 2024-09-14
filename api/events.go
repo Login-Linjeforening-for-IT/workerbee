@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -31,7 +32,7 @@ type getEventsRequest struct {
 func (server *Server) getEvents(ctx *gin.Context) {
 	var req getEventsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getEvents, ShouldBindQuery - %w", err))
 		return
 	}
 
@@ -68,7 +69,7 @@ type getEventRequest struct {
 func (server *Server) getEvent(ctx *gin.Context) {
 	var req getEventRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getEvent, ShouldBindUri - %w", err))
 		return
 	}
 
@@ -215,7 +216,7 @@ func (server *Server) updateEvent(ctx *gin.Context) {
 	}
 
 	if req.TimeType.Valid && !(req.TimeType.TimeTypeEnum).Valid() {
-		server.writeError(ctx, http.StatusBadRequest, errors.New("invalid time type"))
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("updateEvent, ShouldBindJSON - %w", errors.New("invalid time type")))
 		return
 	}
 
@@ -250,7 +251,7 @@ type deleteEventRequest struct {
 func (server *Server) deleteEvent(ctx *gin.Context) {
 	var req deleteEventRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("deleteEvent, ShouldBindUri - %w", err))
 		return
 	}
 

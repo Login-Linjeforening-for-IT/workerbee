@@ -31,7 +31,7 @@ func (server *Server) authMiddleware(checkAuthorization authorizationCheckFunc) 
 			if err == nil {
 				refreshed = true
 			} else {
-				server.writeError(ctx, http.StatusUnauthorized, ErrUnauthenticated)
+				server.writeError(ctx, http.StatusUnauthorized, fmt.Errorf("authMiddleware, refreshAccessToken - %w", ErrUnauthenticated))
 				ctx.Abort()
 				return
 			}
@@ -40,7 +40,7 @@ func (server *Server) authMiddleware(checkAuthorization authorizationCheckFunc) 
 		if !refreshed {
 			payload, err = server.accessTokenMaker.VerifyToken(accessToken)
 			if err != nil {
-				server.writeError(ctx, http.StatusUnauthorized, ErrUnauthenticated)
+				server.writeError(ctx, http.StatusUnauthorized, fmt.Errorf("authMiddleware, VerifyToken - %w", ErrUnauthenticated))
 				ctx.Abort()
 				return
 			}
@@ -48,7 +48,7 @@ func (server *Server) authMiddleware(checkAuthorization authorizationCheckFunc) 
 
 		if checkAuthorization != nil {
 			if !checkAuthorization(payload.Roles) {
-				server.writeError(ctx, http.StatusForbidden, ErrUnauthorized)
+				server.writeError(ctx, http.StatusForbidden, fmt.Errorf("authMiddleware, checkAuthorization - %w", ErrUnauthenticated))
 				ctx.Abort()
 				return
 			}

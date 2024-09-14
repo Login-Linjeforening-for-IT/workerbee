@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ type getLocationsRequest struct {
 func (server *Server) getLocations(ctx *gin.Context) {
 	var req getLocationsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getLocations, ShouldBindQuery - %w", err))
 		return
 	}
 
@@ -91,7 +92,7 @@ type getLocationRequest struct {
 func (server *Server) getLocation(ctx *gin.Context) {
 	var req getLocationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getLocation, ShouldBindQuery - %w", err))
 		return
 	}
 
@@ -219,7 +220,7 @@ type deleteLocationRequest struct {
 func (server *Server) deleteLocation(ctx *gin.Context) {
 	var req deleteLocationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("deleteLocation, ShouldBindUri - %w", err))
 		return
 	}
 

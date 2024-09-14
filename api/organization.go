@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ type getOrganizationsRequest struct {
 func (server *Server) getOrganizations(ctx *gin.Context) {
 	var req getOrganizationsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getOrganizations, ShouldBindQuery  - %w", err))
 		return
 	}
 
@@ -63,7 +64,7 @@ type getOrganizationRequest struct {
 func (server *Server) getOrganization(ctx *gin.Context) {
 	var req getOrganizationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getOrganization, ShouldBindUri  - %w", err))
 		return
 	}
 
@@ -188,7 +189,7 @@ type deleteOrganizationRequest struct {
 func (server *Server) deleteOrganization(ctx *gin.Context) {
 	var req deleteOrganizationRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("deleteOrganization, ShouldBindUri  - %w", err))
 		return
 	}
 

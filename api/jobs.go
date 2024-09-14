@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -29,7 +30,7 @@ type getJobsRequest struct {
 func (server *Server) getJobs(ctx *gin.Context) {
 	var req getJobsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getJobs, ShouldBindQuery - %w", err))
 		return
 	}
 
@@ -65,7 +66,7 @@ type getJobRequest struct {
 func (server *Server) getJob(ctx *gin.Context) {
 	var req getJobRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getJob, ShouldBindUri - %w", err))
 		return
 	}
 
@@ -201,7 +202,7 @@ type deleteJobRequest struct {
 func (server *Server) deleteJob(ctx *gin.Context) {
 	var req deleteJobRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("deleteJob, ShouldBindUri - %w", err))
 		return
 	}
 

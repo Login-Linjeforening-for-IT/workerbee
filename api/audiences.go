@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +48,7 @@ type getAudienceRequest struct {
 func (server *Server) getAudience(ctx *gin.Context) {
 	var req getAudienceRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getAudience, ShouldBindUri - %w", err))
 		return
 	}
 

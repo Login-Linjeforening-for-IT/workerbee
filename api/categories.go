@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -46,7 +47,7 @@ type getCategoryRequest struct {
 func (server *Server) getCategory(ctx *gin.Context) {
 	var req getCategoryRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getCategory, ShouldBindUri - %w", err))
 		return
 	}
 

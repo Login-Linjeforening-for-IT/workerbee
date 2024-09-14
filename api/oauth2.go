@@ -95,20 +95,20 @@ func (server *Server) oauth2Fallback(provider string, getUserInfo getUserInfoFun
 		if err != nil || ctx.Request.FormValue("state") != oauthState.Value {
 			err = fmt.Errorf("error - " + ctx.Request.FormValue("state"))
 
-			server.writeError(ctx, http.StatusUnauthorized, err)
+			server.writeError(ctx, http.StatusUnauthorized, fmt.Errorf("oauth2Fallback, Cookie or FormValue - %w", err))
 			return
 		}
 
 		code := ctx.Request.FormValue("code")
 		userToken, err := server.oauth2Config.getToken(code)
 		if err != nil {
-			server.writeError(ctx, http.StatusInternalServerError, err)
+			server.writeError(ctx, http.StatusInternalServerError, fmt.Errorf("oauth2Fallback, getToken  - %w", err))
 			return
 		}
 
 		userInfo, err := getUserInfo(ctx, userToken)
 		if err != nil {
-			server.writeError(ctx, http.StatusInternalServerError, err)
+			server.writeError(ctx, http.StatusInternalServerError, fmt.Errorf("oauth2Fallback, getUserInfo  - %w", err))
 			return
 		}
 
@@ -126,13 +126,13 @@ func (server *Server) oauth2Fallback(provider string, getUserInfo getUserInfoFun
 
 		accessToken, accessTokenPayload, err := server.createAccessToken(ctx, userInfo.ID, userInfo.Roles)
 		if err != nil {
-			server.writeError(ctx, http.StatusInternalServerError, err)
+			server.writeError(ctx, http.StatusInternalServerError, fmt.Errorf("oauth2Fallback, createAccessToken  - %w", err))
 			return
 		}
 
 		refreshToken, refreshTokenPayload, err := server.createRefreshToken(ctx, userInfo.ID, userInfo.Roles)
 		if err != nil {
-			server.writeError(ctx, http.StatusInternalServerError, err)
+			server.writeError(ctx, http.StatusInternalServerError, fmt.Errorf("oauth2Fallback, createRefreshToken  - %w", err))
 			return
 		}
 

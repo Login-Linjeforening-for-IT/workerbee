@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,7 @@ type getRulesRequest struct {
 func (server *Server) getRules(ctx *gin.Context) {
 	var req getRulesRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getRules, ShouldBindQuery  - %w", err))
 		return
 	}
 
@@ -63,7 +64,7 @@ type getRuleRequest struct {
 func (server *Server) getRule(ctx *gin.Context) {
 	var req getRuleRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("getRule, ShouldBindUri  - %w", err))
 		return
 	}
 
@@ -149,7 +150,7 @@ type deleteRuleRequest struct {
 func (server *Server) deleteRule(ctx *gin.Context) {
 	var req deleteRuleRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
-		server.writeError(ctx, http.StatusBadRequest, err)
+		server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("deleteRule, ShouldBindUri  - %w", err))
 		return
 	}
 

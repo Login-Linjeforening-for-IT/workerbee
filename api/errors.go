@@ -49,7 +49,7 @@ func (server *Server) CustomRecovery() gin.RecoveryFunc {
 			err = fmt.Errorf("%v", err)
 		}
 
-		server.writeError(ctx, http.StatusInternalServerError, err.(error))
+		server.writeError(ctx, http.StatusInternalServerError, fmt.Errorf("CustomRecovery, !ok - %w", err.(error)))
 	}
 }
 
@@ -131,11 +131,11 @@ func (server *Server) writeError(ctx *gin.Context, status int, err error) {
 func (server *Server) writeDBError(ctx *gin.Context, err error) {
 	switch err.(type) {
 	case *db.ForeignKeyViolationError, *db.NotFoundError:
-		server.writeError(ctx, http.StatusNotFound, err)
+		server.writeError(ctx, http.StatusNotFound, fmt.Errorf("writeDBError, ForeignKeyViolationError - %w", err))
 	case *db.UniqueViolationError:
-		server.writeError(ctx, http.StatusConflict, err)
+		server.writeError(ctx, http.StatusConflict, fmt.Errorf("writeDBError, UniqueViolationError - %w", err))
 	default:
-		server.writeError(ctx, http.StatusInternalServerError, err)
+		server.writeError(ctx, http.StatusInternalServerError, fmt.Errorf("writeDBError, default - %w", err))
 	}
 }
 
@@ -174,7 +174,7 @@ func writeValidationError[T any](server *Server, ctx *gin.Context, err error) {
 		err = &ValidationErrors{errs}
 	}
 
-	server.writeError(ctx, http.StatusBadRequest, err)
+	server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("writeValidationError, ValidationError - %w", err))
 }
 
 func (server *Server) redactError(err error) error {
