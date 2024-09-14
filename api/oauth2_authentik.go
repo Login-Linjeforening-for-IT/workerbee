@@ -86,7 +86,7 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 	err = json.Unmarshal(content, &u)
 	// err = json.NewDecoder(response.Body).Decode(&u)
 	if err != nil {
-		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal: %s\n%w", content, err)
+		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal failed: %s\nJSON content: %s", err.Error(), string(content))
 	}
 
 	return userInfo{
