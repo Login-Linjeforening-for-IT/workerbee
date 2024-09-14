@@ -21,7 +21,7 @@ func AuthentikOauth2Config(baseURL string, clientID string, clientSecret string,
 			Scopes:       []string{"email", "profile", "openid"},
 			Endpoint:     authentikEndpoint(baseURL),
 		},
-		UserInfoEndpoint: baseURL + OauthAuthentikUserInfoPath,
+		UserInfoEndpoint: baseURL + "/application/o/userinfo/",
 		RevokeEndpoint:   baseURL + "/application/o/revoke/",
 		stateExpiration:  stateExpiration,
 		provider:         "authentik",
@@ -39,8 +39,6 @@ func (server *Server) authentikCallback() gin.HandlerFunc {
 	return server.oauth2Fallback("authentik", server.oauth2Config.getAuthentikUserInfo)
 }
 
-var OauthAuthentikUserInfoPath = "/application/o/userinfo/"
-
 type authentikUserInfo struct {
 	Sub    string   `json:"sub"`
 	Name   string   `json:"name"`
@@ -49,6 +47,10 @@ type authentikUserInfo struct {
 }
 
 func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth2.Token) (userInfo, error) {
+	if (token == nil) {
+		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - token is nil")
+	}
+
 	client := conf.Client(ctx, token)
 
 	client.Transport = &http.Transport{
@@ -56,6 +58,7 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 			InsecureSkipVerify: true,
 		},
 	}
+
 
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
@@ -86,7 +89,7 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 	err = json.Unmarshal(content, &u)
 	// err = json.NewDecoder(response.Body).Decode(&u)
 	if err != nil {
-		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal failed: %s\nJSON content: %s, Length: %d", err.Error(), string(content), len(content))
+		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal failed: %s\nJSON content: %s, Length: %d, Token: %s", err.Error(), string(content), len(content), token)
 	}
 
 	return userInfo{
