@@ -59,7 +59,7 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
-		return userInfo{}, err
+		return userInfo{}, fmt.Errorf("userinfo error: %w", err)
 	}
 	defer response.Body.Close()
 
@@ -81,12 +81,12 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 	}
 	*/
 	fmt.Println(string(content))
-
+	
 	var u authentikUserInfo
 	err = json.Unmarshal(content, &u)
 	// err = json.NewDecoder(response.Body).Decode(&u)
 	if err != nil {
-		return userInfo{}, err
+		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal: %s\n%w", content, err)
 	}
 
 	return userInfo{
