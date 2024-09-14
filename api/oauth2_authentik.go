@@ -2,9 +2,11 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -48,6 +50,13 @@ type authentikUserInfo struct {
 
 func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth2.Token) (userInfo, error) {
 	client := conf.Client(ctx, token)
+
+	client.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
 		return userInfo{}, err

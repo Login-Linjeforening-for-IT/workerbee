@@ -29,6 +29,13 @@ package api
 
 // func (conf *oauth2Config) getGoogleUserInfo(ctx context.Context, token *oauth2.Token) (userInfo, error) {
 // 	client := conf.Client(ctx, token)
+
+// client.Transport = &http.Transport{
+// 	TLSClientConfig: &tls.Config{
+// 		InsecureSkipVerify: true,
+// 	},
+// }
+
 // 	response, err := client.Get(conf.UserInfoEndpoint)
 // 	if err != nil {
 // 		return userInfo{}, err
