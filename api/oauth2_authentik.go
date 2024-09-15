@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -47,7 +48,7 @@ type authentikUserInfo struct {
 }
 
 func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth2.Token) (userInfo, error) {
-	if (token == nil) {
+	if token == nil {
 		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - token is nil")
 	}
 
@@ -59,11 +60,14 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 		},
 	}
 
-
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
 		return userInfo{}, fmt.Errorf("userinfo error: %w", err)
 	}
+	return userInfo{
+		ID: strconv.Itoa(response.StatusCode),
+	}, nil
+
 	defer response.Body.Close()
 
 	content, err := io.ReadAll(response.Body)
@@ -84,7 +88,7 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 	}
 	*/
 	fmt.Println(string(content))
-	
+
 	var u authentikUserInfo
 	err = json.Unmarshal(content, &u)
 	// err = json.NewDecoder(response.Body).Decode(&u)
