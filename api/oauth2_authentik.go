@@ -2,11 +2,11 @@ package api
 
 import (
 	"context"
-	"crypto/tls"
+	// "crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
+	// "net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -54,13 +54,13 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 
 	client := conf.Client(ctx, token)
 
-	transport := client.Transport.(*http.Transport)
+	// transport := client.Transport.(*http.Transport)
 
-	if transport.TLSClientConfig == nil {
-		transport.TLSClientConfig = &tls.Config{}
-	}
+	// if transport.TLSClientConfig == nil {
+	// 	transport.TLSClientConfig = &tls.Config{}
+	// }
 
-	transport.TLSClientConfig.InsecureSkipVerify = true
+	// transport.TLSClientConfig.InsecureSkipVerify = true
 
 	if true {
 		return userInfo{}, fmt.Errorf("%s", client.Transport)
