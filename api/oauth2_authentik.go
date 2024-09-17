@@ -60,6 +60,10 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 		},
 	}
 
+	if true {
+		return userInfo{}, fmt.Errorf("%s", client.Transport)
+	}
+
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
 		return userInfo{}, fmt.Errorf("userinfo error: %w", err)
