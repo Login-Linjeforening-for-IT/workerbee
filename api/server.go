@@ -84,7 +84,7 @@ func (server *Server) initRouter() {
 	router.Use(gin.CustomRecoveryWithWriter(os.Stdout, server.CustomRecovery()))
 
 	corsConf := cors.DefaultConfig()
-	if server.config.AllowedOrigins != nil && len(server.config.AllowedOrigins) > 0 {
+	if len(server.config.AllowedOrigins) > 0 {
 		corsConf.AllowOrigins = server.config.AllowedOrigins
 	} else {
 		corsConf.AllowAllOrigins = true

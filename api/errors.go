@@ -1,7 +1,7 @@
 package api
 
 import (
-	"errors"
+	// "errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
 )
 
@@ -177,24 +177,24 @@ func writeValidationError[T any](server *Server, ctx *gin.Context, err error) {
 	server.writeError(ctx, http.StatusBadRequest, fmt.Errorf("writeValidationError, ValidationError - %w", err))
 }
 
-func (server *Server) redactError(err error) error {
-	id := uuid.NewString()
+// func (server *Server) redactError(err error) error {
+// 	id := uuid.NewString()
 
-	errChain := []string{}
-	for chainErr := err; chainErr != nil; chainErr = errors.Unwrap(chainErr) {
-		errChain = append(errChain, chainErr.Error())
-	}
+// 	errChain := []string{}
+// 	for chainErr := err; chainErr != nil; chainErr = errors.Unwrap(chainErr) {
+// 		errChain = append(errChain, chainErr.Error())
+// 	}
 
-	server.logger.Error().Err(err).
-		Str("error-id", id).
-		Str("error-chain", strings.Join(errChain, " -- ")).
-		Int("error-chain-length", len(errChain)).
-		Str("type", reflect.TypeOf(err).String()).
-		Send()
+// 	server.logger.Error().Err(err).
+// 		Str("error-id", id).
+// 		Str("error-chain", strings.Join(errChain, " -- ")).
+// 		Int("error-chain-length", len(errChain)).
+// 		Str("type", reflect.TypeOf(err).String()).
+// 		Send()
 
-	return &RedactedError{
-		ID:      id,
-		Status:  http.StatusInternalServerError,
-		Message: "Something went wrong. Contact admin if problem persists.",
-	}
-}
+// 	return &RedactedError{
+// 		ID:      id,
+// 		Status:  http.StatusInternalServerError,
+// 		Message: "Something went wrong. Contact admin if problem persists.",
+// 	}
+// }

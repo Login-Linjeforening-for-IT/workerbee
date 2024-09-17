@@ -13,14 +13,16 @@ const (
 	refreshTokenCookieName = "refresh_token"
 )
 
-func (server *Server) createAccessToken(ctx context.Context, userID string, roles []string) (string, *token.Payload, error) {
+// _ = ctx, but was unused
+func (server *Server) createAccessToken(_ context.Context, userID string, roles []string) (string, *token.Payload, error) {
 	return server.accessTokenMaker.CreateToken(token.CreateTokenParams{
 		UID:   userID,
 		Roles: roles,
 	})
 }
 
-func (server *Server) createRefreshToken(ctx context.Context, userID string, roles []string) (string, *token.Payload, error) {
+// _ = ctx, but was unused
+func (server *Server) createRefreshToken(_ context.Context, userID string, roles []string) (string, *token.Payload, error) {
 	return server.refreshTokenMaker.CreateToken(token.CreateTokenParams{
 		UID:   userID,
 		Roles: roles,

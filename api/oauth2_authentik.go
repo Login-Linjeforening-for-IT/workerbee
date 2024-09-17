@@ -2,12 +2,9 @@ package api
 
 import (
 	"context"
-	// "crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
-	// "net/http"
-	// "strconv"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -54,18 +51,6 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 
 	client := conf.Client(ctx, token)
 
-	// transport := client.Transport.(*http.Transport)
-
-	// if transport.TLSClientConfig == nil {
-	// 	transport.TLSClientConfig = &tls.Config{}
-	// }
-
-	// transport.TLSClientConfig.InsecureSkipVerify = true
-
-	// if true {
-	// 	return userInfo{}, fmt.Errorf("%s", client.Transport)
-	// }
-
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
 		return userInfo{}, fmt.Errorf("userinfo error: %w", err)
@@ -97,9 +82,8 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 
 	var u authentikUserInfo
 	err = json.Unmarshal(content, &u)
-	// err = json.NewDecoder(response.Body).Decode(&u)
 	if err != nil {
-		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal failed: %s\nJSON content: %s, Length: %d, Token: %s", err.Error(), string(content), len(content), token)
+		return userInfo{}, fmt.Errorf("getAuthentikUserInfo - Unmarshal failed: %s, JSON content: %s, Length: %d, Token: %+v", err.Error(), string(content), len(content), token)
 	}
 
 	return userInfo{

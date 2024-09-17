@@ -62,36 +62,36 @@ func (server *Server) authMiddleware(checkAuthorization authorizationCheckFunc) 
 // type authorizationCheckStrategy func(requiredRoles ...string) authorizationCheckFunc
 type authorizationCheckFunc func(roles []string) bool
 
-func allOf(requiredRoles ...string) authorizationCheckFunc {
-	return func(roles []string) bool {
-		for _, requiredRole := range requiredRoles {
-			found := false
-			for _, role := range roles {
-				if role == requiredRole {
-					found = true
-					break
-				}
-			}
-			if !found {
-				return false
-			}
-		}
-		return true
-	}
-}
+// func allOf(requiredRoles ...string) authorizationCheckFunc {
+// 	return func(roles []string) bool {
+// 		for _, requiredRole := range requiredRoles {
+// 			found := false
+// 			for _, role := range roles {
+// 				if role == requiredRole {
+// 					found = true
+// 					break
+// 				}
+// 			}
+// 			if !found {
+// 				return false
+// 			}
+// 		}
+// 		return true
+// 	}
+// }
 
-func anyOf(requiredRoles ...string) authorizationCheckFunc {
-	return func(roles []string) bool {
-		for _, requiredRole := range requiredRoles {
-			for _, role := range roles {
-				if role == requiredRole {
-					return true
-				}
-			}
-		}
-		return false
-	}
-}
+// func anyOf(requiredRoles ...string) authorizationCheckFunc {
+// 	return func(roles []string) bool {
+// 		for _, requiredRole := range requiredRoles {
+// 			for _, role := range roles {
+// 				if role == requiredRole {
+// 					return true
+// 				}
+// 			}
+// 		}
+// 		return false
+// 	}
+// }
 
 func regexpMatch(pattern string) authorizationCheckFunc {
 	r := regexp.MustCompile(pattern)
@@ -162,10 +162,10 @@ func setUser(ctx *gin.Context, payload *token.Payload) {
 	ctx.Set(userContextKey, payload)
 }
 
-func getUser(ctx *gin.Context) *token.Payload {
-	user, ok := ctx.Get(userContextKey)
-	if !ok {
-		return nil
-	}
-	return user.(*token.Payload)
-}
+// func getUser(ctx *gin.Context) *token.Payload {
+// 	user, ok := ctx.Get(userContextKey)
+// 	if !ok {
+// 		return nil
+// 	}
+// 	return user.(*token.Payload)
+// }

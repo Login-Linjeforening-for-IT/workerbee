@@ -89,7 +89,8 @@ type oauth2FallbackResponseUser struct {
 	Roles []string `json:"roles"`
 }
 
-func (server *Server) oauth2Fallback(provider string, getUserInfo getUserInfoFunc) gin.HandlerFunc {
+// _ = provider, but was unused
+func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		oauthState, err := ctx.Request.Cookie("oauthstate")
 		if err != nil || ctx.Request.FormValue("state") != oauthState.Value {
