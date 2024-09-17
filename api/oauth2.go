@@ -77,20 +77,6 @@ func (server *Server) oauth2Login(ctx *gin.Context) {
 
 type getUserInfoFunc func(ctx context.Context, token *oauth2.Token) (userInfo, error)
 
-type oauth2FallbackResponse struct {
-	AccessToken           string                     `json:"access_token"`
-	AccessTokenExpiresAt  time.Time                  `json:"access_token_expires_at"`
-	RefreshToken          string                     `json:"refresh_token"`
-	RefreshTokenExpiresAt time.Time                  `json:"refresh_token_expires_at"`
-	User                  oauth2FallbackResponseUser `json:"user"`
-}
-
-type oauth2FallbackResponseUser struct {
-	ID    string   `json:"id"`
-	Name  string   `json:"name"`
-	Roles []string `json:"roles"`
-}
-
 // _ = provider, but was unused
 func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc, queenbeeURL string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -159,19 +145,7 @@ func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc, quee
 		ctx.SetCookie("user_name", userInfo.Name, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
 		ctx.SetCookie("user_roles", strings.Join(userInfo.Roles, ","), int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
 
-		// Redirect to the target domain
+		// Redirects to QueenBee with id, name, roles and tokes as cookies.
 		ctx.Redirect(http.StatusFound, queenbeeURL)
-
-		// ctx.JSON(http.StatusOK, oauth2FallbackResponse{
-		// 	AccessToken:           accessToken,
-		// 	AccessTokenExpiresAt:  accessTokenPayload.ExpiresAt,
-		// 	RefreshToken:          refreshToken,
-		// 	RefreshTokenExpiresAt: refreshTokenPayload.ExpiresAt,
-		// 	User: oauth2FallbackResponseUser{
-		// 		ID:    userInfo.ID,
-		// 		Name:  userInfo.Name,
-		// 		Roles: accessTokenPayload.Roles,
-		// 	},
-		// })
 	}
 }
