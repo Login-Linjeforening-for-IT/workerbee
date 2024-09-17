@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func AuthentikOauth2Config(baseURL string, clientID string, clientSecret string, redirectURL string) *oauth2Config {
+func AuthentikOauth2Config(baseURL string, clientID string, clientSecret string, redirectURL string, queenbeeURL string) *oauth2Config {
 	return &oauth2Config{
 		Config: oauth2.Config{
 			ClientID:     clientID,
@@ -23,6 +23,7 @@ func AuthentikOauth2Config(baseURL string, clientID string, clientSecret string,
 		RevokeEndpoint:   baseURL + "/application/o/revoke/",
 		stateExpiration:  stateExpiration,
 		provider:         "authentik",
+		QueenbeeURL:	  queenbeeURL,
 	}
 }
 
@@ -34,7 +35,7 @@ func authentikEndpoint(baseURL string) oauth2.Endpoint {
 }
 
 func (server *Server) authentikCallback() gin.HandlerFunc {
-	return server.oauth2Fallback("authentik", server.oauth2Config.getAuthentikUserInfo)
+	return server.oauth2Fallback(server.oauth2Config.provider, server.oauth2Config.getAuthentikUserInfo, server.oauth2Config.QueenbeeURL)
 }
 
 type authentikUserInfo struct {
@@ -55,9 +56,6 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 	if err != nil {
 		return userInfo{}, fmt.Errorf("userinfo error: %w", err)
 	}
-	// return userInfo{
-	// 	ID: strconv.Itoa(response.StatusCode),
-	// }, nil
 
 	defer response.Body.Close()
 

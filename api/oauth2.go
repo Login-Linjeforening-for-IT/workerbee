@@ -2,10 +2,11 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
-	"crypto/tls"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/xid"
@@ -27,6 +28,7 @@ type oauth2Config struct {
 	RevokeEndpoint   string
 	stateExpiration  time.Duration
 	provider         string
+	QueenbeeURL		 string
 }
 
 var stateExpiration = 20 * time.Minute
@@ -90,7 +92,7 @@ type oauth2FallbackResponseUser struct {
 }
 
 // _ = provider, but was unused
-func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc) gin.HandlerFunc {
+func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc, queenbeeURL string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		oauthState, err := ctx.Request.Cookie("oauthstate")
 		if err != nil || ctx.Request.FormValue("state") != oauthState.Value {
@@ -153,16 +155,23 @@ func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc) gin.
 		setAccessTokenCookie(ctx, accessToken, accessTokenPayload)
 		setRefreshTokenCookie(ctx, refreshToken, refreshTokenPayload)
 
-		ctx.JSON(http.StatusOK, oauth2FallbackResponse{
-			AccessToken:           accessToken,
-			AccessTokenExpiresAt:  accessTokenPayload.ExpiresAt,
-			RefreshToken:          refreshToken,
-			RefreshTokenExpiresAt: refreshTokenPayload.ExpiresAt,
-			User: oauth2FallbackResponseUser{
-				ID:    userInfo.ID,
-				Name:  userInfo.Name,
-				Roles: accessTokenPayload.Roles,
-			},
-		})
+		ctx.SetCookie("user_id", userInfo.ID, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
+		ctx.SetCookie("user_name", userInfo.Name, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
+		ctx.SetCookie("user_roles", strings.Join(userInfo.Roles, ","), int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
+
+		// Redirect to the target domain
+		ctx.Redirect(http.StatusFound, queenbeeURL)
+
+		// ctx.JSON(http.StatusOK, oauth2FallbackResponse{
+		// 	AccessToken:           accessToken,
+		// 	AccessTokenExpiresAt:  accessTokenPayload.ExpiresAt,
+		// 	RefreshToken:          refreshToken,
+		// 	RefreshTokenExpiresAt: refreshTokenPayload.ExpiresAt,
+		// 	User: oauth2FallbackResponseUser{
+		// 		ID:    userInfo.ID,
+		// 		Name:  userInfo.Name,
+		// 		Roles: accessTokenPayload.Roles,
+		// 	},
+		// })
 	}
 }

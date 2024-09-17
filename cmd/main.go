@@ -40,9 +40,10 @@ type TokenConfig struct {
 }
 
 type Oauth2Config struct {
-	ClientID     string `config:"OAUTH2_CLIENT_ID"`
-	ClientSecret string `config:"OAUTH2_CLIENT_SECRET"`
-	RedirectURL  string `config:"OAUTH2_REDIRECT_URL"`
+	ClientID     	string `config:"OAUTH2_CLIENT_ID"`
+	ClientSecret 	string `config:"OAUTH2_CLIENT_SECRET"`
+	RedirectURL  	string `config:"OAUTH2_REDIRECT_URL"`
+	RedirectClient	string `config:OAUTH2_FRONTEND_REDIRECT_URL`
 
 	AuthentikBaseURL string `config:"OAUTH2_AUTHENTIK_BASE_URL" default:"https://authentik.login.no"`
 }
@@ -80,7 +81,7 @@ func main() {
 	refreshTokenMaker, err := token.NewPasetoMaker(tokenConf.RefreshTokenSymmetricKey, token.RefreshToken, tokenConf.RefreshTokenDuration)
 	guard(err)
 
-	authentik := api.AuthentikOauth2Config(oauth2Conf.AuthentikBaseURL, oauth2Conf.ClientID, oauth2Conf.ClientSecret, oauth2Conf.RedirectURL)
+	authentik := api.AuthentikOauth2Config(oauth2Conf.AuthentikBaseURL, oauth2Conf.ClientID, oauth2Conf.ClientSecret, oauth2Conf.RedirectURL, oauth2Conf.RedirectClient)
 
 	// Connect to database
 	log.Println("Connecting to database...")
