@@ -62,9 +62,9 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 
 	// transport.TLSClientConfig.InsecureSkipVerify = true
 
-	if true {
-		return userInfo{}, fmt.Errorf("%s", client.Transport)
-	}
+	// if true {
+	// 	return userInfo{}, fmt.Errorf("%s", client.Transport)
+	// }
 
 	response, err := client.Get(conf.UserInfoEndpoint)
 	if err != nil {
