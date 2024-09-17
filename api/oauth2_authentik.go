@@ -70,9 +70,9 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 	if err != nil {
 		return userInfo{}, fmt.Errorf("userinfo error: %w", err)
 	}
-	return userInfo{
-		ID: strconv.Itoa(response.StatusCode),
-	}, nil
+	// return userInfo{
+	// 	ID: strconv.Itoa(response.StatusCode),
+	// }, nil
 
 	defer response.Body.Close()
 
