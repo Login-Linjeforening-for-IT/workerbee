@@ -141,9 +141,9 @@ func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc, quee
 		setAccessTokenCookie(ctx, accessToken, accessTokenPayload)
 		setRefreshTokenCookie(ctx, refreshToken, refreshTokenPayload)
 
-		ctx.SetCookie("user_id", userInfo.ID, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
-		ctx.SetCookie("user_name", userInfo.Name, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
-		ctx.SetCookie("user_roles", strings.Join(userInfo.Roles, ","), int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, true, true)
+		ctx.SetCookie("user_id", userInfo.ID, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, false, true)
+		ctx.SetCookie("user_name", userInfo.Name, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, false, true)
+		ctx.SetCookie("user_roles", strings.Join(userInfo.Roles, ","), int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, false, true)
 
 		// Redirects to QueenBee with id, name, roles and tokes as cookies.
 		ctx.Redirect(http.StatusFound, queenbeeURL)
