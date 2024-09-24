@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -138,14 +140,22 @@ func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc, quee
 			return
 		}
 
-		setAccessTokenCookie(ctx, accessToken, accessTokenPayload)
-		setRefreshTokenCookie(ctx, refreshToken, refreshTokenPayload)
+		// Creates query parameters
+		queryParams := url.Values{}
+		queryParams.Add("user_id", userInfo.ID)
+		queryParams.Add("user_name", userInfo.Name)
+		queryParams.Add("user_roles", strings.Join(userInfo.Roles, ","))
+		queryParams.Add("access_token", accessToken)
+		queryParams.Add("refresh_token", refreshToken)
 
-		ctx.SetCookie("user_id", userInfo.ID, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, false, true)
-		ctx.SetCookie("user_name", userInfo.Name, int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, false, true)
-		ctx.SetCookie("user_roles", strings.Join(userInfo.Roles, ","), int(time.Until(refreshTokenPayload.ExpiresAt).Seconds()), "/", queenbeeURL, false, true)
+		// Sets the expiration time
+		queryParams.Add("access_token_expires", strconv.FormatInt(accessTokenPayload.ExpiresAt.Unix(), 10))
+		queryParams.Add("refresh_token_expires", strconv.FormatInt(refreshTokenPayload.ExpiresAt.Unix(), 10))
 
-		// Redirects to QueenBee with id, name, roles and tokes as cookies.
-		ctx.Redirect(http.StatusFound, queenbeeURL)
+		// Appends params to queenbeeURL
+		redirectURL := fmt.Sprintf("%s?%s", queenbeeURL, queryParams.Encode())
+
+		// Redirects to frontend with info as url params
+		ctx.Redirect(http.StatusFound, redirectURL)
 	}
 }
