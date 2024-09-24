@@ -43,7 +43,7 @@ type Oauth2Config struct {
 	ClientID     	 string `config:"OAUTH2_CLIENT_ID"`
 	ClientSecret 	 string `config:"OAUTH2_CLIENT_SECRET"`
 	RedirectURL  	 string `config:"OAUTH2_REDIRECT_URL"`
-	RedirectClient	 string `config:"OAUTH2_FRONTEND_REDIRECT_URL" default:"https://queenbee.login.no"`
+	RedirectClient	 string `config:"OAUTH2_FRONTEND_REDIRECT_URL" default:"http://localhost:4200"`
 	AuthentikBaseURL string `config:"OAUTH2_AUTHENTIK_BASE_URL" default:"https://authentik.login.no"`
 }
 
