@@ -94,7 +94,7 @@ func (server *Server) initRouter() {
     corsConf.AllowCredentials = true
 
     // Adds refresh token header
-    corsConf.AllowHeaders = append(server.config.AllowedHeaders, "X-Refresh-Token", "X-Roles")
+    corsConf.AllowHeaders = append(server.config.AllowedHeaders, "X-Refresh-Token")
 
     corsConf.AllowMethods = server.config.AllowedMethods
 
@@ -102,7 +102,7 @@ func (server *Server) initRouter() {
     router.Use(cors.New(corsConf))
 
 	v1 := router.Group("/v1")
-	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch("*TekKom*")))
+	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*TekKom.*")))
 	{
 		events := authRoutes.Group("/events")
 		{
