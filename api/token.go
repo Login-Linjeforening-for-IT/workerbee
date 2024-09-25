@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 
 	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
 
@@ -34,8 +35,20 @@ func setAccessTokenCookie(ctx *gin.Context, accessToken string, accessTokenPaylo
 		int(accessTokenPayload.ExpiresAt.Sub(accessTokenPayload.IssuedAt).Seconds()), "", "", false, true)
 }
 
-func getAccessTokenCookie(ctx *gin.Context) (string, error) {
-	return ctx.Cookie(accessTokenCookieName)
+func getAccessTokenFromHeader(ctx *gin.Context) (string, error) {
+    authHeader := ctx.GetHeader("Authorization")
+    
+    if authHeader == "" {
+        return "", fmt.Errorf("authorization header not found")
+    }
+
+    if len(authHeader) < 7 || authHeader[:7] != "Bearer " {
+        return "", fmt.Errorf("invalid authorization format")
+    }
+
+    accessToken := authHeader[7:]
+
+    return accessToken, nil
 }
 
 func setRefreshTokenCookie(ctx *gin.Context, refreshToken string, refreshTokenPayload *token.Payload) {
@@ -43,6 +56,12 @@ func setRefreshTokenCookie(ctx *gin.Context, refreshToken string, refreshTokenPa
 		int(refreshTokenPayload.ExpiresAt.Sub(refreshTokenPayload.IssuedAt).Seconds()), "", "", false, true)
 }
 
-func getRefreshTokenCookie(ctx *gin.Context) (string, error) {
-	return ctx.Cookie(refreshTokenCookieName)
+func getRefreshTokenFromHeader(ctx *gin.Context) (string, error) {
+	authHeader := ctx.GetHeader("X-Refresh-Token")
+    
+    if authHeader == "" {
+        return "", fmt.Errorf("refresh token header not found")
+    }
+
+    return authHeader, nil
 }

@@ -19,7 +19,7 @@ var (
 
 func (server *Server) authMiddleware(checkAuthorization authorizationCheckFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		accessToken, err := getAccessTokenCookie(ctx)
+		accessToken, err := getAccessTokenFromHeader(ctx)
 
 		var (
 			payload   *token.Payload = nil
@@ -107,7 +107,7 @@ func regexpMatch(pattern string) authorizationCheckFunc {
 }
 
 func (server *Server) refreshAccessToken(ctx *gin.Context) (*token.Payload, error) {
-	refreshToken, err := getRefreshTokenCookie(ctx)
+	refreshToken, err := getRefreshTokenFromHeader(ctx)
 	if err != nil {
 		return nil, ErrUnauthenticated
 	}

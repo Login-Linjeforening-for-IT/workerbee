@@ -84,19 +84,25 @@ func (server *Server) initRouter() {
 	router.Use(gin.CustomRecoveryWithWriter(os.Stdout, server.CustomRecovery()))
 
 	corsConf := cors.DefaultConfig()
-	if len(server.config.AllowedOrigins) > 0 {
-		corsConf.AllowOrigins = server.config.AllowedOrigins
-	} else {
-		corsConf.AllowAllOrigins = true
-	}
-	corsConf.AllowCredentials = true
-	corsConf.AllowHeaders = server.config.AllowedHeaders
-	corsConf.AllowMethods = server.config.AllowedMethods
 
-	router.Use(cors.New(corsConf))
+    if len(server.config.AllowedOrigins) > 0 {
+        corsConf.AllowOrigins = server.config.AllowedOrigins
+    } else {
+        corsConf.AllowAllOrigins = true
+    }
+
+    corsConf.AllowCredentials = true
+
+    // Adds refresh token header
+    corsConf.AllowHeaders = append(server.config.AllowedHeaders, "X-Refresh-Token", "X-Roles")
+
+    corsConf.AllowMethods = server.config.AllowedMethods
+
+    // Applies CORS
+    router.Use(cors.New(corsConf))
 
 	v1 := router.Group("/v1")
-	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*-verv"))) // TODO: correct after roles are defined
+	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch("*TekKom*")))
 	{
 		events := authRoutes.Group("/events")
 		{
