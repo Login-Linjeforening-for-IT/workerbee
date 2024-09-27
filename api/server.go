@@ -92,11 +92,7 @@ func (server *Server) initRouter() {
     }
 
     corsConf.AllowCredentials = true
-
-    // Adds refresh token header
     corsConf.AllowHeaders = append(server.config.AllowedHeaders, "X-Refresh-Token")
-
-    corsConf.AllowMethods = server.config.AllowedMethods
 
     // Applies CORS
     router.Use(cors.New(corsConf))
