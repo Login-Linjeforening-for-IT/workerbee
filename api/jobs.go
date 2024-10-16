@@ -149,7 +149,7 @@ func (server *Server) createJob(ctx *gin.Context) {
 }
 
 type updateJobRequest struct {
-	ID int32 `uri:"id" binding:"required,min=1"`
+	ID int32 `json:"id" binding:"required"`
 	db.UpdateJobParams
 }
 
