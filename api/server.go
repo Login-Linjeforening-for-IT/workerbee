@@ -98,7 +98,7 @@ func (server *Server) initRouter() {
     router.Use(cors.New(corsConf))
 
 	v1 := router.Group("/v1")
-	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*TekKom.*")))
+	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*Queenbee.*")))
 	{
 		events := authRoutes.Group("/events")
 		{

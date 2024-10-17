@@ -72,7 +72,7 @@ func (conf *oauth2Config) getAuthentikUserInfo(ctx context.Context, token *oauth
 		"given_name": "Even Testersen",
 		"preferred_username": "even-tekkom-verv",
 		"nickname": "even-tekkom-verv",
-		"groups": ["Tekkom-verv"],
+		"groups": ["Tekkom-verv", "Queenbee"],
 		"sub": "6e30705a8ddc2371c38d0cf767325282645cf6449c9b0b75e1a9a7fec5101312"
 	}
 	*/
