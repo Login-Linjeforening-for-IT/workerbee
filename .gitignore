@@ -1,3 +1,5 @@
 *.secret.*
 .env
 bin/*
+cert.pem
+key.pem
