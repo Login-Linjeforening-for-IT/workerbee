@@ -30,7 +30,7 @@ type oauth2Config struct {
 	RevokeEndpoint   string
 	stateExpiration  time.Duration
 	provider         string
-	QueenbeeURL		 string
+	QueenbeeURL      string
 }
 
 var stateExpiration = 20 * time.Minute
@@ -47,28 +47,28 @@ func generateOauthState() string {
 
 // Custom HTTP client with TLS verification disabled
 func selfSignedClient() *http.Client {
-    return &http.Client{
-        Transport: &http.Transport{
-            TLSClientConfig: &tls.Config{
-                InsecureSkipVerify: true,
-            },
-        },
-    }
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
 }
 
 // exchange code for token
 func (conf oauth2Config) getToken(code string) (*oauth2.Token, error) {
-    // Create a context with a custom HTTP client
-    insecureClient := selfSignedClient()
-    ctx := context.WithValue(context.Background(), oauth2.HTTPClient, insecureClient)
+	// Create a context with a custom HTTP client
+	insecureClient := selfSignedClient()
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, insecureClient)
 
-    // Exchange the code for a token
-    token, err := conf.Exchange(ctx, code)
-    if err != nil {
-        return nil, fmt.Errorf("code exchange wrong: %w", err)
-    }
+	// Exchange the code for a token
+	token, err := conf.Exchange(ctx, code)
+	if err != nil {
+		return nil, fmt.Errorf("code exchange wrong: %w", err)
+	}
 
-    return token, nil
+	return token, nil
 }
 
 func (server *Server) oauth2Login(ctx *gin.Context) {
@@ -84,7 +84,7 @@ func (server *Server) oauth2Fallback(_ string, getUserInfo getUserInfoFunc, quee
 	return func(ctx *gin.Context) {
 		oauthState, err := ctx.Request.Cookie("oauthstate")
 		if err != nil || ctx.Request.FormValue("state") != oauthState.Value {
-			err = fmt.Errorf("error - " + ctx.Request.FormValue("state"))
+			err = fmt.Errorf("error - %v", ctx.Request.FormValue("state"))
 
 			server.writeError(ctx, http.StatusUnauthorized, fmt.Errorf("oauth2Fallback, Cookie or FormValue - %w", err))
 			return

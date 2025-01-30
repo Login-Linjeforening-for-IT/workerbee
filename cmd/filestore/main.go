@@ -1,3 +1,7 @@
+/*
+Small web server that allows uploading images and displaying them.
+Used for testing the images package.
+*/
 package main
 
 import (
@@ -34,7 +38,7 @@ func main() {
 			return
 		}
 
-		err = store.UploadImage("", name, file)
+		err = store.UploadImage("", "2", name, file)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
