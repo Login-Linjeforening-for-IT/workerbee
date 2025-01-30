@@ -4,7 +4,7 @@ import "io"
 
 type Store interface {
 	GetImages(dir string) ([]FileDetails, error)
-	UploadImage(dir string, name string, file File) error
+	UploadImage(dir string, id string, fileName string, file File) error
 }
 
 type FileDetails struct {

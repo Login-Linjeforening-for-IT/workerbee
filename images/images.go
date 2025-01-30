@@ -11,6 +11,16 @@ import (
 	_ "image/png"
 )
 
+// TODO: Implement use of constants
+type ImageRatio struct {
+	width  int
+	height int
+}
+
+var Banner = ImageRatio{10, 4}
+var Small = ImageRatio{10, 4}
+var Ads = ImageRatio{3, 2}
+
 // func (server *Server) uploadToS3(localFilePath, fileName, doPath string) error {
 // 	file, err := os.Open(localFilePath)
 // 	if err != nil {
@@ -154,6 +164,7 @@ func checkFileRatio(img image.Image, ratioW, ratioH int) error {
 }
 
 // size is in bytes
+// TODO: Update max file sizes?
 func checkFileSize(size int64, fileType string) error {
 	switch fileType {
 	case "jpeg", "jpg":

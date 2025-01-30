@@ -1,13 +1,14 @@
 package api
 
 import (
+	"errors"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"net/http"
 
-	"gitlab.login.no/tekkom/web/beehive/admin-api/images"
 	"github.com/gin-gonic/gin"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/images"
 )
 
 func (server *Server) handleImageUpload(ctx *gin.Context, dir string, ratioW int, ratioH int) {
@@ -24,22 +25,22 @@ func (server *Server) handleImageUpload(ctx *gin.Context, dir string, ratioW int
 		return
 	}
 
-	// Use the name from the form if it exists, otherwise use the filename
-	name := ctx.Request.FormValue("name")
-	if name == "" {
-		name = headers.Filename
+	// Use the id from the form if it exists, otherwise use the filename
+	id := ctx.Request.FormValue("id")
+	if id == "" {
+		server.writeError(ctx, http.StatusBadRequest, errors.New("id not found"))
 	}
 
-	// err = server.imageStore.UploadImage(dir, name, file)
-	// if err != nil {
-	// 	switch err.(type) {
-	// 	case *images.DirNotFoundError:
-	// 		server.writeError(ctx, http.StatusNotFound, err)
-	// 	default:
-	// 		server.writeError(ctx, http.StatusInternalServerError, err)
-	// 	}
-	// 	return
-	// }
+	err = server.imageStore.UploadImage(dir, id, headers.Filename, file)
+	if err != nil {
+		switch err.(type) {
+		case *images.DirNotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
 
 	ctx.Status(http.StatusNoContent)
 }
@@ -61,18 +62,18 @@ func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
 }
 
 func (server *Server) handleImageList(ctx *gin.Context, dir string) {
-	// files, err := server.imageStore.GetImages(dir)
-	// if err != nil {
-	// 	switch err.(type) {
-	// 	case *images.DirNotFoundError:
-	// 		server.writeError(ctx, http.StatusNotFound, err)
-	// 	default:
-	// 		server.writeError(ctx, http.StatusInternalServerError, err)
-	// 	}
-	// 	return
-	// }
+	files, err := server.imageStore.GetImages(dir)
+	if err != nil {
+		switch err.(type) {
+		case *images.DirNotFoundError:
+			server.writeError(ctx, http.StatusNotFound, err)
+		default:
+			server.writeError(ctx, http.StatusInternalServerError, err)
+		}
+		return
+	}
 
-	// ctx.JSON(http.StatusOK, files)
+	ctx.JSON(http.StatusOK, files)
 }
 
 func (server *Server) fetchEventsBannerList(ctx *gin.Context) {

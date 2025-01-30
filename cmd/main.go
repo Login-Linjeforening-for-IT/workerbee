@@ -12,8 +12,9 @@ import (
 	"github.com/redis/go-redis/v9"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/api"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/config"
-	// "gitlab.login.no/tekkom/web/beehive/admin-api/images"
+
 	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/images"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/service"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/sessionstore"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
@@ -25,10 +26,6 @@ type DBConfig struct {
 	DBUser string `config:"DB_USER" default:"root"`
 	DBPass string `config:"DB_PASS" default:"secret"`
 	DBName string `config:"DB_NAME" default:"beehivedb"`
-	// DOKey     string `config:"DO_ACCESS_KEY_ID"`
-	// DOSecret  string `config:"DO_SECRET_ACCESS_KEY"`
-	// DORegion  string `config:"DO_REGION" default:"ams3"`
-	// DOBaseURL string `config:"DO_BASE_URL" default:"https://ams3.digitaloceanspaces.com"`
 }
 
 type TLSConfig struct {
@@ -45,10 +42,10 @@ type TokenConfig struct {
 }
 
 type Oauth2Config struct {
-	ClientID     	 string `config:"OAUTH2_CLIENT_ID"`
-	ClientSecret 	 string `config:"OAUTH2_CLIENT_SECRET"`
-	RedirectURL  	 string `config:"OAUTH2_REDIRECT_URL"`
-	RedirectClient	 string `config:"OAUTH2_FRONTEND_REDIRECT_URL" default:"https://queenbee-dev.login.no"`
+	ClientID         string `config:"OAUTH2_CLIENT_ID"`
+	ClientSecret     string `config:"OAUTH2_CLIENT_SECRET"`
+	RedirectURL      string `config:"OAUTH2_REDIRECT_URL"`
+	RedirectClient   string `config:"OAUTH2_FRONTEND_REDIRECT_URL" default:"https://queenbee-dev.login.no"`
 	AuthentikBaseURL string `config:"OAUTH2_AUTHENTIK_BASE_URL" default:"https://authentik.login.no"`
 }
 
@@ -74,7 +71,8 @@ func main() {
 	sessionStoreConf := config.MustLoad[sessionstore.RedisConfig](fileopt)
 	apiConf := config.MustLoad[api.Config](fileopt)
 	tlsConf := config.MustLoad[TLSConfig](fileopt)
-	// doConf := config.MustLoad[DOConfig](config.WithFile(*configFile))
+	doConf := config.MustLoad[images.DOConfig](fileopt)
+	fmt.Println(doConf)
 	tokenConf := config.MustLoad[TokenConfig](fileopt)
 	oauth2Conf := config.MustLoad[Oauth2Config](fileopt)
 
@@ -115,16 +113,15 @@ func main() {
 
 	// Start server
 	log.Println("Starting server...")
+	imageStore, _ := images.NewDOStore(doConf) // TODO: handle error
 	server := api.NewServer(apiConf,
-		service, 
+		service,
 		sessionStore,
-		// imageStore,
+		imageStore,
 		authentik,
-		accessTokenMaker, 
+		accessTokenMaker,
 		refreshTokenMaker,
 	)
-
-	// imageStore := images.NewFileStore("./testimages")
 
 	if tlsConf.Enabled {
 		guard(server.StartTLS(tlsConf.Cert, tlsConf.Key))

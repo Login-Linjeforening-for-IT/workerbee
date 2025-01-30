@@ -12,10 +12,10 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	db "gitlab.login.no/tekkom/web/beehive/admin-api/db/sqlc"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/sessionstore"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/images"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/service"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/sessionstore"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/token"
 )
 
 func init() {
@@ -39,9 +39,9 @@ type Config struct {
 }
 
 type Server struct {
-	config *Config
-	router *gin.Engine
-	logger zerolog.Logger
+	config     *Config
+	router     *gin.Engine
+	logger     zerolog.Logger
 	imageStore images.Store
 
 	// data
@@ -52,7 +52,7 @@ type Server struct {
 	oauth2Config      *oauth2Config
 	accessTokenMaker  token.Maker
 	refreshTokenMaker token.Maker
-	
+
 	// do
 	DOKey    string `config:"DO_ACCESS_KEY_ID"`
 	DOSecret string `config:"DO_SECRET_ACCESS_KEY"`
@@ -62,6 +62,7 @@ func NewServer(
 	config *Config,
 	service service.Service,
 	sessionstore sessionstore.Store,
+	imageStore images.Store,
 	oauth2Conf *oauth2Config,
 	accessTokenMaker token.Maker,
 	refreshTokenMaker token.Maker,
@@ -71,7 +72,7 @@ func NewServer(
 		service:      service,
 		sessionstore: sessionstore,
 		logger:       zerolog.New(os.Stdout).With().Timestamp().Logger(),
-		// imageStore: imageStore,
+		imageStore:   imageStore,
 
 		oauth2Config:      oauth2Conf,
 		accessTokenMaker:  accessTokenMaker,
@@ -92,17 +93,17 @@ func (server *Server) initRouter() {
 
 	corsConf := cors.DefaultConfig()
 
-    if len(server.config.AllowedOrigins) > 0 {
-        corsConf.AllowOrigins = server.config.AllowedOrigins
-    } else {
-        corsConf.AllowAllOrigins = true
-    }
+	if len(server.config.AllowedOrigins) > 0 {
+		corsConf.AllowOrigins = server.config.AllowedOrigins
+	} else {
+		corsConf.AllowAllOrigins = true
+	}
 
-    corsConf.AllowCredentials = true
-    corsConf.AllowHeaders = append(server.config.AllowedHeaders, "X-Refresh-Token")
+	corsConf.AllowCredentials = true
+	corsConf.AllowHeaders = append(server.config.AllowedHeaders, "X-Refresh-Token")
 
-    // Applies CORS
-    router.Use(cors.New(corsConf))
+	// Applies CORS
+	router.Use(cors.New(corsConf))
 
 	v1 := router.Group("/v1")
 	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*QueenBee.*")))

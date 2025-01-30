@@ -49,8 +49,8 @@ func (store *FileStore) GetImages(prefix string) ([]FileDetails, error) {
 	return files, nil
 }
 
-func (store *FileStore) UploadImage(dir string, name string, file File) error {
-	filePath := filepath.Join(store.baseDir, dir, name)
+func (store *FileStore) UploadImage(dir string, id string, fileName string, file File) error {
+	filePath := filepath.Join(store.baseDir, dir, id+fileName)
 
 	out, err := os.Create(filePath)
 	if err != nil {
