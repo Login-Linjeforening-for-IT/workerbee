@@ -1,5 +1,13 @@
 *.secret.*
-.env
-bin/*
 cert.pem
 key.pem
+
+# Ignore debug and build folders
+__debug_*
+bin/*
+testimages/*
+
+# Ignore env files
+.env
+.envrc
+.direnv/

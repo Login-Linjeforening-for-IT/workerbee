@@ -10,3 +10,8 @@ TOKEN_ACCESS_TOKEN_SYMMETRIC_KEY=<your_symmetric_key>
 TOKEN_REFRESH_TOKEN_SYMMETRIC_KEY=<your_symmetric_refresh_key>
 ```
 3. Run `make run`
+
+
+## Maintainers
+- Gjermund H. Pedersen<br>
+  gjermuhp@stud.ntnu.no
