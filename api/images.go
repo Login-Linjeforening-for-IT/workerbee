@@ -1,3 +1,5 @@
+// TODO: Add godoc
+
 package api
 
 import (
@@ -25,7 +27,6 @@ func (server *Server) handleImageUpload(ctx *gin.Context, dir string, ratioW int
 		return
 	}
 
-	// Use the id from the form if it exists, otherwise use the filename
 	id := ctx.Request.FormValue("id")
 	if id == "" {
 		server.writeError(ctx, http.StatusBadRequest, errors.New("id not found"))
@@ -46,19 +47,19 @@ func (server *Server) handleImageUpload(ctx *gin.Context, dir string, ratioW int
 }
 
 func (server *Server) uploadEventImageBanner(ctx *gin.Context) {
-	server.handleImageUpload(ctx, "img/events/banner/", 10, 4)
+	server.handleImageUpload(ctx, "img/events/banner/", images.BannerW, images.BannerH)
 }
 
 func (server *Server) uploadEventImageSmall(ctx *gin.Context) {
-	server.handleImageUpload(ctx, "img/events/small/", 10, 4)
+	server.handleImageUpload(ctx, "img/events/small/", images.BannerW, images.BannerH)
 }
 
 func (server *Server) uploadJobsImage(ctx *gin.Context) {
-	server.handleImageUpload(ctx, "img/ads/", 3, 2)
+	server.handleImageUpload(ctx, "img/ads/", images.AdsW, images.AdsH)
 }
 
 func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
-	server.handleImageUpload(ctx, "img/organizations/", 3, 2)
+	server.handleImageUpload(ctx, "img/organizations/", images.OrgW, images.OrgH)
 }
 
 func (server *Server) handleImageList(ctx *gin.Context, dir string) {
@@ -76,6 +77,16 @@ func (server *Server) handleImageList(ctx *gin.Context, dir string) {
 	ctx.JSON(http.StatusOK, files)
 }
 
+// TODO: Add godoc
+//
+//	@Summary		Get a list of events banner
+//	@Description	Get a list of events banner
+//	@Tags			jobs
+//	@Produce		json
+//	@Param			name	form		int	 true	"Name"
+//	@Param			id		form		int	 true	"ID"
+//	@Param			file	form		file true	"File"
+//	@Router			/fetchEventBannerList [get]
 func (server *Server) fetchEventsBannerList(ctx *gin.Context) {
 	server.handleImageList(ctx, "img/events/banner/")
 }
