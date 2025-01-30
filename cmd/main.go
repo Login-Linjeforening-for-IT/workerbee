@@ -111,9 +111,13 @@ func main() {
 
 	sessionStore := sessionstore.New(client)
 
+	// Connect to image store
+	log.Println("Connecting to image store...")
+	imageStore, err := images.NewDOStore(doConf)
+	guard(err)
+
 	// Start server
 	log.Println("Starting server...")
-	imageStore, _ := images.NewDOStore(doConf) // TODO: handle error
 	server := api.NewServer(apiConf,
 		service,
 		sessionStore,

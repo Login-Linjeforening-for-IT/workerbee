@@ -1,7 +1,14 @@
+/*
+Package images provides a simple interface to store and retrieve a list of images from a backend.
+The DigitalOcean store implementation is used to store the images on DigitalOcean Spaces.
+*/
+
 package images
 
 import (
 	"context"
+	"mime"
+	"path/filepath"
 	"regexp"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -26,6 +33,7 @@ type DOConfig struct {
 	DOBucket  string `config:"DO_BUCKET" default:"beehive"`
 }
 
+// Authenticates wit DO and returns a client
 func NewDOStore(
 	doConfig *DOConfig,
 ) (*DOStore, error) {
@@ -65,6 +73,7 @@ func (store *DOStore) GetImages(dir string) ([]FileDetails, error) {
 	var files []FileDetails
 	for _, obj := range result.Contents {
 		fileName := fileRegex.FindString(*obj.Key)
+		// Result contains the directory itself, skip it
 		if fileName == "" {
 			continue
 		}
@@ -80,12 +89,13 @@ func (store *DOStore) GetImages(dir string) ([]FileDetails, error) {
 }
 
 func (store *DOStore) UploadImage(dir string, id string, fileName string, file File) error {
-	// TODO: Set content type
+	mimeType := mime.TypeByExtension(filepath.Ext(fileName))
 	_, err := store.client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(store.bucket),
-		Key:    aws.String(dir + id + fileName),
-		Body:   file,
-		ACL:    types.ObjectCannedACLPublicRead,
+		Bucket:      aws.String(store.bucket),
+		Key:         aws.String(dir + id + "_" + fileName),
+		Body:        file,
+		ACL:         types.ObjectCannedACLPublicRead,
+		ContentType: &mimeType,
 	})
 	if err != nil {
 		return err

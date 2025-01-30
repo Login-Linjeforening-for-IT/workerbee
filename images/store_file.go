@@ -1,3 +1,8 @@
+/*
+Package images provides a simple interface to store and retrieve a list of images from a backend.
+The file store implementation is used for testing and storing the images localy.
+*/
+
 package images
 
 import (
