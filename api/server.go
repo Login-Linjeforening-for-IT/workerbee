@@ -105,6 +105,7 @@ func (server *Server) initRouter() {
 	// Applies CORS
 	router.Use(cors.New(corsConf))
 
+	// TODO: Remove unused endpoints
 	v1 := router.Group("/v1")
 	authRoutes := v1.Group("/", server.authMiddleware(regexpMatch(".*QueenBee.*")))
 	{

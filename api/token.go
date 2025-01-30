@@ -36,32 +36,32 @@ func setAccessTokenCookie(ctx *gin.Context, accessToken string, accessTokenPaylo
 }
 
 func getAccessTokenFromHeader(ctx *gin.Context) (string, error) {
-    authHeader := ctx.GetHeader("Authorization")
-    
-    if authHeader == "" {
-        return "", fmt.Errorf("authorization header not found")
-    }
+	authHeader := ctx.GetHeader("Authorization")
 
-    if len(authHeader) < 7 || authHeader[:7] != "Bearer " {
-        return "", fmt.Errorf("invalid authorization format")
-    }
+	if authHeader == "" {
+		return "", fmt.Errorf("authorization header not found")
+	}
 
-    accessToken := authHeader[7:]
+	if len(authHeader) < 7 || authHeader[:7] != "Bearer " {
+		return "", fmt.Errorf("invalid authorization format")
+	}
 
-    return accessToken, nil
+	accessToken := authHeader[7:]
+
+	return accessToken, nil
 }
 
-func setRefreshTokenCookie(ctx *gin.Context, refreshToken string, refreshTokenPayload *token.Payload) {
-	ctx.SetCookie(refreshTokenCookieName, refreshToken,
-		int(refreshTokenPayload.ExpiresAt.Sub(refreshTokenPayload.IssuedAt).Seconds()), "", "", false, true)
-}
+// func setRefreshTokenCookie(ctx *gin.Context, refreshToken string, refreshTokenPayload *token.Payload) {
+// 	ctx.SetCookie(refreshTokenCookieName, refreshToken,
+// 		int(refreshTokenPayload.ExpiresAt.Sub(refreshTokenPayload.IssuedAt).Seconds()), "", "", false, true)
+// }
 
 func getRefreshTokenFromHeader(ctx *gin.Context) (string, error) {
 	authHeader := ctx.GetHeader("X-Refresh-Token")
-    
-    if authHeader == "" {
-        return "", fmt.Errorf("refresh token header not found")
-    }
 
-    return authHeader, nil
+	if authHeader == "" {
+		return "", fmt.Errorf("refresh token header not found")
+	}
+
+	return authHeader, nil
 }
