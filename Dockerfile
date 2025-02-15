@@ -11,7 +11,7 @@ RUN go build \
     cmd/main.go
 
 # To get the time zone data
-FROM alpine:latest as alpine-with-tz
+FROM alpine:latest AS alpine-with-tz
 RUN apk --no-cache add tzdata zip
 WORKDIR /usr/share/zoneinfo
 
