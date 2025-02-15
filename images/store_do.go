@@ -88,12 +88,12 @@ func (store *DOStore) GetImages(dir string) ([]FileDetails, error) {
 	return files, nil
 }
 
-func (store *DOStore) UploadImage(dir string, id string, fileName string, file File) error {
+func (store *DOStore) UploadImage(dir string, fileName string, file File) error {
 	mimeType := mime.TypeByExtension(filepath.Ext(fileName))
 	// Do we want to include the id/name of the one who uploaded the file? (x-amz-meta-)
 	_, err := store.client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket:      aws.String(store.bucket),
-		Key:         aws.String(dir + id + "_" + fileName),
+		Key:         aws.String(dir + fileName),
 		Body:        file,
 		ACL:         types.ObjectCannedACLPublicRead,
 		ContentType: &mimeType,

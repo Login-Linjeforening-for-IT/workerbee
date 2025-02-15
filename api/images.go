@@ -3,7 +3,6 @@
 package api
 
 import (
-	"errors"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -27,12 +26,7 @@ func (server *Server) handleImageUpload(ctx *gin.Context, dir string, ratioW int
 		return
 	}
 
-	id := ctx.Request.FormValue("id")
-	if id == "" {
-		server.writeError(ctx, http.StatusBadRequest, errors.New("id not found"))
-	}
-
-	err = server.imageStore.UploadImage(dir, id, headers.Filename, file)
+	err = server.imageStore.UploadImage(dir, headers.Filename, file)
 	if err != nil {
 		switch err.(type) {
 		case *images.DirNotFoundError:

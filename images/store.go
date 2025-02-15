@@ -6,7 +6,7 @@ type Store interface {
 	// Returns a list of images in the given directory.
 	GetImages(dir string) ([]FileDetails, error)
 	// Uploads the given file to the specified directory with the given ID and filename.
-	UploadImage(dir string, id string, fileName string, file File) error
+	UploadImage(dir string, fileName string, file File) error
 }
 
 type FileDetails struct {

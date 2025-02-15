@@ -38,7 +38,7 @@ func main() {
 			return
 		}
 
-		err = store.UploadImage("", "2", name, file)
+		err = store.UploadImage("", name, file)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
