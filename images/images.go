@@ -63,19 +63,19 @@ func checkFileSize(size int64, fileType string) error {
 	switch fileType {
 	case "jpeg", "jpg":
 		if size > MAX_SIZE * MB {
-			return errors.New("file size exceeds maximum allowed size")
+			return fmt.Errorf("file size exceeds maximum allowed size (%v KB / %v KB)", size / 1024, (MAX_SIZE * MB) / 1024)
 		}
 	case "png":
 		if size > MAX_SIZE * MB {
-			return errors.New("file size exceeds maximum allowed size")
+			return fmt.Errorf("file size exceeds maximum allowed size (%v KB / %v KB)", size / 1024, (MAX_SIZE * MB) / 1024)
 		}
 	case "gif":
 		if size > MAX_SIZE * MB {
-			return errors.New("file size exceeds maximum allowed size")
+			return fmt.Errorf("file size exceeds maximum allowed size (%v KB / %v KB)", size / 1024, (MAX_SIZE * MB) / 1024)
 		}
 	default:
 		if size > MAX_SIZE * MB {
-			return errors.New("file size exceeds maximum allowed size")
+			return fmt.Errorf("file size exceeds maximum allowed size (%v KB / %v KB)", size / 1024, (MAX_SIZE * MB) / 1024)
 		}
 	}
 
