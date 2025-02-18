@@ -20,6 +20,8 @@ const (
 	AdsH    = 2
 	OrgW    = 3
 	OrgH    = 2
+	MAX_SIZE = 5
+	MB = 1048576
 )
 
 // Removes the prefix from the full path to the file. F.ex the prefix img/events/small from the full filepath
@@ -60,19 +62,19 @@ func checkFileRatio(img image.Image, ratioW, ratioH int) error {
 func checkFileSize(size int64, fileType string) error {
 	switch fileType {
 	case "jpeg", "jpg":
-		if size > 500*1024 {
+		if size > MAX_SIZE * MB {
 			return errors.New("file size exceeds maximum allowed size")
 		}
 	case "png":
-		if size > 500*1024 {
+		if size > MAX_SIZE * MB {
 			return errors.New("file size exceeds maximum allowed size")
 		}
 	case "gif":
-		if size > 2000*1024 {
+		if size > MAX_SIZE * MB {
 			return errors.New("file size exceeds maximum allowed size")
 		}
 	default:
-		if size > 500*1024 {
+		if size > MAX_SIZE * MB {
 			return errors.New("file size exceeds maximum allowed size")
 		}
 	}
