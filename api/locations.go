@@ -10,7 +10,7 @@ import (
 )
 
 type getLocationsRequest struct {
-	Limit  int32  `form:"limit,default=20"`
+	Limit  int32  `form:"limit,default=200"`
 	Offset int32  `form:"offset"`
 	Type   string `form:"type"`
 }
