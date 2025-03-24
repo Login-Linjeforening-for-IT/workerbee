@@ -40,18 +40,50 @@ func (server *Server) handleImageUpload(ctx *gin.Context, dir string, ratioW int
 	ctx.Status(http.StatusNoContent)
 }
 
+//	@Summary		Post a event banner
+//	@Description	Post a event banner
+//	@Tags			images
+//	@Produce		json
+//	@Param			file	formData	file	true	"File"
+//	@Router			/images/events/banner [post]
+//
+//	@Success		204	{object}	nil
 func (server *Server) uploadEventImageBanner(ctx *gin.Context) {
 	server.handleImageUpload(ctx, "img/events/banner/", images.BannerW, images.BannerH)
 }
 
+//	@Summary		Post a small event image
+//	@Description	Post a small event image
+//	@Tags			images
+//	@Produce		json
+//	@Param			file	formData	file	true	"File"
+//	@Router			/images/events/small [post]
+//
+//	@Success		204	{object}	nil
 func (server *Server) uploadEventImageSmall(ctx *gin.Context) {
 	server.handleImageUpload(ctx, "img/events/small/", images.BannerW, images.BannerH)
 }
 
+//	@Summary		Post a job image
+//	@Description	Post a job image
+//	@Tags			images
+//	@Produce		json
+//	@Param			file	formData	file	true	"File"
+//	@Router			/images/jobs [post]
+//
+//	@Success		204	{object}	nil
 func (server *Server) uploadJobsImage(ctx *gin.Context) {
 	server.handleImageUpload(ctx, "img/ads/", images.AdsW, images.AdsH)
 }
 
+//	@Summary		Post a organization image
+//	@Description	Post a organization image
+//	@Tags			images
+//	@Produce		json
+//	@Param			file	formData	file	true	"File"
+//	@Router			/images/organizations [post]
+//
+//	@Success		204	{object}	nil
 func (server *Server) uploadOrganizationImage(ctx *gin.Context) {
 	server.handleImageUpload(ctx, "img/organizations/", images.OrgW, images.OrgH)
 }
@@ -75,24 +107,43 @@ func (server *Server) handleImageList(ctx *gin.Context, dir string) {
 //
 //	@Summary		Get a list of events banner
 //	@Description	Get a list of events banner
-//	@Tags			jobs
+//	@Tags			images
 //	@Produce		json
-//	@Param			name	form		int	 true	"Name"
-//	@Param			id		form		int	 true	"ID"
-//	@Param			file	form		file true	"File"
-//	@Router			/fetchEventBannerList [get]
+//	@Router			/images/events/banner [get]
+//	@Success		200	{array}	images.FileDetails
 func (server *Server) fetchEventsBannerList(ctx *gin.Context) {
 	server.handleImageList(ctx, "img/events/banner/")
 }
 
+//	@Summary		Get a list of small event images
+//	@Description	Get a list of small event images
+//	@Tags			images
+//	@Produce		json
+//	@Router			/images/events/small [get]
+//
+//	@Success		200	{array}	images.FileDetails
 func (server *Server) fetchEventsSmallList(ctx *gin.Context) {
 	server.handleImageList(ctx, "img/events/small/")
 }
 
+//	@Summary		Get a list of job images
+//	@Description	Get a list of job images
+//	@Tags			images
+//	@Produce		json
+//	@Router			/images/jobs [get]
+//
+//	@Success		200	{array}	images.FileDetails
 func (server *Server) fetchJobsList(ctx *gin.Context) {
 	server.handleImageList(ctx, "img/ads/")
 }
 
+//	@Summary		Get a list of organization images
+//	@Description	Get a list of organization images
+//	@Tags			images
+//	@Produce		json
+//	@Router			/images/organizations [get]
+//
+//	@Success		200	{array}	images.FileDetails
 func (server *Server) fetchOrganizationsList(ctx *gin.Context) {
 	server.handleImageList(ctx, "img/organizations/")
 }

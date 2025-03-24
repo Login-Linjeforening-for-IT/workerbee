@@ -982,6 +982,15 @@ definitions:
       type:
         type: integer
     type: object
+  images.FileDetails:
+    properties:
+      filepath:
+        type: string
+      name:
+        type: string
+      size:
+        type: integer
+    type: object
   service.EventDetails:
     properties:
       audiences:
@@ -1383,6 +1392,130 @@ paths:
       summary: Add organization to event
       tags:
       - events
+  /images/events/banner:
+    get:
+      description: Get a list of events banner
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/images.FileDetails'
+            type: array
+      summary: Get a list of events banner
+      tags:
+      - images
+    post:
+      description: Post a event banner
+      parameters:
+      - description: File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Post a event banner
+      tags:
+      - images
+  /images/events/small:
+    get:
+      description: Get a list of small event images
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/images.FileDetails'
+            type: array
+      summary: Get a list of small event images
+      tags:
+      - images
+    post:
+      description: Post a small event image
+      parameters:
+      - description: File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Post a small event image
+      tags:
+      - images
+  /images/jobs:
+    get:
+      description: Get a list of job images
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/images.FileDetails'
+            type: array
+      summary: Get a list of job images
+      tags:
+      - images
+    post:
+      description: Post a job image
+      parameters:
+      - description: File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Post a job image
+      tags:
+      - images
+  /images/organizations:
+    get:
+      description: Get a list of organization images
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/images.FileDetails'
+            type: array
+      summary: Get a list of organization images
+      tags:
+      - images
+    post:
+      description: Post a organization image
+      parameters:
+      - description: File
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Post a organization image
+      tags:
+      - images
   /jobs:
     get:
       description: Get a list of jobs
