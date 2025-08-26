@@ -1,0 +1,5 @@
+services:
+  api:
+    hostname: "api"
+    container_name: "api"
+    build: ./api
