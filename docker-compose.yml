@@ -3,3 +3,12 @@ services:
     hostname: "api"
     container_name: "api"
     build: ./api
+  db:
+    hostname: "db"
+    container_name: "db"
+    build: ./db
+    env_file:
+      - .env
+    ports:
+      - "9090:5432" # Running on port 9090 incase 5432 is taken
+      # - "5432:5432"
