@@ -8,7 +8,7 @@ import (
 func Route(c *gin.Engine) {
 	v1 := c.Group(BASE_PATH)
 	{
-		v1.GET("/ping", handlers.PongHandler)
+		v1.GET("/ping", AuthMiddleware(), handlers.PongHandler)
 		events := v1.Group("/events")
 		{
 			events.GET("/:id", handlers.PongHandler)
