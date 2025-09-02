@@ -11,36 +11,52 @@ func Route(c *gin.Engine) {
 		v1.GET("/ping", handlers.PongHandler)
 		events := v1.Group("/events")
 		{
-			events.GET("/testing", handlers.PongHandler)
+			events.GET("/:id", handlers.PongHandler)
+			events.GET("/", handlers.PongHandler)
+			events.POST("/", handlers.PongHandler)
+			events.PATCH("/:id", handlers.PongHandler)
+			events.DELETE("/:id", handlers.PongHandler)
+			events.GET("/categories", handlers.PongHandler)
+			events.GET("/audience", handlers.PongHandler)
 		}
 		rules := v1.Group("/rules")
 		{
-			rules.GET("/testing", handlers.PongHandler)
+			rules.GET("/:id", handlers.PongHandler)
+			rules.GET("/", handlers.PongHandler)
+			rules.POST("/", handlers.PongHandler)
+			rules.DELETE("/:id", handlers.PongHandler)
 		}
 		locations := v1.Group("/locations")
 		{
-			locations.GET("/testing", handlers.PongHandler)
+			locations.GET("/:id", handlers.PongHandler)
+			locations.GET("/", handlers.PongHandler)
+			locations.POST("/", handlers.PongHandler)
+			locations.PATCH("/:id", handlers.PongHandler)
+			locations.DELETE("/:id", handlers.PongHandler)
 		}
 		organizations := v1.Group("/organizations")
 		{
-			organizations.GET("/testing", handlers.PongHandler)
+			organizations.GET("/:id", handlers.PongHandler)
+			organizations.GET("/", handlers.PongHandler)
+			organizations.POST("/", handlers.PongHandler)
+			organizations.DELETE("/:id", handlers.PongHandler)
+			organizations.PATCH("/:id", handlers.PongHandler)
 		}
 		categories := v1.Group("/categories")
 		{
-			categories.GET("/testing", handlers.PongHandler)
-		}
-		audiences := v1.Group("/audiences")
-		{
-			audiences.GET("/testing", handlers.PongHandler)
+			categories.GET("/", handlers.PongHandler)
+			categories.GET("/:id", handlers.PongHandler)
+			categories.POST("/", handlers.PongHandler)
+
 		}
 		jobs := v1.Group("/jobs")
 		{
-			jobs.GET("/testing", handlers.PongHandler)
+			jobs.GET("/:id", handlers.PongHandler)
+			jobs.GET("/", handlers.PongHandler)
+			jobs.POST("/", handlers.PongHandler)
+			jobs.PATCH("/:id", handlers.PongHandler)
+			jobs.DELETE("/:id", handlers.PongHandler)
+			jobs.GET("/cities", handlers.PongHandler)
 		}
-		cities := v1.Group("/cities")
-		{
-			cities.GET("/testing", handlers.PongHandler)
-		}
-
 	}
 }
