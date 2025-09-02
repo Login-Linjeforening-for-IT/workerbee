@@ -1,5 +1,6 @@
 package internal
 
 const (
-	BASE_PATH = "/api/v2"
+	BASE_PATH    = "/api/v2"
+	USERINGO_URL = "https://authentik.login.no/application/o/userinfo/"
 )
