@@ -1,19 +1,24 @@
 services:
-  api:
-    hostname: "api"
-    container_name: "api"
+  workerbee:
+    container_name: "workerbee"
     build: ./api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
   
   postgres:
     image: postgres:17
     container_name: workerbee-database
     restart: always
     environment:
-      POSTGRES_USER: workerbee
-      POSTGRES_DB: workerbee
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5432:${POSTGRES_PORT:-5432}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ${INIT_SQL_FILE:-./db/init.up.sql}:/docker-entrypoint-initdb.d/init.sql

@@ -37,7 +37,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		token := tokenParts[1]
 
-		req, err := http.NewRequest(http.MethodGet, USERINGO_URL, nil)
+		req, err := http.NewRequest(http.MethodGet, USERINFO_URL, nil)
 		if err != nil {
 			HandleError(c, err, "Unable to create request to Authentik", http.StatusInternalServerError)
 			return

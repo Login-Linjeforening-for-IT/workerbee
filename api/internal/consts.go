@@ -2,6 +2,6 @@ package internal
 
 const (
 	BASE_PATH      = "/api/v2"
-	USERINGO_URL   = "https://authentik.login.no/application/o/userinfo/"
+	USERINFO_URL   = "https://authentik.login.no/application/o/userinfo/"
 	QUEENBEE_GROUP = "QueenBee"
 )
