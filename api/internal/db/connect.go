@@ -8,8 +8,11 @@ import (
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal/config"
 )
 
+var db *sqlx.DB
+
 func Init() {
-	db, err := sqlx.Connect("postgres", config.DB_url)
+	var err error
+	db, err = sqlx.Connect("postgres", config.DB_url)
 	if err != nil {
 		log.Fatalln("Unable to connect to db: ", err)
 	}

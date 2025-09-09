@@ -27,9 +27,9 @@ func Init() {
 	user := GetEnv("POSTGRES_USER", "admin")
 	password := GetEnv("POSTGRES_PASSWORD", "admin")
 	port := GetEnv("POSTRGRES_PORT", "5432")
-	db := GetEnv("POSTGRES_DB", "db")
+	db_name := GetEnv("POSTGRES_DB", "db")
 
-	DB_url = fmt.Sprintf("postgres://%s:%s@workerbee-database:%s/%s?sslmode=disable", user, password, port, db)
+	DB_url = fmt.Sprintf("postgres://%s:%s@workerbee-database:%s/%s?sslmode=disable", user, password, port, db_name)
 
 	StartTime = time.Now()
 }
