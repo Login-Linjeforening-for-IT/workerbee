@@ -4,21 +4,13 @@ CREATE TYPE "time_type_enum" AS ENUM (
   'whole_day',
   'tbd'
 );
-
 CREATE TYPE "location_type" AS ENUM (
   'mazemap',
   'coords',
   'address',
   'digital'
 );
-
-CREATE TYPE "job_type" AS ENUM (
-  'full',
-  'part',
-  'summer',
-  'verv'
-);
-
+CREATE TYPE "job_type" AS ENUM ('full', 'part', 'summer', 'verv');
 CREATE TABLE "events" (
   "id" SERIAL PRIMARY KEY,
   "visible" bool NOT NULL DEFAULT false,
@@ -53,7 +45,6 @@ CREATE TABLE "events" (
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz
 );
-
 CREATE TABLE "categories" (
   "id" SERIAL PRIMARY KEY,
   "color" varchar NOT NULL,
@@ -64,7 +55,6 @@ CREATE TABLE "categories" (
   "updated_at" timestamptz NOT NULL DEFAULT (now()),
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
-
 CREATE TABLE "audiences" (
   "id" SERIAL PRIMARY KEY,
   "name_no" varchar NOT NULL,
@@ -75,13 +65,11 @@ CREATE TABLE "audiences" (
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz
 );
-
 CREATE TABLE "event_audience_relation" (
   "event_id" int NOT NULL,
   "audience_id" int NOT NULL,
   PRIMARY KEY ("event_id", "audience_id")
 );
-
 CREATE TABLE "rules" (
   "id" SERIAL PRIMARY KEY,
   "name_no" varchar NOT NULL,
@@ -92,7 +80,6 @@ CREATE TABLE "rules" (
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz
 );
-
 CREATE TABLE "organizations" (
   "id" SERIAL PRIMARY KEY,
   "shortname" varchar,
@@ -110,13 +97,11 @@ CREATE TABLE "organizations" (
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz
 );
-
 CREATE TABLE "event_organization_relation" (
   "event_id" int NOT NULL,
   "organization_id" int NOT NULL,
   PRIMARY KEY ("event_id", "organization_id")
 );
-
 CREATE TABLE "locations" (
   "id" SERIAL PRIMARY KEY,
   "name_no" varchar NOT NULL,
@@ -134,7 +119,6 @@ CREATE TABLE "locations" (
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz
 );
-
 CREATE TABLE "job_advertisements" (
   "id" SERIAL PRIMARY KEY,
   "visible" bool NOT NULL DEFAULT false,
@@ -158,122 +142,83 @@ CREATE TABLE "job_advertisements" (
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "deleted_at" timestamptz
 );
-
 CREATE TABLE "ad_city_relation" (
   "job_advertisement_id" int NOT NULL,
   "city_id" int NOT NULL,
   PRIMARY KEY ("job_advertisement_id", "city_id")
 );
-
 CREATE TABLE "cities" (
-  "id" SERIAL,
-  "name" varchar,
-  PRIMARY KEY ("id", "name")
+  "id" SERIAL PRIMARY KEY,
+  "name" varchar UNIQUE
 );
-
 CREATE TABLE "ad_skill_relation" (
   "job_advertisement_id" int NOT NULL,
   "skill_id" int NOT NULL,
   PRIMARY KEY ("job_advertisement_id", "skill_id")
 );
-
 CREATE TABLE "skills" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar NOT NULL
 );
-
 CREATE INDEX ON "events" ("visible");
-
 CREATE INDEX ON "events" ("highlight");
-
 CREATE INDEX ON "events" ("category_id");
-
 CREATE INDEX ON "events" ("time_start");
-
 CREATE INDEX ON "events" ("time_end");
-
 CREATE INDEX ON "events" ("updated_at");
-
 CREATE INDEX ON "events" ("created_at");
-
 CREATE INDEX ON "events" ("deleted_at");
-
 CREATE INDEX ON "categories" ("updated_at");
-
 CREATE INDEX ON "categories" ("created_at");
-
 CREATE INDEX ON "audiences" ("updated_at");
-
 CREATE INDEX ON "audiences" ("created_at");
-
 CREATE INDEX ON "audiences" ("deleted_at");
-
 CREATE INDEX ON "event_audience_relation" ("event_id");
-
 CREATE INDEX ON "event_audience_relation" ("audience_id");
-
 CREATE INDEX ON "rules" ("updated_at");
-
 CREATE INDEX ON "rules" ("created_at");
-
 CREATE INDEX ON "rules" ("deleted_at");
-
 CREATE INDEX ON "organizations" ("type");
-
 CREATE INDEX ON "organizations" ("updated_at");
-
 CREATE INDEX ON "organizations" ("created_at");
-
 CREATE INDEX ON "organizations" ("deleted_at");
-
 CREATE INDEX ON "event_organization_relation" ("event_id");
-
 CREATE INDEX ON "event_organization_relation" ("organization_id");
-
 CREATE INDEX ON "locations" ("updated_at");
-
 CREATE INDEX ON "locations" ("created_at");
-
 CREATE INDEX ON "locations" ("deleted_at");
-
 CREATE INDEX ON "job_advertisements" ("updated_at");
-
 CREATE INDEX ON "job_advertisements" ("created_at");
-
 CREATE INDEX ON "job_advertisements" ("deleted_at");
-
 CREATE INDEX ON "ad_city_relation" ("job_advertisement_id");
-
 CREATE INDEX ON "ad_city_relation" ("city_id");
-
 CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
-
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
-
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
-
-ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
-
-ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
-
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
-
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
-
-ALTER TABLE "event_audience_relation" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
-
-ALTER TABLE "event_audience_relation" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
-
-ALTER TABLE "event_organization_relation" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
-
-ALTER TABLE "event_organization_relation" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("shortname");
-
-ALTER TABLE "job_advertisements" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("shortname");
-
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
-
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("name");
-
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
-
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
+ALTER TABLE "events"
+ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
+ALTER TABLE "events"
+ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
+ALTER TABLE "locations"
+ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+ALTER TABLE "events"
+ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
+ALTER TABLE "events"
+ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
+ALTER TABLE "event_audience_relation"
+ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
+ALTER TABLE "event_audience_relation"
+ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
+ALTER TABLE "event_organization_relation"
+ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id");
+ALTER TABLE "event_organization_relation"
+ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "job_advertisements"
+ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "ad_city_relation"
+ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
+ALTER TABLE "ad_city_relation"
+ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+ALTER TABLE "ad_skill_relation"
+ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
+ALTER TABLE "ad_skill_relation"
+ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
