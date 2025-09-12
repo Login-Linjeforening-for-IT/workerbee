@@ -1,0 +1,275 @@
+definitions:
+  models.CategoriesStats:
+    properties:
+      categoryID:
+        type: integer
+      eventCount:
+        type: integer
+      nameEN:
+        type: string
+      nameNO:
+        type: string
+    type: object
+  models.Event:
+    properties:
+      audience:
+        type: integer
+      audience_name_en:
+        type: string
+      audience_name_no:
+        type: string
+      canceled:
+        type: boolean
+      capacity:
+        type: integer
+      category:
+        type: integer
+      categoryNameEn:
+        type: string
+      categoryNameNo:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      descriptionEn:
+        type: string
+      descriptionNo:
+        type: string
+      digital:
+        type: boolean
+      full:
+        type: boolean
+      highlight:
+        type: boolean
+      id:
+        type: integer
+      imageBanner:
+        type: string
+      imageSmall:
+        type: string
+      informationalEn:
+        type: string
+      informationalNo:
+        type: string
+      is_deleted:
+        type: boolean
+      linkDiscord:
+        type: string
+      linkFacebook:
+        type: string
+      linkSignup:
+        type: string
+      linkStream:
+        type: string
+      location:
+        type: integer
+      location_name_en:
+        type: string
+      location_name_no:
+        type: string
+      nameEn:
+        type: string
+      nameNo:
+        type: string
+      organization:
+        type: integer
+      organizer_name_en:
+        type: string
+      organizer_name_no:
+        type: string
+      parent:
+        type: integer
+      rule:
+        type: integer
+      timeEnd:
+        type: string
+      timePublish:
+        type: string
+      timeSignupDeadline:
+        type: string
+      timeSignupRelease:
+        type: string
+      timeStart:
+        type: string
+      timeType:
+        description: Use string or custom type for enum
+        type: string
+      updatedAt:
+        type: string
+      visible:
+        type: boolean
+    type: object
+  models.NewAdditionsStats:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      table:
+        type: string
+    type: object
+  models.Status:
+    properties:
+      uptime:
+        type: integer
+      version:
+        type: string
+    type: object
+  models.TotalStats:
+    properties:
+      totalEvents:
+        type: integer
+      totalJobs:
+        type: integer
+      totalLocations:
+        type: integer
+      totalOrganizations:
+        type: integer
+      totalRules:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v2/docs:
+    get:
+      description: Serves the Swagger UI for API documentation.
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get Swagger docs
+      tags:
+      - docs
+  /api/v2/events:
+    get:
+      description: Returns a list of events with details, including category, location,
+        audience, and organizer info. Supports historical filtering, limit, and offset.
+      parameters:
+      - description: Maximum number of results
+        in: query
+        name: limit
+        type: integer
+      - description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      - description: Include historical events
+        in: query
+        name: historical
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Event'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get events
+      tags:
+      - events
+  /api/v2/ping:
+    get:
+      description: Health check endpoint. Returns a simple pong message.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ping endpoint
+      tags:
+      - health
+  /api/v2/stats/categories:
+    get:
+      description: Returns, for each category, the number of events in the last 3
+        months. Only categories with at least one event are included, ordered by event
+        count descending.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategoriesStats'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get category event statistics
+      tags:
+      - stats
+  /api/v2/stats/new_additions:
+    get:
+      description: Returns a list of the newest additions across events, categories,
+        audiences, rules, organizations, locations, and job advertisements. Ordered
+        by creation date, limited by the 'limit' query parameter.
+      parameters:
+      - description: Maximum number of results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.NewAdditionsStats'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get newest additions
+      tags:
+      - stats
+  /api/v2/stats/total:
+    get:
+      description: Returns total counts for events, jobs, organizations, locations,
+        and rules (excluding deleted records).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TotalStats'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get total statistics
+      tags:
+      - stats
+  /api/v2/status:
+    get:
+      description: Returns API version and uptime.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Status'
+      summary: Get API status
+      tags:
+      - status
+swagger: "2.0"
