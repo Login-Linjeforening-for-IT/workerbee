@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal/config"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal/db"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/config"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/db"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/routes_internal"
 )
 
 func init() {
@@ -23,7 +23,7 @@ func main() {
 
 	router.Use(gin.Logger())
 
-	internal.Route(router)
+	routes_internal.Route(router)
 
 	router.Run(":" + config.Port)
 }

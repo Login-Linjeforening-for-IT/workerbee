@@ -1,18 +1,19 @@
-package internal
+package routes_internal
 
 import (
 	"github.com/gin-gonic/gin"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/handlers"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal"
 )
 
 func Route(c *gin.Engine) {
-	v1 := c.Group(BASE_PATH)
+	v1 := c.Group(internal.BASE_PATH)
 	{
 		v1.GET("/ping", handlers.PongHandler)
 		events := v1.Group("/events")
 		{
 			events.GET("/:id", handlers.PongHandler)
-			events.GET("/", handlers.PongHandler)
+			events.GET("/", handlers.GetEvents)
 			events.POST("/", handlers.PongHandler)
 			events.PATCH("/:id", handlers.PongHandler)
 			events.DELETE("/:id", handlers.PongHandler)
