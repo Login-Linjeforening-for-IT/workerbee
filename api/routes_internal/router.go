@@ -59,5 +59,11 @@ func Route(c *gin.Engine) {
 			jobs.DELETE("/:id", handlers.PongHandler)
 			jobs.GET("/cities", handlers.PongHandler)
 		}
+		stats := v1.Group("/stats")
+		{
+			stats.GET("/total", handlers.GetTotalStats)
+			stats.GET("/categories", handlers.GetCategoriesStats)
+			stats.GET("/newAdditions", handlers.GetNewAdditionsStats)
+		}
 	}
 }
