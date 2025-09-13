@@ -1,253 +1,274 @@
 CREATE TYPE "time_type_enum" AS ENUM (
-  'default',
-  'no_end',
-  'whole_day',
-  'tbd'
+    'default',
+    'no_end',
+    'whole_day',
+    'tbd'
 );
 
 CREATE TYPE "location_type" AS ENUM (
-  'mazemap',
-  'coords',
-  'address',
-  'city',
-  'digital'
+    'mazemap',
+    'coords',
+    'address',
+    'digital'
 );
 
 CREATE TYPE "job_type" AS ENUM (
-  'full',
-  'part',
-  'summer',
-  'verv'
+    'full',
+    'part',
+    'summer',
+    'verv'
 );
 
-
-CREATE TABLE "event" (
-  "id" SERIAL PRIMARY KEY,
-  "visible" bool NOT NULL DEFAULT false,
-  "name_no" varchar NOT NULL,
-  "name_en" varchar NOT NULL,
-  "description_no" varchar NOT NULL,
-  "description_en" varchar NOT NULL,
-  "informational_no" varchar NOT NULL,
-  "informational_en" varchar NOT NULL,
-  "time_type" time_type_enum NOT NULL DEFAULT 'default',
-  "time_start" timestamptz NOT NULL,
-  "time_end" timestamptz NOT NULL,
-  "time_publish" timestamptz,
-  "time_signup_release" timestamptz,
-  "time_signup_deadline" timestamptz,
-  "canceled" bool NOT NULL DEFAULT false,
-  "digital" bool NOT NULL DEFAULT false,
-  "highlight" bool NOT NULL DEFAULT false,
-  "image_small" varchar,
-  "image_banner" varchar NOT NULL,
-  "link_facebook" varchar,
-  "link_discord" varchar,
-  "link_signup" varchar,
-  "link_stream" varchar,
-  "capacity" int,
-  "full" bool NOT NULL DEFAULT false,
-  "category" int NOT NULL,
-  "location" int,
-  "parent" int,
-  "rule" int,
-  "audience" int,
-  "organization" int,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE "events" (
+    "id" SERIAL PRIMARY KEY,
+    "visible" bool NOT NULL DEFAULT false,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar NOT NULL,
+    "informational_no" varchar NOT NULL,
+    "informational_en" varchar NOT NULL,
+    "time_type" time_type_enum NOT NULL DEFAULT 'default',
+    "time_start" timestamp NOT NULL,
+    "time_end" timestamp NOT NULL,
+    "time_publish" timestamp,
+    "time_signup_release" timestamp,
+    "time_signup_deadline" timestamp,
+    "canceled" bool NOT NULL DEFAULT false,
+    "digital" bool NOT NULL DEFAULT false,
+    "highlight" bool NOT NULL DEFAULT false,
+    "image_small" varchar,
+    "image_banner" varchar NOT NULL,
+    "link_facebook" varchar,
+    "link_discord" varchar,
+    "link_signup" varchar,
+    "link_stream" varchar,
+    "capacity" int,
+    "full" bool NOT NULL DEFAULT false,
+    "category_id" int NOT NULL,
+    "organization_id" int,
+    "location_id" int,
+    "parent_id" int,
+    "rule_id" int,
+    "audience_id" int,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp
 );
 
-CREATE TABLE "category" (
-  "id" SERIAL PRIMARY KEY,
-  "color" varchar NOT NULL,
-  "name_no" varchar NOT NULL,
-  "name_en" varchar NOT NULL,
-  "description_no" text NOT NULL,
-  "description_en" text NOT NULL,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+CREATE TABLE "categories" (
+    "id" SERIAL PRIMARY KEY,
+    "color" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar,
+    "description_no" text NOT NULL,
+    "description_en" text,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "audience" (
-  "id" SERIAL PRIMARY KEY,
-  "name_no" varchar NOT NULL,
-  "name_en" varchar NOT NULL,
-  "description_no" varchar NOT NULL,
-  "description_en" varchar NOT NULL,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE "audiences" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp
 );
 
-CREATE TABLE "rule" (
-  "id" SERIAL PRIMARY KEY,
-  "name_no" varchar NOT NULL,
-  "name_en" varchar NOT NULL,
-  "description_no" varchar NOT NULL,
-  "description_en" varchar NOT NULL,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE "rules" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp
 );
 
-CREATE TABLE "organization" (
-  "id" SERIAL PRIMARY KEY,
-  "shortname" varchar NOT NULL,
-  "name_no" varchar NOT NULL,
-  "name_en" varchar NOT NULL,
-  "description_no" varchar NOT NULL,
-  "description_en" varchar NOT NULL,
-  "type" int NOT NULL DEFAULT 1,
-  "link_homepage" varchar,
-  "link_linkedin" varchar,
-  "link_facebook" varchar,
-  "link_instagram" varchar,
-  "logo" varchar,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE "organizations" (
+    "id" SERIAL PRIMARY KEY,
+    "shortname" varchar,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar,
+    "type" int NOT NULL DEFAULT 1,
+    "link_homepage" varchar,
+    "link_linkedin" varchar,
+    "link_facebook" varchar,
+    "link_instagram" varchar,
+    "logo" varchar,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp
 );
 
-CREATE TABLE "location" (
-  "id" SERIAL PRIMARY KEY,
-  "name_no" varchar NOT NULL,
-  "name_en" varchar NOT NULL,
-  "type" location_type NOT NULL DEFAULT 'digital',
-  "mazemap_campus_id" int,
-  "mazemap_poi_id" int,
-  "address_street" varchar,
-  "address_postcode" int,
-  "city_name" varchar,
-  "coordinate_lat" float,
-  "coordinate_long" float,
-  "url" varchar,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE "locations" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "type" location_type NOT NULL DEFAULT 'digital',
+    "mazemap_campus_id" int,
+    "mazemap_poi_id" int,
+    "address_street" varchar,
+    "address_postcode" int,
+    "city_id" int,
+    "coordinate_lat" float,
+    "coordinate_long" float,
+    "url" varchar,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp
 );
 
-CREATE TABLE "job_advertisement" (
-  "id" SERIAL PRIMARY KEY,
-  "visible" bool NOT NULL DEFAULT false,
-  "highlight" bool NOT NULL DEFAULT false,
-  "title_no" varchar NOT NULL,
-  "title_en" varchar NOT NULL,
-  "position_title_no" varchar NOT NULL,
-  "position_title_en" varchar NOT NULL,
-  "description_short_no" varchar NOT NULL,
-  "description_short_en" varchar NOT NULL,
-  "description_long_no" varchar NOT NULL,
-  "description_long_en" varchar NOT NULL,
-  "job_type" job_type NOT NULL DEFAULT 'full',
-  "time_publish" timestamptz NOT NULL DEFAULT (now()),
-  "time_expire" timestamptz NOT NULL,
-  "application_deadline" timestamptz NOT NULL,
-  "banner_image" varchar,
-  "organization" int NOT NULL,
-  "application_url" varchar,
-  "updated_at" timestamptz NOT NULL DEFAULT (now()),
-  "created_at" timestamptz NOT NULL DEFAULT (now()),
-  "deleted_at" timestamptz
+CREATE TABLE "job_advertisements" (
+    "id" SERIAL PRIMARY KEY,
+    "visible" bool NOT NULL DEFAULT false,
+    "highlight" bool NOT NULL DEFAULT false,
+    "title_no" varchar NOT NULL,
+    "title_en" varchar NOT NULL,
+    "position_title_no" varchar NOT NULL,
+    "position_title_en" varchar NOT NULL,
+    "description_short_no" varchar NOT NULL,
+    "description_short_en" varchar NOT NULL,
+    "description_long_no" varchar NOT NULL,
+    "description_long_en" varchar NOT NULL,
+    "job_type" job_type NOT NULL DEFAULT 'full',
+    "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "time_expire" timestamp NOT NULL,
+    "application_deadline" timestamp NOT NULL,
+    "banner_image" varchar,
+    "organization_id" int NOT NULL,
+    "application_url" varchar,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp
 );
 
-CREATE TABLE "job_skill_relation" (
-  "job_id" int NOT NULL,
-  "skill" varchar NOT NULL,
-  PRIMARY KEY ("job_id", "skill")
+CREATE TABLE "ad_city_relation" (
+    "job_advertisement_id" int NOT NULL,
+    "city_id" int NOT NULL,
+    PRIMARY KEY ("job_advertisement_id", "city_id")
 );
 
-CREATE TABLE "job_location_relation" (
-  "job_id" int NOT NULL,
-  "location_id" int NOT NULL,
-  PRIMARY KEY ("job_id", "location_id")
+CREATE TABLE "cities" (
+    "id" SERIAL PRIMARY KEY,
+    "name" varchar UNIQUE
 );
 
-CREATE INDEX ON "event" ("visible");
+CREATE TABLE "ad_skill_relation" (
+    "job_advertisement_id" int NOT NULL,
+    "skill_id" int NOT NULL,
+    PRIMARY KEY ("job_advertisement_id", "skill_id")
+);
 
-CREATE INDEX ON "event" ("category");
+CREATE TABLE "skills" (
+    "id" SERIAL PRIMARY KEY,
+    "name" varchar NOT NULL
+);
 
-CREATE INDEX ON "event" ("time_start");
+CREATE INDEX ON "events" ("visible");
+CREATE INDEX ON "events" ("highlight");
+CREATE INDEX ON "events" ("category_id");
+CREATE INDEX ON "events" ("time_start");
+CREATE INDEX ON "events" ("time_end");
+CREATE INDEX ON "events" ("updated_at");
+CREATE INDEX ON "events" ("created_at");
+CREATE INDEX ON "events" ("deleted_at");
 
-CREATE INDEX ON "event" ("time_end");
+CREATE INDEX ON "categories" ("updated_at");
+CREATE INDEX ON "categories" ("created_at");
 
-CREATE INDEX ON "event" ("deleted_at");
+CREATE INDEX ON "audiences" ("updated_at");
+CREATE INDEX ON "audiences" ("created_at");
+CREATE INDEX ON "audiences" ("deleted_at");
 
-CREATE INDEX ON "audience" ("deleted_at");
+CREATE INDEX ON "rules" ("updated_at");
+CREATE INDEX ON "rules" ("created_at");
+CREATE INDEX ON "rules" ("deleted_at");
 
-CREATE INDEX ON "rule" ("deleted_at");
+CREATE INDEX ON "organizations" ("type");
+CREATE INDEX ON "organizations" ("updated_at");
+CREATE INDEX ON "organizations" ("created_at");
+CREATE INDEX ON "organizations" ("deleted_at");
 
-CREATE INDEX ON "organization" ("type");
+CREATE INDEX ON "locations" ("updated_at");
+CREATE INDEX ON "locations" ("created_at");
+CREATE INDEX ON "locations" ("deleted_at");
 
-CREATE INDEX ON "organization" ("deleted_at");
+CREATE INDEX ON "job_advertisements" ("updated_at");
+CREATE INDEX ON "job_advertisements" ("created_at");
+CREATE INDEX ON "job_advertisements" ("deleted_at");
+CREATE INDEX ON "ad_city_relation" ("job_advertisement_id");
+CREATE INDEX ON "ad_city_relation" ("city_id");
+CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
+CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
-CREATE INDEX ON "location" ("deleted_at");
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 
-CREATE INDEX ON "job_advertisement" ("deleted_at");
+ALTER TABLE "job_advertisements" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
 
-CREATE INDEX ON "job_location_relation" ("job_id");
-
-CREATE INDEX ON "job_location_relation" ("location_id");
-
-CREATE INDEX ON "job_skill_relation" ("job_id");
-
-CREATE INDEX ON "job_skill_relation" ("skill");
-
-ALTER TABLE "event" ADD FOREIGN KEY ("category") REFERENCES "category" ("id");
-
-ALTER TABLE "event" ADD FOREIGN KEY ("location") REFERENCES "location" ("id");
-
-ALTER TABLE "event" ADD FOREIGN KEY ("parent") REFERENCES "event" ("id");
-
-ALTER TABLE "event" ADD FOREIGN KEY ("rule") REFERENCES "rule" ("id");
-
-ALTER TABLE "event" ADD FOREIGN KEY ("audience") REFERENCES "audience" ("id");
-
-ALTER TABLE "event" ADD FOREIGN KEY ("organization") REFERENCES "organization" ("id");
-
-ALTER TABLE "job_advertisement" ADD FOREIGN KEY ("organization") REFERENCES "organization" ("id");
-
-ALTER TABLE "job_location_relation" ADD FOREIGN KEY ("job_id") REFERENCES "job_advertisement" ("id");
-
-ALTER TABLE "job_location_relation" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
-
-ALTER TABLE "job_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "job_advertisement" ("id");
-
-------------------
--- Events
-------------------
-
-CREATE OR REPLACE VIEW "public_event" AS
-SELECT * FROM "event"
-WHERE "deleted_at" IS NULL
-    AND "visible" IS TRUE
-    AND ("time_publish" IS NULL OR "time_publish" < now());
-
-CREATE OR REPLACE VIEW "visible_event" AS
-SELECT * FROM "public_event"
-WHERE "time_end" > now();
-
-
-------------------
--- Jobs
-------------------
-
-CREATE OR REPLACE VIEW "public_job" AS
-SELECT * FROM "job_advertisement"
-WHERE "deleted_at" IS NULL
-    AND "visible" IS TRUE
-    AND "time_publish" < now();
-
-CREATE OR REPLACE VIEW "visible_job" AS
-SELECT * FROM "public_job"
-WHERE "time_expire" > now();
+ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
 
 ------------------
 -- Dummy Data
 ------------------
 
-INSERT INTO "category" (
+INSERT INTO "skills" ("name") VALUES
+('Programmering'),
+('Datavisualisering'),
+('Prosjektledelse'),
+('Markedsføring'),
+('Kundebehandling');
+
+INSERT INTO "cities" ("name") VALUES
+('Arendal'),
+('Bodø'),
+('Drammen'),
+('Fredrikstad'),
+('Gjøvik'),
+('Halden'),
+('Hamar'),
+('Harstad'),
+('Haugesund'),
+('Kristiansand'),
+('Kristiansund'),
+('Larvik'),
+('Lillehammer'),
+('Mo i Rana'),
+('Molde'),
+('Moss'),
+('Porsgrunn'),
+('Sandefjord'),
+('Sandnes'),
+('Sarpsborg'),
+('Skien'),
+('Steinkjer'),
+('Tønsberg'),
+('Ålesund'),
+('Alta'),
+('Oslo'),
+('Trondheim'),
+('Bergen'),
+('Stavanger'),
+('Tromsø');
+
+
+INSERT INTO "categories" (
   "color", 
   "name_no", 
   "name_en", 
@@ -263,7 +284,7 @@ VALUES
 ('#FF33A8', 'Musikk', 'Music', 'Konserter og musikalske arrangementer.', 'Concerts and musical events.', now(), now()),
 ('#FFD700', 'Mat', 'Food', 'Arrangementer med fokus på mat og drikke.', 'Events focused on food and beverages.', now(), now());
 
-INSERT INTO "location" (
+INSERT INTO "locations" (
   "name_no", 
   "name_en", 
   "type", 
@@ -271,7 +292,7 @@ INSERT INTO "location" (
   "mazemap_poi_id", 
   "address_street", 
   "address_postcode", 
-  "city_name", 
+  "city_id", 
   "coordinate_lat", 
   "coordinate_long", 
   "url", 
@@ -280,68 +301,56 @@ INSERT INTO "location" (
 )
 VALUES
 ('Universitetet i Oslo', 'University of Oslo', 'address', NULL, NULL, 
-  'Problemveien 7', 0313, 'Oslo', 59.9390, 10.7205, NULL, now(), now()),
+  'Problemveien 7', 313, 26, 59.9390, 10.7205, NULL, now(), now()),
 ('Nidarosdomen', 'Nidaros Cathedral', 'coords', NULL, NULL, 
-  NULL, NULL, 'Trondheim', 63.4277, 10.3969, NULL, now(), now()),
+  NULL, NULL, 27, 63.4277, 10.3969, NULL, now(), now()),
 ('Bergenhus Festning', 'Bergenhus Fortress', 'address', NULL, NULL, 
-  'Bergenhus', 5003, 'Bergen', 60.3993, 5.3221, NULL, now(), now()),
+  'Bergenhus', 5003, 28, 60.3993, 5.3221, NULL, now(), now()),
 ('Stavanger Forum', 'Stavanger Forum', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 1', 'Bestegata 1', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 2', 'Bestegata 2', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 3', 'Bestegata 3', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 4', 'Bestegata 4', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 5', 'Bestegata 5', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 6', 'Bestegata 6', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 7', 'Bestegata 7', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 8', 'Bestegata 8', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 9', 'Bestegata 9', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 10', 'Bestegata 10', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 11', 'Bestegata 11', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 12', 'Bestegata 12', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 13', 'Bestegata 13', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 14', 'Bestegata 14', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 15', 'Bestegata 15', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 16', 'Bestegata 16', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 17', 'Bestegata 17', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 18', 'Bestegata 18', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 19', 'Bestegata 19', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Bestegata 20', 'Bestegata 20', 'mazemap', 1, 12345, 
-  NULL, 4021, 'Stavanger', 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
+  NULL, 4021, 29, 58.9537, 5.6990, 'https://stavanger-forum.no', now(), now()),
 ('Tromsø Bibliotek', 'Tromsø Library', 'address', NULL, NULL, 
-  'Grønnegata 94', 9008, 'Tromsø', 69.6489, 18.9551, NULL, now(), now()),
-('Oslo', 'Oslo', 'city', NULL, NULL, 
-  NULL, NULL, 'Oslo', NULL, NULL, NULL, now(), now()),
-('Trondheim', 'Trondheim', 'city', NULL, NULL, 
-  NULL, NULL, 'Trondheim', NULL, NULL, NULL, now(), now()),
-('Bergen', 'Bergen', 'city', NULL, NULL, 
-  NULL, NULL, 'Bergen', NULL, NULL, NULL, now(), now()),
-('Stavanger', 'Stavanger', 'city', NULL, NULL, 
-  NULL, NULL, 'Stavanger', NULL, NULL, NULL, now(), now()),
-('Tromsø', 'Tromsø', 'city', NULL, NULL, 
-  NULL, NULL, 'Tromsø', NULL, NULL, NULL, now(), now());
-
-
-INSERT INTO "rule" (
+  'Grønnegata 94', 9008, 30, 69.6489, 18.9551, NULL, now(), now());
+INSERT INTO "rules" (
   "name_no", "name_en", "description_no", "description_en", "updated_at", "created_at"
 )
 VALUES
@@ -366,7 +375,7 @@ VALUES
   'All attendees must present a valid ticket to participate in the event.', 
   now(), now());
 
-INSERT INTO "audience" (
+INSERT INTO "audiences" (
   "name_no", "name_en", "description_no", "description_en", "updated_at", "created_at"
 )
 VALUES
@@ -383,7 +392,7 @@ VALUES
   'The event is aimed at professionals in relevant industries.', 
   now(), now());
 
-INSERT INTO "organization" (
+INSERT INTO "organizations" (
   "shortname", 
   "name_no", 
   "name_en", 
@@ -430,7 +439,7 @@ VALUES
    'https://www.facebook.com/SINTEF', 'https://www.instagram.com/sintef', 
    'logo.png', now(), now());
 
-INSERT INTO "job_advertisement" (
+INSERT INTO "job_advertisements" (
   "visible", 
   "highlight", 
   "title_no", 
@@ -446,7 +455,7 @@ INSERT INTO "job_advertisement" (
   "time_expire", 
   "application_deadline", 
   "banner_image", 
-  "organization", 
+  "organization_id", 
   "application_url", 
   "updated_at", 
   "created_at"
@@ -488,43 +497,42 @@ VALUES
   'full', now(), '2025-07-31', '2025-06-01', 'https://www.example.com/banner5.jpg', 
   2, 'https://www.ntnu.no/job-apply', now(), now());
 
-INSERT INTO "job_skill_relation" ("job_id", "skill")
+INSERT INTO "ad_skill_relation" ("job_advertisement_id", "skill_id")
 VALUES
-(1, 'Programmering'), -- Software Developer (UiO)
-(1, 'Datavisualisering'), -- Software Developer (UiO)
-(2, 'Prosjektledelse'), -- Marketing Coordinator (DNB)
-(3, 'Markedsføring'), -- Project Manager (Telenor)
-(3, 'Kundebehandling'); -- Project Manager (Telenor)
+(1, 1), -- Software Developer (UiO) - Programmering
+(1, 2), -- Software Developer (UiO) - Datavisualisering
+(2, 3), -- Marketing Coordinator (DNB) - Prosjektledelse
+(3, 4), -- Project Manager (Telenor) - Markedsføring
+(3, 5); -- Project Manager (Telenor) - Kundebehandling
 
-INSERT INTO "job_location_relation" ("job_id", "location_id")
+INSERT INTO "ad_city_relation" ("job_advertisement_id", "city_id")
 VALUES
 (1, 26),  -- Software Developer (UiO) - Oslo
 (2, 29),  -- Marketing Coordinator (DNB) - Stavanger
 (3, 30),  -- Project Manager (Telenor) - Tromsø
-(4, 27), -- Customer Support Agent (SINTEF) - Trondheim
+(4, 27),  -- Customer Support Agent (SINTEF) - Trondheim
 (5, 27);  -- Data Analyst (NTNU) - Trondheim
 
-INSERT INTO "event" (
+INSERT INTO "events" (
   "visible", "name_no", "name_en", "description_no", "description_en", 
   "informational_no", "informational_en", "time_type", "time_start", "time_end", 
   "time_publish", "time_signup_release", "time_signup_deadline", "canceled", 
   "digital", "highlight", "image_small", "image_banner", "link_facebook", 
-  "link_discord", "link_signup", "link_stream", "capacity", "full", "category", 
-  "location", "parent", "rule", "audience", "organization", "updated_at", "created_at", "deleted_at"
+  "link_discord", "link_signup", "link_stream", "capacity", "full", "category_id", 
+  "organization_id", "location_id", "parent_id", "rule_id", "audience_id", "created_at", "updated_at", "deleted_at"
 )
 VALUES
 (true, 'Hackathon Oslo', 'Hackathon Oslo', 'Bli med på en spennende hackathon i Oslo!',
   'Join an exciting hackathon in Oslo!', 'Mer informasjon kommer snart.', 'More information coming soon.',
   'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', '2025-02-01 09:00:00', 
   '2025-01-15 08:00:00', '2025-01-30 23:59:00', false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 1, 1, NULL, 1, 1, 1, '2025-02-01 09:00:00', '2025-02-01 09:00:00', NULL),
+  NULL, NULL, NULL, NULL, NULL, false, 1, 1, 1, NULL, 1, 1, '2025-02-01 09:00:00', '2025-02-01 09:00:00', NULL),
 (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 'Lær om de nyeste teknologiene på Tech Conference i Bergen.',
   'Learn about the latest technologies at Tech Conference in Bergen.', 'Påmelding nødvendig.', 'Registration required.',
   'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', now(), 
   '2025-02-15 08:00:00', '2025-03-01 23:59:00', false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 2, 2, NULL, 2, 1, 2, now(), now(), NULL),
-(
-  true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
+  NULL, NULL, NULL, NULL, NULL, false, 2, 2, 2, NULL, 1, 2, now(), now(), NULL),
+(true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
   'Utforsk kunstig intelligens i Trondheim!', 
   'Explore artificial intelligence in Trondheim!', 
   'Gratis workshop for alle interesserte.', 'Free workshop for all interested.',
@@ -532,10 +540,8 @@ VALUES
   NOW() + (INTERVAL '1 day' * trunc(random() * 30)) + (INTERVAL '1 hour' * trunc(random() * 10)), 
   NOW(), NOW() - INTERVAL '10 days', NOW() + INTERVAL '15 days', 
   false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 3, 3, NULL, 3, 1, 2, NOW(), NOW(), NULL
-),
-(
-  true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
+  NULL, NULL, NULL, NULL, NULL, false, 3, 3, 3, NULL, 1, 1, NOW(), NOW(), NULL),
+(true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
   'Lær om cybersikkerhet i Stavanger!', 
   'Learn about cybersecurity in Stavanger!', 
   'Fokus på praktiske løsninger.', 'Focus on practical solutions.',
@@ -543,10 +549,8 @@ VALUES
   NOW() + (INTERVAL '1 day' * trunc(random() * 30)) + (INTERVAL '1 hour' * trunc(random() * 10)), 
   NOW(), NOW() - INTERVAL '5 days', NOW() + INTERVAL '20 days', 
   true, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 4, 4, NULL, 4, 3, 3, NOW(), NOW(), NULL
-),
-(
-  true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
+  NULL, NULL, NULL, NULL, NULL, false, 4, 3, 4, NULL, 3, 3, NOW(), NOW(), NULL),
+(true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
   'Møt eksperter innen skyteknologi i Tromsø.', 
   'Meet cloud technology experts in Tromsø.', 
   'Networking muligheter.', 'Networking opportunities.',
@@ -554,6 +558,5 @@ VALUES
   NOW() - INTERVAL '5 days' + (INTERVAL '1 hour' * trunc(random() * 10)), 
   NOW(), NOW() - INTERVAL '30 days', NOW() - INTERVAL '10 days', 
   false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 5, 5, NULL, 5, 1, 2, NOW(), NOW(), NULL
-);
+  NULL, NULL, NULL, NULL, NULL, false, 5, 1, 5, NULL, 2, 2, NOW(), NOW(), NULL);
 
