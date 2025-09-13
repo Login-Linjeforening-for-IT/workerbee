@@ -222,3 +222,98 @@ ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_advertisement_id") REFEREN
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+
+-- BeeFormed
+CREATE TYPE question_type_enum AS ENUM (
+    'single_choice',
+    'multiple_choice',
+    'text',
+    'number',
+    'date'
+);
+
+CREATE TABLE users (
+    "id" SERIAL PRIMARY KEY,
+    "full_name" varchar UNIQUE NOT NULL,
+    "email" varchar UNIQUE NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE forms (
+    "id" SERIAL PRIMARY KEY,
+    "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+    "title" varchar NOT NULL,
+    "description" varchar,
+    "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "close_at" timestamp NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE questions (
+  "id" SERIAL PRIMARY KEY,
+  "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
+    "question_title" varchar NOT NULL,
+    "question_description" varchar NOT NULL,
+    "question_type" question_type_enum NOT NULL,
+    "required" boolean DEFAULT false,
+    "position" int NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE question_options (
+    "id" SERIAL PRIMARY KEY,
+    "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
+    "option_text" varchar NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE submissions (
+    "id" SERIAL PRIMARY KEY,
+    "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
+    "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+    "submitted_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE answers (
+    "id" SERIAL PRIMARY KEY,
+    "submission_id" int NOT NULL REFERENCES "submissions"("id") ON DELETE CASCADE,
+    "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
+    "option_id" int REFERENCES "question_options"("id"),
+    "answer_text" text,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE answer_options (
+    "answer_id" int NOT NULL REFERENCES "answers"("id") ON DELETE CASCADE,
+    "option_id" int NOT NULL REFERENCES "question_options"("id") ON DELETE CASCADE,
+    PRIMARY KEY ("answer_id", "option_id")
+);
+
+CREATE INDEX ON "forms"("user_id");
+CREATE INDEX ON "forms"("deleted_at");
+
+CREATE INDEX ON "questions"("form_id");
+CREATE INDEX ON "questions"("deleted_at");
+CREATE INDEX ON "question_options"("question_id");
+CREATE INDEX ON "question_options"("deleted_at");
+
+CREATE INDEX ON "submissions"("form_id");
+CREATE INDEX ON "submissions"("user_id");
+CREATE INDEX ON "submissions"("deleted_at");
+
+CREATE INDEX ON "answers"("submission_id");
+CREATE INDEX ON "answers"("question_id");
+CREATE INDEX ON "answers"("option_id");
+CREATE INDEX ON "answers"("deleted_at");

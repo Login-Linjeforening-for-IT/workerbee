@@ -208,13 +208,6 @@ CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
-
 ALTER TABLE "job_advertisements" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
@@ -223,6 +216,100 @@ ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills"
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
+-- BeeFormed
+CREATE TYPE question_type_enum AS ENUM (
+    'single_choice',
+    'multiple_choice',
+    'text',
+    'number',
+    'date'
+);
+
+CREATE TABLE users (
+    "id" SERIAL PRIMARY KEY,
+    "full_name" varchar UNIQUE NOT NULL,
+    "email" varchar UNIQUE NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE forms (
+    "id" SERIAL PRIMARY KEY,
+    "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+    "title" varchar NOT NULL,
+    "description" varchar,
+    "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "close_at" timestamp NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE questions (
+  "id" SERIAL PRIMARY KEY,
+  "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
+    "question_title" varchar NOT NULL,
+    "question_description" varchar NOT NULL,
+    "question_type" question_type_enum NOT NULL,
+    "required" boolean DEFAULT false,
+    "position" int NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE question_options (
+    "id" SERIAL PRIMARY KEY,
+    "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
+    "option_text" varchar NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE submissions (
+    "id" SERIAL PRIMARY KEY,
+    "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
+    "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+    "submitted_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE answers (
+    "id" SERIAL PRIMARY KEY,
+    "submission_id" int NOT NULL REFERENCES "submissions"("id") ON DELETE CASCADE,
+    "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
+    "option_id" int REFERENCES "question_options"("id"),
+    "answer_text" text,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "deleted_at" timestamp DEFAULT NULL
+);
+
+CREATE TABLE answer_options (
+    "answer_id" int NOT NULL REFERENCES "answers"("id") ON DELETE CASCADE,
+    "option_id" int NOT NULL REFERENCES "question_options"("id") ON DELETE CASCADE,
+    PRIMARY KEY ("answer_id", "option_id")
+);
+
+CREATE INDEX ON "forms"("user_id");
+CREATE INDEX ON "forms"("deleted_at");
+
+CREATE INDEX ON "questions"("form_id");
+CREATE INDEX ON "questions"("deleted_at");
+CREATE INDEX ON "question_options"("question_id");
+CREATE INDEX ON "question_options"("deleted_at");
+
+CREATE INDEX ON "submissions"("form_id");
+CREATE INDEX ON "submissions"("user_id");
+CREATE INDEX ON "submissions"("deleted_at");
+
+CREATE INDEX ON "answers"("submission_id");
+CREATE INDEX ON "answers"("question_id");
+CREATE INDEX ON "answers"("option_id");
+CREATE INDEX ON "answers"("deleted_at");
 
 ------------------
 -- Dummy Data
@@ -560,3 +647,109 @@ VALUES
   false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
   NULL, NULL, NULL, NULL, NULL, false, 5, 1, 5, NULL, 2, 2, NOW(), NOW(), NULL);
 
+-- BeeFormed Dummy Data
+-- Users
+INSERT INTO users (full_name, email) VALUES
+('Ola Nordmann', 'ola.nordmann@example.com'),
+('Kari Nordmann', 'kari.nordmann@example.com'),
+('Per Hansen', 'per.hansen@example.com'),
+('Anne Olsen', 'anne.olsen@example.com'),
+('Mona Berg', 'mona.berg@example.com'),
+('Erik Solheim', 'erik.solheim@example.com'),
+('Sofie Kristoffersen', 'sofie.kristoffersen@example.com'),
+('Jonas Lie', 'jonas.lie@example.com'),
+('Emma Johansen', 'emma.johansen@example.com'),
+('Henrik Ibsen', 'henrik.ibsen@example.com'),
+('Sara Lund', 'sara.lund@example.com'),
+('Martin Nilsen', 'martin.nilsen@example.com');
+
+-- Forms
+INSERT INTO forms (user_id, title, description, open_at, close_at) VALUES
+(1, 'Påmelding til Sommerfest', 'Skjema for påmelding til sommerfesten.', NOW(), NOW() + INTERVAL '30 days'),
+(2, 'Tilbakemelding på kurs', 'Gi oss din tilbakemelding på kurset.', NOW(), NOW() + INTERVAL '15 days'),
+(3, 'Interesse for studentaktiviteter', 'Hvilke aktiviteter ønsker du å delta på?', NOW(), NOW() + INTERVAL '60 days'),
+(4, 'Frivillig arbeid', 'Registrer deg som frivillig.', NOW(), NOW() + INTERVAL '45 days'),
+(5, 'Matpreferanser', 'Hva ønsker du å spise på arrangementet?', NOW(), NOW() + INTERVAL '10 days'),
+(6, 'Reiseundersøkelse', 'Hvordan planlegger du å reise til arrangementet?', NOW(), NOW() + INTERVAL '20 days'),
+(7, 'Evaluering av arrangement', 'Gi din vurdering av arrangementet.', NOW(), NOW() + INTERVAL '7 days'),
+(8, 'Påmelding til workshop', 'Meld deg på vår workshop.', NOW(), NOW() + INTERVAL '25 days'),
+(9, 'Interesse for verv', 'Er du interessert i et verv?', NOW(), NOW() + INTERVAL '40 days'),
+(10, 'Spørreundersøkelse om transport', 'Hvordan reiser du til campus?', NOW(), NOW() + INTERVAL '15 days');
+
+-- Questions
+INSERT INTO questions (form_id, question_title, question_description, question_type, required, position) VALUES
+(1, 'Fullt navn', 'Skriv inn ditt fulle navn.', 'text', true, 1),
+(1, 'E-postadresse', 'Skriv inn din e-postadresse.', 'text', true, 2),
+(1, 'Ønsker du å delta på middag?', 'Velg ett alternativ.', 'single_choice', true, 3),
+(1, 'Allergier', 'Har du noen allergier?', 'multiple_choice', false, 4),
+(1, 'Antall personer', 'Hvor mange personer kommer du med?', 'number', true, 5),
+(1, 'Dato for deltakelse', 'Velg dato du ønsker å delta.', 'date', true, 6),
+(2, 'Kursets navn', 'Hvilket kurs deltok du på?', 'text', true, 1),
+(2, 'Vurdering av kurset', 'Hvordan vil du vurdere kurset?', 'single_choice', true, 2),
+(2, 'Hva likte du best?', 'Beskriv det du likte best.', 'text', false, 3),
+(2, 'Forbedringsforslag', 'Har du forslag til forbedringer?', 'text', false, 4),
+(2, 'Vil du anbefale kurset?', 'Velg ett alternativ.', 'single_choice', true, 5),
+(2, 'Dato for kurs', 'Når deltok du på kurset?', 'date', true, 6),
+(3, 'Hvilke aktiviteter interesserer deg?', 'Velg én eller flere.', 'multiple_choice', true, 1),
+(3, 'Hvor ofte ønsker du å delta?', 'Velg ett alternativ.', 'single_choice', true, 2),
+(3, 'Kommentarer', 'Har du kommentarer?', 'text', false, 3),
+(3, 'Antall tidligere deltakelser', 'Hvor mange ganger har du deltatt før?', 'number', false, 4),
+(3, 'Foretrukket dag', 'Hvilken dag passer best?', 'single_choice', true, 5),
+(3, 'Dato for neste aktivitet', 'Når ønsker du å delta neste gang?', 'date', false, 6),
+(4, 'Navn', 'Skriv inn ditt navn.', 'text', true, 1),
+(4, 'E-post', 'Skriv inn din e-post.', 'text', true, 2),
+(4, 'Hvilket område ønsker du å jobbe med?', 'Velg ett alternativ.', 'single_choice', true, 3),
+(4, 'Tidligere erfaring', 'Beskriv din erfaring.', 'text', false, 4),
+(4, 'Antall timer per uke', 'Hvor mange timer kan du bidra?', 'number', true, 5),
+(4, 'Startdato', 'Når kan du starte?', 'date', true, 6),
+(5, 'Navn', 'Skriv inn ditt navn.', 'text', true, 1),
+(5, 'Matpreferanse', 'Velg din matpreferanse.', 'single_choice', true, 2),
+(5, 'Allergier', 'Velg én eller flere allergier.', 'multiple_choice', false, 3),
+(5, 'Kommentarer', 'Har du kommentarer?', 'text', false, 4),
+(5, 'Antall måltider', 'Hvor mange måltider ønsker du?', 'number', true, 5),
+(5, 'Dato for måltid', 'Når ønsker du måltidet?', 'date', true, 6),
+(6, 'Navn', 'Skriv inn ditt navn.', 'text', true, 1),
+(6, 'Transportmiddel', 'Velg transportmiddel.', 'single_choice', true, 2),
+(6, 'Reisefølge', 'Hvor mange reiser sammen med deg?', 'number', false, 3),
+(6, 'Avreisested', 'Hvor reiser du fra?', 'text', true, 4),
+(6, 'Kommentarer', 'Har du kommentarer?', 'text', false, 5),
+(6, 'Reisedato', 'Når reiser du?', 'date', true, 6),
+(7, 'Hvordan vil du vurdere arrangementet?', 'Velg ett alternativ.', 'single_choice', true, 1),
+(7, 'Hva likte du best?', 'Beskriv det du likte best.', 'text', false, 2),
+(7, 'Vil du delta igjen?', 'Velg ett alternativ.', 'single_choice', true, 3),
+(7, 'Kommentarer', 'Har du kommentarer?', 'text', false, 4),
+(8, 'Fullt navn', 'Skriv inn ditt fulle navn.', 'text', true, 1),
+(8, 'E-postadresse', 'Skriv inn din e-postadresse.', 'text', true, 2),
+(8, 'Workshop tema', 'Velg workshop tema.', 'single_choice', true, 3),
+(8, 'Erfaring med temaet', 'Beskriv din erfaring.', 'text', false, 4),
+(9, 'Er du interessert i et verv?', 'Velg ett alternativ.', 'single_choice', true, 1),
+(9, 'Hvilket verv ønsker du?', 'Velg ett alternativ.', 'single_choice', false, 2),
+(9, 'Motivasjon', 'Beskriv din motivasjon.', 'text', false, 3),
+(10, 'Transportmiddel', 'Velg transportmiddel.', 'single_choice', true, 1),
+(10, 'Hvor ofte reiser du til campus?', 'Velg ett alternativ.', 'single_choice', true, 2),
+(10, 'Kommentarer', 'Har du kommentarer?', 'text', false, 3);
+
+-- Question Options
+INSERT INTO question_options (question_id, option_text) VALUES
+(3, 'Ja'), (3, 'Nei'),
+(4, 'Gluten'), (4, 'Laktose'), (4, 'Nøtter'), (4, 'Ingen'),
+(8, 'Utmerket'), (8, 'God'), (8, 'Middels'), (8, 'Dårlig'),
+(11, 'Ja'), (11, 'Nei'),
+(13, 'Sport'), (13, 'Musikk'), (13, 'Teknologi'), (13, 'Kunst'), (13, 'Friluftsliv'),
+(14, 'Ukentlig'), (14, 'Månedlig'), (14, 'Årlig'),
+(17, 'Mandag'), (17, 'Onsdag'), (17, 'Fredag'), (17, 'Helg'),
+(21, 'Teknologi'), (21, 'Markedsføring'), (21, 'Logistikk'), (21, 'Kunst'),
+(27, 'Vegetar'), (27, 'Veganer'), (27, 'Kjøtt'), (27, 'Fisk'),
+(28, 'Gluten'), (28, 'Laktose'), (28, 'Nøtter'), (28, 'Ingen'),
+(33, 'Bil'), (33, 'Buss'), (33, 'Tog'), (33, 'Sykkel'), (33, 'Gående'),
+(37, 'Utmerket'), (37, 'God'), (37, 'Middels'), (37, 'Dårlig'),
+(39, 'Ja'), (39, 'Nei'),
+(43, 'Teknologi'), (43, 'Kunst'), (43, 'Mat'), (43, 'Sport'),
+(46, 'Ja'), (46, 'Nei'),
+(47, 'Leder'), (47, 'Sekretær'), (47, 'Økonomiansvarlig'), (47, 'Arrangementsansvarlig'),
+(50, 'Bil'), (50, 'Buss'), (50, 'Tog'), (50, 'Sykkel'), (50, 'Gående');
+
+-- Submissions
+INSERT INTO submissions (form_id, user_id) VALUES
+(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10),
+(1, 11), (2, 12), (3, 7), (4, 8), (5, 9), (6, 10);
