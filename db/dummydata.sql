@@ -60,9 +60,9 @@ CREATE TABLE "categories" (
     "id" SERIAL PRIMARY KEY,
     "color" varchar NOT NULL,
     "name_no" varchar NOT NULL,
-    "name_en" varchar,
+    "name_en" varchar NOT NULL,
     "description_no" text NOT NULL,
-    "description_en" text,
+    "description_en" text NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -70,9 +70,9 @@ CREATE TABLE "categories" (
 CREATE TABLE "audiences" (
     "id" SERIAL PRIMARY KEY,
     "name_no" varchar NOT NULL,
-    "name_en" varchar,
+    "name_en" varchar NOT NULL,
     "description_no" varchar NOT NULL,
-    "description_en" varchar,
+    "description_en" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" timestamp
@@ -81,9 +81,9 @@ CREATE TABLE "audiences" (
 CREATE TABLE "rules" (
     "id" SERIAL PRIMARY KEY,
     "name_no" varchar NOT NULL,
-    "name_en" varchar,
+    "name_en" varchar NOT NULL,
     "description_no" varchar NOT NULL,
-    "description_en" varchar,
+    "description_en" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" timestamp
@@ -93,9 +93,9 @@ CREATE TABLE "organizations" (
     "id" SERIAL PRIMARY KEY,
     "shortname" varchar,
     "name_no" varchar NOT NULL,
-    "name_en" varchar,
+    "name_en" varchar NOT NULL,
     "description_no" varchar NOT NULL,
-    "description_en" varchar,
+    "description_en" varchar NOT NULL,
     "type" int NOT NULL DEFAULT 1,
     "link_homepage" varchar,
     "link_linkedin" varchar,
