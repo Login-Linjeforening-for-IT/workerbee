@@ -239,6 +239,7 @@ CREATE TABLE forms (
     "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "title" varchar NOT NULL,
     "description" varchar,
+    "capacity" int,
     "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "close_at" timestamp NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -664,17 +665,17 @@ INSERT INTO users (full_name, email) VALUES
 ('Martin Nilsen', 'martin.nilsen@example.com');
 
 -- Forms
-INSERT INTO forms (user_id, title, description, open_at, close_at) VALUES
-(1, 'Påmelding til Sommerfest', 'Skjema for påmelding til sommerfesten.', NOW(), NOW() + INTERVAL '30 days'),
-(2, 'Tilbakemelding på kurs', 'Gi oss din tilbakemelding på kurset.', NOW(), NOW() + INTERVAL '15 days'),
-(3, 'Interesse for studentaktiviteter', 'Hvilke aktiviteter ønsker du å delta på?', NOW(), NOW() + INTERVAL '60 days'),
-(4, 'Frivillig arbeid', 'Registrer deg som frivillig.', NOW(), NOW() + INTERVAL '45 days'),
-(5, 'Matpreferanser', 'Hva ønsker du å spise på arrangementet?', NOW(), NOW() + INTERVAL '10 days'),
-(6, 'Reiseundersøkelse', 'Hvordan planlegger du å reise til arrangementet?', NOW(), NOW() + INTERVAL '20 days'),
-(7, 'Evaluering av arrangement', 'Gi din vurdering av arrangementet.', NOW(), NOW() + INTERVAL '7 days'),
-(8, 'Påmelding til workshop', 'Meld deg på vår workshop.', NOW(), NOW() + INTERVAL '25 days'),
-(9, 'Interesse for verv', 'Er du interessert i et verv?', NOW(), NOW() + INTERVAL '40 days'),
-(10, 'Spørreundersøkelse om transport', 'Hvordan reiser du til campus?', NOW(), NOW() + INTERVAL '15 days');
+INSERT INTO forms (user_id, title, description, open_at, close_at, capacity) VALUES
+(1, 'Påmelding til Sommerfest', 'Skjema for påmelding til sommerfesten.', NOW(), NOW() + INTERVAL '30 days', NULL),
+(2, 'Tilbakemelding på kurs', 'Gi oss din tilbakemelding på kurset.', NOW(), NOW() + INTERVAL '15 days', 45),
+(3, 'Interesse for studentaktiviteter', 'Hvilke aktiviteter ønsker du å delta på?', NOW(), NOW() + INTERVAL '60 days', NULL),
+(4, 'Frivillig arbeid', 'Registrer deg som frivillig.', NOW(), NOW() + INTERVAL '45 days', 13),
+(5, 'Matpreferanser', 'Hva ønsker du å spise på arrangementet?', NOW(), NOW() + INTERVAL '10 days', 4),
+(6, 'Reiseundersøkelse', 'Hvordan planlegger du å reise til arrangementet?', NOW(), NOW() + INTERVAL '20 days', NULL),
+(7, 'Evaluering av arrangement', 'Gi din vurdering av arrangementet.', NOW(), NOW() + INTERVAL '7 days', 46),
+(8, 'Påmelding til workshop', 'Meld deg på vår workshop.', NOW(), NOW() + INTERVAL '25 days', NULL),
+(9, 'Interesse for verv', 'Er du interessert i et verv?', NOW(), NOW() + INTERVAL '40 days', 65),
+(10, 'Spørreundersøkelse om transport', 'Hvordan reiser du til campus?', NOW(), NOW() + INTERVAL '15 days', NULL);
 
 -- Questions
 INSERT INTO questions (form_id, question_title, question_description, question_type, required, position) VALUES

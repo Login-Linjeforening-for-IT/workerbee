@@ -65,7 +65,29 @@ func Route(c *gin.Engine) {
 		{
 			stats.GET("/total", handlers.GetTotalStats)
 			stats.GET("/categories", handlers.GetCategoriesStats)
-			stats.GET("/newAdditions", handlers.GetNewAdditionsStats)
+			stats.GET("/new-additions", handlers.GetNewAdditionsStats)
+		}
+		forms := v2.Group("/forms")
+		{
+			forms.GET("/:id", handlers.GetForm)
+			forms.GET("/", handlers.GetForms)
+			forms.POST("/", handlers.PingHandler)
+			forms.DELETE("/:id", handlers.PingHandler)
+			forms.PATCH("/:id", handlers.PingHandler)
+			questions := forms.Group("/:id/questions")
+			{
+				questions.GET("/", handlers.PingHandler)
+				questions.POST("/", handlers.PingHandler)
+				questions.DELETE("/", handlers.PingHandler)
+				questions.PATCH("/", handlers.PingHandler)
+			}
+			answers := forms.Group("/:id/answers")
+			{
+				answers.GET("/", handlers.PingHandler)
+				answers.POST("/", handlers.PingHandler)
+				answers.DELETE("/:id", handlers.PingHandler)
+				answers.PATCH("/:id", handlers.PingHandler)
+			}
 		}
 	}
 }

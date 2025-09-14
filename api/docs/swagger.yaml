@@ -100,6 +100,38 @@ definitions:
       visible:
         type: boolean
     type: object
+  models.Form:
+    properties:
+      capacity:
+        type: integer
+      closeAt:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      openAt:
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.FormsResponse:
+    properties:
+      forms:
+        items:
+          $ref: '#/definitions/models.Form'
+        type: array
+      total_count:
+        type: integer
+    type: object
   models.NewAdditionsStats:
     properties:
       createdAt:
@@ -182,6 +214,53 @@ paths:
       summary: Get events
       tags:
       - events
+  /api/v2/forms:
+    get:
+      description: Returns a list of forms, supports search and pagination
+      parameters:
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.FormsResponse'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: List forms
+      tags:
+      - forms
+  /api/v2/forms/{id}:
+    get:
+      description: Returns a form by its ID
+      parameters:
+      - description: Form ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get a single form
+      tags:
+      - forms
   /api/v2/ping:
     get:
       description: Health check endpoint. Returns a simple pong message.

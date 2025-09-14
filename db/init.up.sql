@@ -246,6 +246,7 @@ CREATE TABLE forms (
     "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "title" varchar NOT NULL,
     "description" varchar,
+    "capacity" int,
     "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "close_at" timestamp NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
