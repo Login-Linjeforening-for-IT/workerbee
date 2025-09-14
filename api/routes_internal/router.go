@@ -20,13 +20,14 @@ func Route(c *gin.Engine) {
 			events.PATCH("/:id", handlers.PingHandler)
 			events.DELETE("/:id", handlers.PingHandler)
 			events.GET("/categories", handlers.PingHandler)
-			events.GET("/audience", handlers.PingHandler)
+			events.GET("/audiences", handlers.PingHandler)
 		}
 		rules := v2.Group("/rules")
 		{
 			rules.GET("/:id", handlers.PingHandler)
 			rules.GET("/", handlers.PingHandler)
 			rules.POST("/", handlers.PingHandler)
+			rules.PATCH("/:id", handlers.PingHandler)
 			rules.DELETE("/:id", handlers.PingHandler)
 		}
 		locations := v2.Group("/locations")
@@ -50,7 +51,8 @@ func Route(c *gin.Engine) {
 			categories.GET("/", handlers.PingHandler)
 			categories.GET("/:id", handlers.PingHandler)
 			categories.POST("/", handlers.PingHandler)
-
+			categories.PATCH("/:id", handlers.PingHandler)
+			categories.DELETE("/:id", handlers.PingHandler)
 		}
 		jobs := v2.Group("/jobs")
 		{
