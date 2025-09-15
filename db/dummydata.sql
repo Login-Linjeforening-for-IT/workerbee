@@ -52,8 +52,7 @@ CREATE TABLE "events" (
     "rule_id" int,
     "audience_id" int,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "categories" (
@@ -74,8 +73,7 @@ CREATE TABLE "audiences" (
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "rules" (
@@ -85,8 +83,7 @@ CREATE TABLE "rules" (
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "organizations" (
@@ -103,8 +100,7 @@ CREATE TABLE "organizations" (
     "link_instagram" varchar,
     "logo" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "locations" (
@@ -121,8 +117,7 @@ CREATE TABLE "locations" (
     "coordinate_long" float,
     "url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "job_advertisements" (
@@ -145,8 +140,7 @@ CREATE TABLE "job_advertisements" (
     "organization_id" int NOT NULL,
     "application_url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "ad_city_relation" (
@@ -178,35 +172,36 @@ CREATE INDEX ON "events" ("time_start");
 CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
-CREATE INDEX ON "events" ("deleted_at");
 
 CREATE INDEX ON "categories" ("updated_at");
 CREATE INDEX ON "categories" ("created_at");
 
 CREATE INDEX ON "audiences" ("updated_at");
 CREATE INDEX ON "audiences" ("created_at");
-CREATE INDEX ON "audiences" ("deleted_at");
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
-CREATE INDEX ON "rules" ("deleted_at");
 
 CREATE INDEX ON "organizations" ("type");
 CREATE INDEX ON "organizations" ("updated_at");
 CREATE INDEX ON "organizations" ("created_at");
-CREATE INDEX ON "organizations" ("deleted_at");
 
 CREATE INDEX ON "locations" ("updated_at");
 CREATE INDEX ON "locations" ("created_at");
-CREATE INDEX ON "locations" ("deleted_at");
 
 CREATE INDEX ON "job_advertisements" ("updated_at");
 CREATE INDEX ON "job_advertisements" ("created_at");
-CREATE INDEX ON "job_advertisements" ("deleted_at");
 CREATE INDEX ON "ad_city_relation" ("job_advertisement_id");
 CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
+
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 
 ALTER TABLE "job_advertisements" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
@@ -230,8 +225,7 @@ CREATE TABLE users (
     "full_name" varchar UNIQUE NOT NULL,
     "email" varchar UNIQUE NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE forms (
@@ -243,8 +237,7 @@ CREATE TABLE forms (
     "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "close_at" timestamp NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE questions (
@@ -256,8 +249,7 @@ CREATE TABLE questions (
     "required" boolean DEFAULT false,
     "position" int NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE question_options (
@@ -265,8 +257,7 @@ CREATE TABLE question_options (
     "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
     "option_text" varchar NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE submissions (
@@ -274,8 +265,7 @@ CREATE TABLE submissions (
     "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
     "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "submitted_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE answers (
@@ -285,8 +275,7 @@ CREATE TABLE answers (
     "option_id" int REFERENCES "question_options"("id"),
     "answer_text" text,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE answer_options (
@@ -296,21 +285,17 @@ CREATE TABLE answer_options (
 );
 
 CREATE INDEX ON "forms"("user_id");
-CREATE INDEX ON "forms"("deleted_at");
 
 CREATE INDEX ON "questions"("form_id");
-CREATE INDEX ON "questions"("deleted_at");
 CREATE INDEX ON "question_options"("question_id");
-CREATE INDEX ON "question_options"("deleted_at");
 
 CREATE INDEX ON "submissions"("form_id");
 CREATE INDEX ON "submissions"("user_id");
-CREATE INDEX ON "submissions"("deleted_at");
 
 CREATE INDEX ON "answers"("submission_id");
 CREATE INDEX ON "answers"("question_id");
 CREATE INDEX ON "answers"("option_id");
-CREATE INDEX ON "answers"("deleted_at");
+
 
 ------------------
 -- Dummy Data
@@ -607,19 +592,19 @@ INSERT INTO "events" (
   "time_publish", "time_signup_release", "time_signup_deadline", "canceled", 
   "digital", "highlight", "image_small", "image_banner", "link_facebook", 
   "link_discord", "link_signup", "link_stream", "capacity", "full", "category_id", 
-  "organization_id", "location_id", "parent_id", "rule_id", "audience_id", "created_at", "updated_at", "deleted_at"
+  "organization_id", "location_id", "parent_id", "rule_id", "audience_id", "created_at", "updated_at"
 )
 VALUES
 (true, 'Hackathon Oslo', 'Hackathon Oslo', 'Bli med på en spennende hackathon i Oslo!',
   'Join an exciting hackathon in Oslo!', 'Mer informasjon kommer snart.', 'More information coming soon.',
   'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', '2025-02-01 09:00:00', 
   '2025-01-15 08:00:00', '2025-01-30 23:59:00', false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 1, 1, 1, NULL, 1, 1, '2025-02-01 09:00:00', '2025-02-01 09:00:00', NULL),
+  NULL, NULL, NULL, NULL, NULL, false, 1, 1, 1, NULL, 1, 1, '2025-02-01 09:00:00', '2025-02-01 09:00:00'),
 (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 'Lær om de nyeste teknologiene på Tech Conference i Bergen.',
   'Learn about the latest technologies at Tech Conference in Bergen.', 'Påmelding nødvendig.', 'Registration required.',
   'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', now(), 
   '2025-02-15 08:00:00', '2025-03-01 23:59:00', false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 2, 2, 2, NULL, 1, 2, now(), now(), NULL),
+  NULL, NULL, NULL, NULL, NULL, false, 2, 2, 2, NULL, 1, 2, now(), now()),
 (true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
   'Utforsk kunstig intelligens i Trondheim!', 
   'Explore artificial intelligence in Trondheim!', 
@@ -628,7 +613,7 @@ VALUES
   NOW() + (INTERVAL '1 day' * trunc(random() * 30)) + (INTERVAL '1 hour' * trunc(random() * 10)), 
   NOW(), NOW() - INTERVAL '10 days', NOW() + INTERVAL '15 days', 
   false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 3, 3, 3, NULL, 1, 1, NOW(), NOW(), NULL),
+  NULL, NULL, NULL, NULL, NULL, false, 3, 3, 3, NULL, 1, 1, NOW(), NOW()),
 (true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
   'Lær om cybersikkerhet i Stavanger!', 
   'Learn about cybersecurity in Stavanger!', 
@@ -637,7 +622,7 @@ VALUES
   NOW() + (INTERVAL '1 day' * trunc(random() * 30)) + (INTERVAL '1 hour' * trunc(random() * 10)), 
   NOW(), NOW() - INTERVAL '5 days', NOW() + INTERVAL '20 days', 
   true, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 4, 3, 4, NULL, 3, 3, NOW(), NOW(), NULL),
+  NULL, NULL, NULL, NULL, NULL, false, 4, 3, 4, NULL, 3, 3, NOW(), NOW()),
 (true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
   'Møt eksperter innen skyteknologi i Tromsø.', 
   'Meet cloud technology experts in Tromsø.', 
@@ -646,7 +631,7 @@ VALUES
   NOW() - INTERVAL '5 days' + (INTERVAL '1 hour' * trunc(random() * 10)), 
   NOW(), NOW() - INTERVAL '30 days', NOW() - INTERVAL '10 days', 
   false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 5, 1, 5, NULL, 2, 2, NOW(), NOW(), NULL);
+  NULL, NULL, NULL, NULL, NULL, false, 5, 1, 5, NULL, 2, 2, NOW(), NOW());
 
 -- BeeFormed Dummy Data
 -- Users

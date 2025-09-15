@@ -12,7 +12,6 @@ type Form struct {
 	CloseAt     time.Time  `db:"close_at"`
 	CreatedAt   time.Time  `db:"created_at"`
 	UpdatedAt   time.Time  `db:"updated_at"`
-	DeletedAt   *time.Time `db:"deleted_at"`
 }
 
 type FormWithTotalCount struct {

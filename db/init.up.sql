@@ -52,8 +52,7 @@ CREATE TABLE "events" (
     "rule_id" int,
     "audience_id" int,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "categories" (
@@ -74,8 +73,7 @@ CREATE TABLE "audiences" (
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "rules" (
@@ -85,8 +83,7 @@ CREATE TABLE "rules" (
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "organizations" (
@@ -103,8 +100,7 @@ CREATE TABLE "organizations" (
     "link_instagram" varchar,
     "logo" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "locations" (
@@ -121,8 +117,7 @@ CREATE TABLE "locations" (
     "coordinate_long" float,
     "url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "job_advertisements" (
@@ -145,8 +140,7 @@ CREATE TABLE "job_advertisements" (
     "organization_id" int NOT NULL,
     "application_url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "ad_city_relation" (
@@ -178,31 +172,25 @@ CREATE INDEX ON "events" ("time_start");
 CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
-CREATE INDEX ON "events" ("deleted_at");
 
 CREATE INDEX ON "categories" ("updated_at");
 CREATE INDEX ON "categories" ("created_at");
 
 CREATE INDEX ON "audiences" ("updated_at");
 CREATE INDEX ON "audiences" ("created_at");
-CREATE INDEX ON "audiences" ("deleted_at");
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
-CREATE INDEX ON "rules" ("deleted_at");
 
 CREATE INDEX ON "organizations" ("type");
 CREATE INDEX ON "organizations" ("updated_at");
 CREATE INDEX ON "organizations" ("created_at");
-CREATE INDEX ON "organizations" ("deleted_at");
 
 CREATE INDEX ON "locations" ("updated_at");
 CREATE INDEX ON "locations" ("created_at");
-CREATE INDEX ON "locations" ("deleted_at");
 
 CREATE INDEX ON "job_advertisements" ("updated_at");
 CREATE INDEX ON "job_advertisements" ("created_at");
-CREATE INDEX ON "job_advertisements" ("deleted_at");
 CREATE INDEX ON "ad_city_relation" ("job_advertisement_id");
 CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
@@ -237,8 +225,7 @@ CREATE TABLE users (
     "full_name" varchar UNIQUE NOT NULL,
     "email" varchar UNIQUE NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE forms (
@@ -250,8 +237,7 @@ CREATE TABLE forms (
     "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "close_at" timestamp NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE questions (
@@ -263,8 +249,7 @@ CREATE TABLE questions (
     "required" boolean DEFAULT false,
     "position" int NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE question_options (
@@ -272,8 +257,7 @@ CREATE TABLE question_options (
     "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
     "option_text" varchar NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE submissions (
@@ -281,8 +265,7 @@ CREATE TABLE submissions (
     "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
     "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "submitted_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE answers (
@@ -292,8 +275,7 @@ CREATE TABLE answers (
     "option_id" int REFERENCES "question_options"("id"),
     "answer_text" text,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" timestamp DEFAULT NULL
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE answer_options (
@@ -303,18 +285,13 @@ CREATE TABLE answer_options (
 );
 
 CREATE INDEX ON "forms"("user_id");
-CREATE INDEX ON "forms"("deleted_at");
 
 CREATE INDEX ON "questions"("form_id");
-CREATE INDEX ON "questions"("deleted_at");
 CREATE INDEX ON "question_options"("question_id");
-CREATE INDEX ON "question_options"("deleted_at");
 
 CREATE INDEX ON "submissions"("form_id");
 CREATE INDEX ON "submissions"("user_id");
-CREATE INDEX ON "submissions"("deleted_at");
 
 CREATE INDEX ON "answers"("submission_id");
 CREATE INDEX ON "answers"("question_id");
 CREATE INDEX ON "answers"("option_id");
-CREATE INDEX ON "answers"("deleted_at");

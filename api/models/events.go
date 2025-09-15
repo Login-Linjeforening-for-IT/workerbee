@@ -45,5 +45,4 @@ type Event struct {
 	Organizer_name_en  string     `db:"organizer_name_en"`
 	UpdatedAt          time.Time  `db:"updated_at"`
 	CreatedAt          time.Time  `db:"created_at"`
-	DeletedAt          *time.Time `db:"deleted_at"`
 }
