@@ -1,0 +1,1 @@
+-- name: get_cities :many

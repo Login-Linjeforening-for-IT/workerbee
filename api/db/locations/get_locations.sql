@@ -1,3 +1,4 @@
+-- name: get_locations :many
 SELECT *,
     COUNT(*) OVER() AS total_count
 FROM locations

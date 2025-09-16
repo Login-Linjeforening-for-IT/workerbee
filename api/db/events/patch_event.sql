@@ -1,0 +1,35 @@
+-- name: patch_event :one
+UPDATE events
+SET
+    visible = $2,
+    name_no = $3,
+    name_en = $4,
+    description_no = $5,
+    description_en = $6,
+    informational_no = $7,
+    informational_en = $8,
+    time_type = $9,
+    time_start = $10,
+    time_end = $11,
+    time_publish = $12,
+    time_signup_release = $13,
+    time_signup_deadline = $14,
+    canceled = $15,
+    digital = $16,
+    highlight = $17,
+    image_small = $18,
+    image_banner = $19,
+    link_facebook = $20,
+    link_discord = $21,
+    link_signup = $22,
+    link_stream = $23,
+    capacity = $24,
+    full = $25,
+    category_id = $26,
+    organization_id = $27,
+    location_id = $28,
+    parent_id = $29,
+    rule_id = $30,
+    audience_id = $31
+WHERE id = $1
+RETURNING *;

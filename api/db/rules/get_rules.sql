@@ -1,3 +1,4 @@
+-- name: get_rules :many
 SELECT *,
     COUNT(*) OVER() AS total_count
 FROM rules

@@ -1,4 +1,5 @@
-INSERT INTO rules 
+-- name: post_location :one
+INSERT INTO locations
 (
     name_no,
     name_en,

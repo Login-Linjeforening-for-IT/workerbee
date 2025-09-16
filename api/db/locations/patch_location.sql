@@ -1,5 +1,6 @@
-UPDATE rules 
-SET 
+-- name: patch_location :one
+UPDATE locations
+SET
     name_no = $2,
     name_en = $3,
     type = $4,
