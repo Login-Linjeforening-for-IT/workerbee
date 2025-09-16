@@ -12,6 +12,7 @@ SELECT
     e.link_signup,
     e.capacity,
     e.full,
+    e.parent_id,
     c.name_no AS category_name_no,
     c.name_en AS category_name_en,
     l.name_no AS location_name_no,
@@ -22,18 +23,16 @@ SELECT
     o.name_no AS organizer_name_no,
     o.name_en AS organizer_name_en,
     COUNT(*) OVER() AS total_count
-FROM event AS e
-INNER JOIN category AS c ON e.category = c.id
-LEFT JOIN location AS l ON e.location = l.id
-LEFT JOIN audience AS a ON e.audience = a.id
-LEFT JOIN organization AS o ON e.organization = o.id
+FROM events AS e
+INNER JOIN categories AS c ON e.category_id = c.id
+LEFT JOIN locations AS l ON e.location_id = l.id
+LEFT JOIN audiences AS a ON e.audience_id = a.id
+LEFT JOIN organizations AS o ON e.organization_id = o.id
 WHERE 
 (
     $4::bool    OR ((e.time_end IS NOT NULL AND e.time_end > now())
                 OR (e.time_start > now() - interval '1 day')))
     AND 
     (
-        $1 = '' OR to_json(e)::text ILIKE '%' || $4 || '%'
+        $1 = '' OR to_json(e)::text ILIKE '%' || $1 || '%'
     )
-ORDER BY e.id
-LIMIT $2 OFFSET $3;

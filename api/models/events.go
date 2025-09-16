@@ -28,21 +28,31 @@ type Event struct {
 	LinkStream         *string    `db:"link_stream"`
 	Capacity           *int       `db:"capacity"`
 	Full               bool       `db:"full"`
-	Category           int        `db:"category"`
+	Category           int        `db:"category_id"`
 	CategoryNameNo     string     `db:"category_name_no"`
 	CategoryNameEn     string     `db:"category_name_en"`
-	Location           *int       `db:"location"`
+	Location           *int       `db:"location_id"`
 	Location_name_no   string     `db:"location_name_no"`
 	Location_name_en   string     `db:"location_name_en"`
 	Is_deleted         bool       `db:"is_deleted"`
-	Parent             *int       `db:"parent"`
-	Rule               *int       `db:"rule"`
-	Audience           *int       `db:"audience"`
+	Parent             *int       `db:"parent_id"`
+	Rule               *int       `db:"rule_id"`
+	Audience           *int       `db:"audience_id"`
 	Audience_name_en   string     `db:"audience_name_en"`
 	Audience_name_no   string     `db:"audience_name_no"`
-	Organization       *int       `db:"organization"`
+	Organization       *int       `db:"organization_id"`
 	Organizer_name_no  string     `db:"organizer_name_no"`
 	Organizer_name_en  string     `db:"organizer_name_en"`
 	UpdatedAt          time.Time  `db:"updated_at"`
 	CreatedAt          time.Time  `db:"created_at"`
+}
+
+type EventWithTotalCount struct {
+	Event
+	TotalCount int `db:"total_count"`
+}
+
+type EventResponse struct {
+	Events      []Event `json:"events"`
+	TotalCount int     `json:"total_count"`
 }

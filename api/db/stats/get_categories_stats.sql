@@ -5,8 +5,8 @@ WITH counts AS (
     c.name_en,
     c.name_no,
     COUNT(e.*) AS event_count
-  FROM category c
-  LEFT JOIN event e ON e.category = c.id
+  FROM categories c
+  LEFT JOIN events e ON e.category_id = c.id
     AND e.time_start >= now() - interval '3 months'
     AND e.time_start <= now()
   GROUP BY c.id, c.name_en, c.name_no

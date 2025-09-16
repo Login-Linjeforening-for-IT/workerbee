@@ -1,18 +1,18 @@
 -- name: GetNewAdditionsStats :one
 SELECT * FROM (
-  SELECT "id", "created_at", 'event' AS "table", COALESCE("name_en", "name_no") AS "name" FROM "event"
+  SELECT "id", "created_at", 'events' AS "table", COALESCE("name_en", "name_no") AS "name" FROM "events"
   UNION ALL
-  SELECT "id", "created_at", 'category', COALESCE("name_en", "name_no") AS "name" FROM "category"
+  SELECT "id", "created_at", 'categories', COALESCE("name_en", "name_no") AS "name" FROM "categories"
   UNION ALL
-  SELECT "id", "created_at", 'audience', COALESCE("name_en", "name_no") AS "name" FROM "audience"
+  SELECT "id", "created_at", 'audiences', COALESCE("name_en", "name_no") AS "name" FROM "audiences"
   UNION ALL
-  SELECT "id", "created_at", 'rule', COALESCE("name_en", "name_no") AS "name" FROM "rule"
+  SELECT "id", "created_at", 'rules', COALESCE("name_en", "name_no") AS "name" FROM "rules"
   UNION ALL
-  SELECT "id", "created_at", 'organization', COALESCE("name_en", "name_no") AS "name" FROM "organization"
+  SELECT "id", "created_at", 'organizations', COALESCE("name_en", "name_no") AS "name" FROM "organizations"
   UNION ALL
-  SELECT "id", "created_at", 'location', COALESCE("name_en", "name_no") AS "name" FROM "location"
+  SELECT "id", "created_at", 'locations', COALESCE("name_en", "name_no") AS "name" FROM "locations"
   UNION ALL
-  SELECT "id", "created_at", 'job_advertisement', COALESCE("title_en", "title_no") AS "name" FROM "job_advertisement"
+  SELECT "id", "created_at", 'job_advertisements', COALESCE("title_en", "title_no") AS "name" FROM "job_advertisements"
 ) AS newest_additions
 ORDER BY "created_at" DESC
 LIMIT $1;

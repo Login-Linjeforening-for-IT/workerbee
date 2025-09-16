@@ -6,7 +6,7 @@ import (
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal"
 )
 
-func Route(c *gin.Engine) {
+func Route(c *gin.Engine, h *handlers.Handler) {
 	v2 := c.Group(internal.BASE_PATH)
 	{
 		v2.GET("/ping", handlers.PingHandler)
@@ -15,12 +15,11 @@ func Route(c *gin.Engine) {
 		events := v2.Group("/events")
 		{
 			events.GET("/:id", handlers.PingHandler)
-			events.GET("/", handlers.GetEvents)
+			events.GET("/", h.GetEvents)
 			events.POST("/", handlers.PingHandler)
 			events.PATCH("/:id", handlers.PingHandler)
 			events.DELETE("/:id", handlers.PingHandler)
 			events.GET("/categories", handlers.PingHandler)
-			events.GET("/audiences", handlers.PingHandler)
 		}
 		rules := v2.Group("/rules")
 		{
@@ -65,14 +64,14 @@ func Route(c *gin.Engine) {
 		}
 		stats := v2.Group("/stats")
 		{
-			stats.GET("/total", handlers.GetTotalStats)
-			stats.GET("/categories", handlers.GetCategoriesStats)
-			stats.GET("/new-additions", handlers.GetNewAdditionsStats)
+			stats.GET("/total", h.GetTotalStats)
+			stats.GET("/categories", h.GetCategoriesStats)
+			stats.GET("/new-additions", h.GetNewAdditionsStats)
 		}
 		forms := v2.Group("/forms")
 		{
-			forms.GET("/:id", handlers.GetForm)
-			forms.GET("/", handlers.GetForms)
+			forms.GET("/:id", h.GetForm)
+			forms.GET("/", h.GetForms)
 			forms.POST("/", handlers.PingHandler)
 			forms.DELETE("/:id", handlers.PingHandler)
 			forms.PATCH("/:id", handlers.PingHandler)

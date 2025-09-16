@@ -4,7 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/config"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/db"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/handlers"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/repository"
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/routes_internal"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/services"
 )
 
 func init() {
@@ -15,15 +18,33 @@ func init() {
 		}
 	*/
 	config.Init()
-	db.Init()
 }
 
 func main() {
+	db := db.Init()
+
+	// Repos
+	eventRepo := repository.NewEventRepository(db)
+	statsRepo := repository.NewStatsRepository(db)
+	formRepo := repository.NewFormRepository(db)
+
+	// Services
+	eventService := services.NewEventService(eventRepo)
+	statsService := services.NewStatsService(statsRepo)
+	formService := services.NewFormService(formRepo)
+
+	// handler container
+	h := &handlers.Handler{
+		Events: *eventService,
+		Stats:  *statsService,
+		Forms:  *formService,
+	}
+
 	router := gin.New()
 
 	router.Use(gin.Logger())
 
-	routes_internal.Route(router)
+	routes_internal.Route(router, h)
 
 	router.Run(":" + config.Port)
 }

@@ -1,13 +1,11 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
-	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/db"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal"
 )
 
 // GetTotalStats godoc
@@ -18,23 +16,10 @@ import (
 // @Success      200  {object}  models.TotalStats
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/total [get]
-func GetTotalStats(c *gin.Context) {
-	totalStats := []models.TotalStats{}
-
-	sqlBytes, err := os.ReadFile("./db/stats/get_total_stats.sql")
+func (h *Handler) GetTotalStats(c *gin.Context) {
+	totalStats, err := h.Stats.GetTotalStats()
 	if err != nil {
-		log.Println("unable to find file, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
 
-	query := string(sqlBytes)
-
-	err = db.DB.Select(&totalStats, query)
-	if err != nil {
-		log.Println("unable to query, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
 	}
 
 	c.JSON(http.StatusOK, totalStats)
@@ -48,23 +33,10 @@ func GetTotalStats(c *gin.Context) {
 // @Success      200  {array}  models.CategoriesStats
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/categories [get]
-func GetCategoriesStats(c *gin.Context) {
-	categoriesStats := []models.CategoriesStats{}
-
-	sqlBytes, err := os.ReadFile("./db/stats/get_categories_stats.sql")
+func (h *Handler) GetCategoriesStats(c *gin.Context) {
+	categoriesStats, err := h.Stats.GetCategoriesStats()
 	if err != nil {
-		log.Println("unable to find file, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
 
-	query := string(sqlBytes)
-
-	err = db.DB.Select(&categoriesStats, query)
-	if err != nil {
-		log.Println("unable to query, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
 	}
 
 	c.JSON(http.StatusOK, categoriesStats)
@@ -79,31 +51,15 @@ func GetCategoriesStats(c *gin.Context) {
 // @Success      200  {array}  models.NewAdditionsStats
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/new_additions [get]
-func GetNewAdditionsStats(c *gin.Context) {
-	limit := c.Query("limit")
-
-	if limit == "" {
-		limit = "10"
-	}
-
-	NewAdditionsStats := []models.NewAdditionsStats{}
-
-	sqlBytes, err := os.ReadFile("./db/stats/get_new_additions_stats.sql")
+func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
+	limit := c.DefaultQuery("limit", "20")
+	limitInt, err := strconv.Atoi(limit)
 	if err != nil {
-		log.Println("unable to find file, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		internal.HandleError(c, err, "Bad request", http.StatusBadRequest)
 		return
 	}
 
-	query := string(sqlBytes)
-
-	err = db.DB.Select(&NewAdditionsStats, query, limit)
-	if err != nil {
-		log.Println("unable to query, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
+	NewAdditionsStats, err := h.Stats.GetNewAdditionsStats(limitInt)
 
 	c.JSON(http.StatusOK, NewAdditionsStats)
 }
-

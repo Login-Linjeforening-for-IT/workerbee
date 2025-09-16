@@ -1,13 +1,9 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/db"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
 )
 
 // GetForm godoc
@@ -18,24 +14,12 @@ import (
 // @Success      200  {object}  models.Form
 // @Failure      500  {object}  error
 // @Router       /api/v2/forms/{id} [get]
-func GetForm(c *gin.Context) {
+func (h *Handler) GetForm(c *gin.Context) {
 	id := c.Param("id")
 
-	forms := []models.Form{}
-
-	sqlBytes, err := os.ReadFile("./db/forms/get_form.sql")
+	forms, err := h.Forms.GetForm(id)
 	if err != nil {
-		log.Println("unable to find file, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
 
-	query := string(sqlBytes)
-	err = db.DB.Select(&forms, query, id)
-	if err != nil {
-		log.Println("unable to query, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
 	}
 
 	if len(forms) == 0 {
@@ -56,39 +40,18 @@ func GetForm(c *gin.Context) {
 // @Success 200 {object} models.FormsResponse
 // @Failure      500  {object}  error
 // @Router       /api/v2/forms [get]
-func GetForms(c *gin.Context) {
+func (h *Handler) GetForms(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 
-	forms := []models.FormWithTotalCount{}
-
-	sqlBytes, err := os.ReadFile("./db/forms/get_forms.sql")
+	forms, err := h.Forms.GetForms(search, limit, offset)
 	if err != nil {
-		log.Println("unable to find file, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+
 	}
 
-	query := string(sqlBytes)
-	err = db.DB.Select(&forms, query, search, limit, offset)
-	if err != nil {
-		log.Println("unable to query, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	total := 0
-	if len(forms) > 0 {
-		total = forms[0].TotalCount
-	}
-
-	formResponses := make([]models.Form, len(forms))
-	for i, f := range forms {
-		formResponses[i] = f.Form
-	}
 	c.JSON(http.StatusOK, gin.H{
-		"forms": formResponses,
-		"total_count": total,
+		"forms":       forms,
+		"total_count": forms[0].TotalCount,
 	})
 }

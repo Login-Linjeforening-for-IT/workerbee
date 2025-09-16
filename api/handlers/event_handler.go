@@ -1,14 +1,24 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
-	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/db"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
+	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal"
 )
+
+var allowedSortColumns = map[string]string{
+	"id":           "e.id",
+	"name_no":      "e.name_no",
+	"name_en":      "e.name_en",
+	"time_start":   "e.time_start",
+	"time_end":     "e.time_end",
+	"time_publish": "e.time_publish",
+	"canceled":     "e.canceled",
+	"capacity":     "e.capacity",
+	"full":         "e.full",
+}
 
 // GetEvents godoc
 // @Summary      Get events
@@ -21,30 +31,24 @@ import (
 // @Success      200  {array}  models.Event
 // @Failure      500  {object}  error
 // @Router       /api/v2/events [get]
-func GetEvents(c *gin.Context) {
-	limit := c.Query("limit")
-	offset := c.Query("offset")
+func (h *Handler) GetEvents(c *gin.Context) {
+	search := c.DefaultQuery("search", "")
+	limit := c.DefaultQuery("limit", "20")
+	offset := c.DefaultQuery("offset", "0")
+	sort := c.DefaultQuery("direction", "asc")
+	orderBy := c.DefaultQuery("order_by", "id")
+	historical := c.DefaultQuery("historical", "false")
 
-	println(limit, offset)
-
-	events := []models.Event{}
-
-	sqlBytes, err := os.ReadFile("./db/events/get_events.sql")
+	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumns)
 	if err != nil {
-		log.Println("unable to find file, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		internal.HandleError(c, err, "Bad input", http.StatusBadRequest)
 		return
 	}
 
-	historical := true
-	query := string(sqlBytes)
+	events, err := h.Events.GetEvents(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized, historical)
 
-	err = db.DB.Select(&events, query, historical, 20, 0)
-	if err != nil {
-		log.Println("unable to query, err ", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
-	}
-
-	c.JSON(http.StatusOK, events)
+	c.JSON(http.StatusOK, gin.H{
+		"events":      events,
+		"total_count": events[0].TotalCount,
+	})
 }
