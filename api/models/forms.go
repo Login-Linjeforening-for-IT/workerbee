@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/lib/pq"
+)
 
 type User struct {
 	ID        int       `db:"id"`
@@ -45,7 +49,8 @@ type QuestionOption struct {
 
 type QuestionWithOptions struct {
 	Question
-	Options []QuestionOption `db:"options"`
+	OptionIDs   pq.Int64Array `db:"option_ids" json:"option_ids"`
+	OptionTexts pq.StringArray `db:"option_texts" json:"option_texts"`
 }
 
 type Submission struct {
