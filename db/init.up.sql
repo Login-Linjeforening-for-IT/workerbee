@@ -232,7 +232,7 @@ CREATE TABLE forms (
     "id" SERIAL PRIMARY KEY,
     "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
     "title" varchar NOT NULL,
-    "description" varchar,
+    "description" varchar NOT NULL,
     "capacity" int,
     "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "close_at" timestamp NOT NULL,
@@ -248,6 +248,7 @@ CREATE TABLE questions (
     "question_type" question_type_enum NOT NULL,
     "required" boolean DEFAULT false,
     "position" int NOT NULL,
+    "max" int,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );

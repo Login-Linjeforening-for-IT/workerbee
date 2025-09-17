@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/jmoiron/sqlx"
@@ -8,7 +9,7 @@ import (
 )
 
 type FormRepository interface {
-	GetForms(search, limit, offset string) ([]models.FormWithTotalCount, error)
+	GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error)
 	GetForm(id string) ([]models.Form, error)
 }
 
@@ -20,7 +21,7 @@ func NewFormRepository(db *sqlx.DB) FormRepository {
 	return &formRepository{db: db}
 }
 
-func (r *formRepository) GetForms(search, limit, offset string) ([]models.FormWithTotalCount, error) {
+func (r *formRepository) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
 	forms := []models.FormWithTotalCount{}
 
 	sqlBytes, err := os.ReadFile("./db/forms/get_forms.sql")
@@ -28,7 +29,8 @@ func (r *formRepository) GetForms(search, limit, offset string) ([]models.FormWi
 		return nil, err
 	}
 
-	query := string(sqlBytes)
+	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), orderBy, sort)
+
 	err = r.db.Select(&forms, query, search, limit, offset)
 	if err != nil {
 		return nil, err
@@ -36,6 +38,7 @@ func (r *formRepository) GetForms(search, limit, offset string) ([]models.FormWi
 
 	return forms, nil
 }
+
 
 func (r *formRepository) GetForm(id string) ([]models.Form, error) {
 	forms := []models.Form{}
