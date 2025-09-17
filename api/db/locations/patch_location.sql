@@ -10,6 +10,7 @@ SET
     address_postcode = $8,
     city_id = $9,
     coordinate_lat = $10,
-    coordinate_lon = $11
+    coordinate_lon = $11,
+    updated_at = NOW()
 WHERE id = $1
 RETURNING *;

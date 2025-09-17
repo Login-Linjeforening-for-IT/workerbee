@@ -11,6 +11,7 @@ SET
     link_linkedin = $9,
     link_facebook = $10,
     link_instagram = $11,
-    logo = $12
+    logo = $12,
+    updated_at = NOW()
 WHERE id = $1
 RETURNING *;

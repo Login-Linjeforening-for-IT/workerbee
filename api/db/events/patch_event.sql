@@ -30,6 +30,7 @@ SET
     location_id = $28,
     parent_id = $29,
     rule_id = $30,
-    audience_id = $31
+    audience_id = $31,
+    updated_at = NOW()
 WHERE id = $1
 RETURNING *;

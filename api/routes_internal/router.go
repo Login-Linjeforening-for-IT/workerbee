@@ -72,9 +72,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			forms.GET("/:id", h.GetForm)
 			forms.GET("/", h.GetForms)
-			forms.POST("/", handlers.PingHandler)
-			forms.DELETE("/:id", handlers.PingHandler)
-			forms.PATCH("/:id", handlers.PingHandler)
+			forms.POST("/", h.PostForm)
+			forms.PATCH("/:id", h.PatchForm)
+			forms.DELETE("/:id", h.DeleteForm)
 			questions := forms.Group(":id/questions")
 			{
 				questions.GET("/", handlers.PingHandler)

@@ -20,3 +20,15 @@ func (s *FormService) GetForms(search, limit, offset, orderBy, sort string) ([]m
 func (s *FormService) GetForm(id string) ([]models.Form, error) {
 	return s.repo.GetForm(id)
 }
+
+func (s *FormService) PostForm(form models.Form) (models.Form, error) {
+	return s.repo.PostForm(form)
+}
+
+func (s *FormService) PatchForm(id string, form models.Form) (models.Form, error) {
+	return s.repo.PatchForm(id, form)
+}
+
+func (s *FormService) DeleteForm(id string) (models.Form, error) {
+	return s.repo.DeleteForm(id)
+}

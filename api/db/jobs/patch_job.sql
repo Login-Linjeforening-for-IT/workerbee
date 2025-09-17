@@ -17,6 +17,7 @@ SET
     application_deadline = $15,
     banner_image = $16,
     organization_id = $17,
-    application_url = $18
+    application_url = $18,
+    updated_at = NOW()
 WHERE id = $1
 RETURNING *;
