@@ -27,14 +27,12 @@ func main() {
 	eventRepo := repository.NewEventRepository(db)
 	statsRepo := repository.NewStatsRepository(db)
 	formRepo := repository.NewFormRepository(db)
+	questionRepo := repository.NewQuestionRepository(db)
 
 	// Services
 	eventService := services.NewEventService(eventRepo)
 	statsService := services.NewStatsService(statsRepo)
 	formService := services.NewFormService(formRepo)
-
-	// Add QuestionRepo and QuestionService
-	questionRepo := repository.NewQuestionRepository(db)
 	questionService := services.NewQuestionService(questionRepo)
 
 	// handler container

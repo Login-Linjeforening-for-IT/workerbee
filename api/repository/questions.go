@@ -8,10 +8,12 @@ import (
 )
 
 type QuestionRepository interface {
-	GetQuestions(formID string) ([]models.QuestionWithOptions, error)
 	PostQuestions(formID string, questions []models.Question) ([]models.Question, error)
 	PatchQuestions(formID string, questions []models.Question) ([]models.Question, error)
 	DeleteQuestion(id string) (models.Question, error)
+	PostQuestionOption(questionID string, options models.QuestionOption) (models.QuestionOption, error)
+	PatchQuestionOption(options models.QuestionOption) (models.QuestionOption, error)
+	DeleteQuestionOption(id string) (models.QuestionOption, error)
 }
 
 type questionRepository struct {
@@ -20,23 +22,6 @@ type questionRepository struct {
 
 func NewQuestionRepository(db *sqlx.DB) QuestionRepository {
 	return &questionRepository{db: db}
-}
-
-func (r *questionRepository) GetQuestions(formID string) ([]models.QuestionWithOptions, error) {
-	questions := []models.QuestionWithOptions{}
-
-	sqlBytes, err := os.ReadFile("./db/forms/questions/get_questions.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	query := string(sqlBytes)
-	err = r.db.Select(&questions, query, formID)
-	if err != nil {
-		return nil, err
-	}
-	
-	return questions, nil
 }
 
 func (r *questionRepository) PostQuestions(formID string, questions []models.Question) ([]models.Question, error) {
@@ -96,4 +81,55 @@ func (r *questionRepository) DeleteQuestion(id string) (models.Question, error) 
 	}
 	
 	return question, nil
+}
+
+func (r *questionRepository) PostQuestionOption(questionID string, options models.QuestionOption) (models.QuestionOption, error) {
+	option := models.QuestionOption{}
+	
+	sqlBytes, err := os.ReadFile("./db/forms/questions/post_question_option.sql")
+	if err != nil {
+		return option, err
+	}
+	
+	query := string(sqlBytes)
+	err = r.db.Get(&option, query, questionID, options.OptionText, options.Position)
+	if err != nil {
+		return option, err
+	}
+	
+	return option, nil
+}
+
+func (r *questionRepository) PatchQuestionOption(options models.QuestionOption) (models.QuestionOption, error) {
+	option := models.QuestionOption{}
+	
+	sqlBytes, err := os.ReadFile("./db/forms/questions/patch_question_option.sql")
+	if err != nil {
+		return option, err
+	}
+	
+	query := string(sqlBytes)
+	err = r.db.Get(&option, query, options.ID, options.OptionText, options.Position)
+	if err != nil {
+		return option, err
+	}
+	
+	return option, nil
+}
+
+func (r *questionRepository) DeleteQuestionOption(id string) (models.QuestionOption, error) {
+	option := models.QuestionOption{}
+	
+	sqlBytes, err := os.ReadFile("./db/forms/questions/delete_question_option.sql")
+	if err != nil {
+		return option, err
+	}
+	
+	query := string(sqlBytes)
+	err = r.db.Get(&option, query, id)
+	if err != nil {
+		return option, err
+	}
+	
+	return option, nil
 }

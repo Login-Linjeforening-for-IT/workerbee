@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 
 type FormRepository interface {
 	GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error)
-	GetForm(id string) ([]models.Form, error)
+	GetForm(id string) (*models.FormWithQuestion, error)
 	PostForm(form models.Form) (models.Form, error)
 	PatchForm(id string, form models.Form) (models.Form, error)
 	DeleteForm(id string) (models.Form, error)
@@ -42,22 +43,35 @@ func (r *formRepository) GetForms(search, limit, offset, orderBy, sort string) (
 	return forms, nil
 }
 
+func (r *formRepository) GetForm(id string) (*models.FormWithQuestion, error) {
+       type formWithQuestionsRaw struct {
+	       models.FormWithQuestion
+	       QuestionsRaw json.RawMessage `db:"questions"`
+	       UserRaw      json.RawMessage `db:"user"`
+       }
+       f := formWithQuestionsRaw{}
 
-func (r *formRepository) GetForm(id string) ([]models.Form, error) {
-	forms := []models.Form{}
+       sqlBytes, err := os.ReadFile("./db/forms/get_form.sql")
+       if err != nil {
+	       return nil, err
+       }
 
-	sqlBytes, err := os.ReadFile("./db/forms/get_form.sql")
-	if err != nil {
-		return nil, err
-	}
+       query := string(sqlBytes)
+       err = r.db.Get(&f, query, id)
+       if err != nil {
+	       return nil, err
+       }
 
-	query := string(sqlBytes)
-	err = r.db.Select(&forms, query, id)
-	if err != nil {
-		return nil, err
-	}
+       if len(f.QuestionsRaw) > 0 {
+	       _ = json.Unmarshal(f.QuestionsRaw, &f.Questions)
+       }
+       if len(f.UserRaw) > 0 {
+	       var user models.User
+	       _ = json.Unmarshal(f.UserRaw, &user)
+	       f.User = &user
+       }
 
-	return forms, nil
+       return &f.FormWithQuestion, nil
 }
 
 func (r *formRepository) PostForm(form models.Form) (models.Form, error) {

@@ -257,6 +257,7 @@ CREATE TABLE question_options (
     "id" SERIAL PRIMARY KEY,
     "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
     "option_text" varchar NOT NULL,
+    "position" int NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
@@ -717,24 +718,24 @@ INSERT INTO questions (form_id, question_title, question_description, question_t
 (10, 'Kommentarer', 'Har du kommentarer?', 'text', false, 3, 2);
 
 -- Question Options
-INSERT INTO question_options (question_id, option_text) VALUES
-(3, 'Ja'), (3, 'Nei'),
-(4, 'Gluten'), (4, 'Laktose'), (4, 'Nøtter'), (4, 'Ingen'),
-(8, 'Utmerket'), (8, 'God'), (8, 'Middels'), (8, 'Dårlig'),
-(11, 'Ja'), (11, 'Nei'),
-(13, 'Sport'), (13, 'Musikk'), (13, 'Teknologi'), (13, 'Kunst'), (13, 'Friluftsliv'),
-(14, 'Ukentlig'), (14, 'Månedlig'), (14, 'Årlig'),
-(17, 'Mandag'), (17, 'Onsdag'), (17, 'Fredag'), (17, 'Helg'),
-(21, 'Teknologi'), (21, 'Markedsføring'), (21, 'Logistikk'), (21, 'Kunst'),
-(27, 'Vegetar'), (27, 'Veganer'), (27, 'Kjøtt'), (27, 'Fisk'),
-(28, 'Gluten'), (28, 'Laktose'), (28, 'Nøtter'), (28, 'Ingen'),
-(33, 'Bil'), (33, 'Buss'), (33, 'Tog'), (33, 'Sykkel'), (33, 'Gående'),
-(37, 'Utmerket'), (37, 'God'), (37, 'Middels'), (37, 'Dårlig'),
-(39, 'Ja'), (39, 'Nei'),
-(43, 'Teknologi'), (43, 'Kunst'), (43, 'Mat'), (43, 'Sport'),
-(46, 'Ja'), (46, 'Nei'),
-(47, 'Leder'), (47, 'Sekretær'), (47, 'Økonomiansvarlig'), (47, 'Arrangementsansvarlig'),
-(50, 'Bil'), (50, 'Buss'), (50, 'Tog'), (50, 'Sykkel'), (50, 'Gående');
+INSERT INTO question_options (question_id, option_text, position) VALUES
+(3, 'Ja', 1), (3, 'Nei', 2),
+(4, 'Gluten', 1), (4, 'Laktose', 2), (4, 'Nøtter', 3), (4, 'Ingen', 4),
+(8, 'Utmerket', 1), (8, 'God', 2), (8, 'Middels', 3), (8, 'Dårlig', 4),
+(11, 'Ja', 1), (11, 'Nei', 2),
+(13, 'Sport', 1), (13, 'Musikk', 2), (13, 'Teknologi', 3), (13, 'Kunst', 4), (13, 'Friluftsliv', 5),
+(14, 'Ukentlig', 1), (14, 'Månedlig', 2), (14, 'Årlig', 3),
+(17, 'Mandag', 1), (17, 'Onsdag', 2), (17, 'Fredag', 3), (17, 'Helg', 4),
+(21, 'Teknologi', 1), (21, 'Markedsføring', 2), (21, 'Logistikk', 3), (21, 'Kunst', 4),
+(27, 'Vegetar', 1), (27, 'Veganer', 2), (27, 'Kjøtt', 3), (27, 'Fisk', 4),
+(28, 'Gluten', 1), (28, 'Laktose', 2), (28, 'Nøtter', 3), (28, 'Ingen', 4),
+(33, 'Bil', 1), (33, 'Buss', 2), (33, 'Tog', 3), (33, 'Sykkel', 4), (33, 'Gående', 5),
+(37, 'Utmerket', 1), (37, 'God', 2), (37, 'Middels', 3), (37, 'Dårlig', 4),
+(39, 'Ja', 1), (39, 'Nei', 2),
+(43, 'Teknologi', 1), (43, 'Kunst', 2), (43, 'Mat', 3), (43, 'Sport', 4),
+(46, 'Ja', 1), (46, 'Nei', 2),
+(47, 'Leder', 1), (47, 'Sekretær', 2), (47, 'Økonomiansvarlig', 3), (47, 'Arrangementsansvarlig', 4),
+(50, 'Bil', 1), (50, 'Buss', 2), (50, 'Tog', 3), (50, 'Sykkel', 4), (50, 'Gående', 5);
 
 -- Submissions
 INSERT INTO submissions (form_id, user_id) VALUES

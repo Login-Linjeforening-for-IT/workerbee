@@ -18,17 +18,18 @@ import (
 func (h *Handler) GetForm(c *gin.Context) {
 	id := c.Param("id")
 
-	forms, err := h.Forms.GetForm(id)
+	form, err := h.Forms.GetForm(id)
 	if err != nil {
-
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-
-	if len(forms) == 0 {
+	
+	if form == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Form not found"})
 		return
 	}
-
-	c.JSON(http.StatusOK, forms[0])
+	
+	c.JSON(http.StatusOK, form)
 }
 
 // GetForms godoc

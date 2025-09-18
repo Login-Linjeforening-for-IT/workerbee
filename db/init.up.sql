@@ -257,6 +257,7 @@ CREATE TABLE question_options (
     "id" SERIAL PRIMARY KEY,
     "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
     "option_text" varchar NOT NULL,
+    "position" int NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );

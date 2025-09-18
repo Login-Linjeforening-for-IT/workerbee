@@ -17,7 +17,7 @@ func (s *FormService) GetForms(search, limit, offset, orderBy, sort string) ([]m
 	return s.repo.GetForms(search, limit, offset, orderBy, sort)
 }
 
-func (s *FormService) GetForm(id string) ([]models.Form, error) {
+func (s *FormService) GetForm(id string) (*models.FormWithQuestion, error) {
 	return s.repo.GetForm(id)
 }
 
