@@ -47,6 +47,15 @@ func (h *Handler) GetEvents(c *gin.Context) {
 	}
 
 	events, err := h.Events.GetEvents(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized, historical)
+	if err != nil {
+		switch { 
+		case errors.Is(err, internal.ErrInvalidSort):
+			internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
+		default:
+			internal.HandleError(c, err, "could not fetch event", http.StatusInternalServerError)
+		}
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"events":      events,
@@ -59,7 +68,7 @@ func (h *Handler) GetEvent(c *gin.Context) {
 
 	event, err := h.Events.GetEvent(id)
 	if err != nil {
-		switch {
+		switch { 
 		case errors.Is(err, internal.ErrInvalidId):
 			internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
 		default:
@@ -68,5 +77,21 @@ func (h *Handler) GetEvent(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, event)
+}
+
+func (h *Handler) DeleteEvent(c *gin.Context) {
+	id := c.Param("id")
+
+	event, err := h.Events.DeleteEvent(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, internal.ErrInvalidId):
+						internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
+		default:
+			internal.HandleError(c, err, "could not fetch event", http.StatusInternalServerError)
+		}
+		return
+	}
 	c.JSON(http.StatusOK, event)
 }

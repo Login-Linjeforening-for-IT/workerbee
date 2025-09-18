@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 
@@ -12,6 +14,7 @@ import (
 type EventRepository interface {
 	GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error)
 	GetEvent(id int) (models.Event, error)
+	DeleteEvent(id int) (models.Event, error)
 }
 
 type eventRepository struct {
@@ -50,6 +53,25 @@ func (r *eventRepository) GetEvent(id int) (models.Event, error) {
 	err = r.db.Get(&event, string(sqlBytes), id)
 	if err != nil {
 		return event, internal.ErrInvalidSort
+	}
+
+	return event, nil
+}
+
+func (r *eventRepository) DeleteEvent(id int) (models.Event, error) {
+	var event models.Event
+
+	sqlBytes, err := os.ReadFile("./db/events/delete_event.sql")
+	if err != nil {
+		return event, err
+	}
+
+	err = r.db.Get(&event, string(sqlBytes), id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return event, internal.ErrInvalidId
+		}
+		return event, err
 	}
 
 	return event, nil
