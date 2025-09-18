@@ -635,109 +635,136 @@ VALUES
   false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
   NULL, NULL, NULL, NULL, NULL, false, 5, 1, 5, NULL, 2, 2, NOW(), NOW());
 
--- BeeFormed Dummy Data
--- Users
+-- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
+-- 10 submissions per form (one per user), and 10 answers per question.
 INSERT INTO users (full_name, email) VALUES
-('Ola Nordmann', 'ola.nordmann@example.com'),
-('Kari Nordmann', 'kari.nordmann@example.com'),
-('Per Hansen', 'per.hansen@example.com'),
-('Anne Olsen', 'anne.olsen@example.com'),
-('Mona Berg', 'mona.berg@example.com'),
-('Erik Solheim', 'erik.solheim@example.com'),
-('Sofie Kristoffersen', 'sofie.kristoffersen@example.com'),
-('Jonas Lie', 'jonas.lie@example.com'),
-('Emma Johansen', 'emma.johansen@example.com'),
-('Henrik Ibsen', 'henrik.ibsen@example.com'),
-('Sara Lund', 'sara.lund@example.com'),
-('Martin Nilsen', 'martin.nilsen@example.com');
+('User One','user1@example.com'),
+('User Two','user2@example.com'),
+('User Three','user3@example.com'),
+('User Four','user4@example.com'),
+('User Five','user5@example.com'),
+('User Six','user6@example.com'),
+('User Seven','user7@example.com'),
+('User Eight','user8@example.com'),
+('User Nine','user9@example.com'),
+('User Ten','user10@example.com');
 
--- Forms
-INSERT INTO forms (user_id, title, description, open_at, close_at, capacity) VALUES
-(1, 'Påmelding til Sommerfest', 'Skjema for påmelding til sommerfesten.', NOW(), NOW() + INTERVAL '30 days', NULL),
-(2, 'Tilbakemelding på kurs', 'Gi oss din tilbakemelding på kurset.', NOW(), NOW() + INTERVAL '15 days', 45),
-(3, 'Interesse for studentaktiviteter', 'Hvilke aktiviteter ønsker du å delta på?', NOW(), NOW() + INTERVAL '60 days', NULL),
-(4, 'Frivillig arbeid', 'Registrer deg som frivillig.', NOW(), NOW() + INTERVAL '45 days', 13),
-(5, 'Matpreferanser', 'Hva ønsker du å spise på arrangementet?', NOW(), NOW() + INTERVAL '10 days', 4),
-(6, 'Reiseundersøkelse', 'Hvordan planlegger du å reise til arrangementet?', NOW(), NOW() + INTERVAL '20 days', NULL),
-(7, 'Evaluering av arrangement', 'Gi din vurdering av arrangementet.', NOW(), NOW() + INTERVAL '7 days', 46),
-(8, 'Påmelding til workshop', 'Meld deg på vår workshop.', NOW(), NOW() + INTERVAL '25 days', NULL),
-(9, 'Interesse for verv', 'Er du interessert i et verv?', NOW(), NOW() + INTERVAL '40 days', 65),
-(10, 'Spørreundersøkelse om transport', 'Hvordan reiser du til campus?', NOW(), NOW() + INTERVAL '15 days', NULL);
+-- Two forms owned by user 1 and user 2
+INSERT INTO forms (user_id, title, description, capacity, open_at, close_at)
+VALUES
+((SELECT id FROM users WHERE full_name='User One'), 'Form A', 'Test form A', 100, now(), '2026-12-31'),
+((SELECT id FROM users WHERE full_name='User Two'), 'Form B', 'Test form B', 100, now(), '2026-12-31');
 
--- Questions
-INSERT INTO questions (form_id, question_title, question_description, question_type, required, position, max) VALUES
-(1, 'Fullt navn', 'Skriv inn ditt fulle navn.', 'text', true, 1, 3),
-(1, 'E-postadresse', 'Skriv inn din e-postadresse.', 'text', true, 2, 2),
-(1, 'Ønsker du å delta på middag?', 'Velg ett alternativ.', 'single_choice', true, 3, NULL),
-(1, 'Allergier', 'Har du noen allergier?', 'multiple_choice', false, 4, 4),
-(1, 'Antall personer', 'Hvor mange personer kommer du med?', 'number', true, 5, NULL),
-(1, 'Dato for deltakelse', 'Velg dato du ønsker å delta.', 'date', true, 6, NULL),
-(2, 'Kursets navn', 'Hvilket kurs deltok du på?', 'text', true, 1, 4),
-(2, 'Vurdering av kurset', 'Hvordan vil du vurdere kurset?', 'single_choice', true, 2, NULL),
-(2, 'Hva likte du best?', 'Beskriv det du likte best.', 'text', false, 3, 2),
-(2, 'Forbedringsforslag', 'Har du forslag til forbedringer?', 'text', false, 4, 5),
-(2, 'Vil du anbefale kurset?', 'Velg ett alternativ.', 'single_choice', true, 5, NULL),
-(2, 'Dato for kurs', 'Når deltok du på kurset?', 'date', true, 6, NULL),
-(3, 'Hvilke aktiviteter interesserer deg?', 'Velg én eller flere.', 'multiple_choice', true, 1, 5),
-(3, 'Hvor ofte ønsker du å delta?', 'Velg ett alternativ.', 'single_choice', true, 2, NULL),
-(3, 'Kommentarer', 'Har du kommentarer?', 'text', false, 3, 3),
-(3, 'Antall tidligere deltakelser', 'Hvor mange ganger har du deltatt før?', 'number', false, 4, NULL),
-(3, 'Foretrukket dag', 'Hvilken dag passer best?', 'single_choice', true, 5, NULL),
-(3, 'Dato for neste aktivitet', 'Når ønsker du å delta neste gang?', 'date', false, 6, NULL),
-(4, 'Navn', 'Skriv inn ditt navn.', 'text', true, 1, 2),
-(4, 'E-post', 'Skriv inn din e-post.', 'text', true, 2, 3),
-(4, 'Hvilket område ønsker du å jobbe med?', 'Velg ett alternativ.', 'single_choice', true, 3, NULL),
-(4, 'Tidligere erfaring', 'Beskriv din erfaring.', 'text', false, 4, 4),
-(4, 'Antall timer per uke', 'Hvor mange timer kan du bidra?', 'number', true, 5, NULL),
-(4, 'Startdato', 'Når kan du starte?', 'date', true, 6, NULL),
-(5, 'Navn', 'Skriv inn ditt navn.', 'text', true, 1, 2),
-(5, 'Matpreferanse', 'Velg din matpreferanse.', 'single_choice', true, 2, NULL),
-(5, 'Allergier', 'Velg én eller flere allergier.', 'multiple_choice', false, 3, 3),
-(5, 'Kommentarer', 'Har du kommentarer?', 'text', false, 4, 5),
-(5, 'Antall måltider', 'Hvor mange måltider ønsker du?', 'number', true, 5, NULL),
-(5, 'Dato for måltid', 'Når ønsker du måltidet?', 'date', true, 6, NULL),
-(6, 'Navn', 'Skriv inn ditt navn.', 'text', true, 1, 3),
-(6, 'Transportmiddel', 'Velg transportmiddel.', 'single_choice', true, 2, NULL),
-(6, 'Reisefølge', 'Hvor mange reiser sammen med deg?', 'number', false, 3, NULL),
-(6, 'Avreisested', 'Hvor reiser du fra?', 'text', true, 4, 2),
-(6, 'Kommentarer', 'Har du kommentarer?', 'text', false, 5, 4),
-(6, 'Reisedato', 'Når reiser du?', 'date', true, 6, NULL),
-(7, 'Hvordan vil du vurdere arrangementet?', 'Velg ett alternativ.', 'single_choice', true, 1, NULL),
-(7, 'Hva likte du best?', 'Beskriv det du likte best.', 'text', false, 2, 2),
-(7, 'Vil du delta igjen?', 'Velg ett alternativ.', 'single_choice', true, 3, NULL),
-(7, 'Kommentarer', 'Har du kommentarer?', 'text', false, 4, 3),
-(8, 'Fullt navn', 'Skriv inn ditt fulle navn.', 'text', true, 1, 2),
-(8, 'E-postadresse', 'Skriv inn din e-postadresse.', 'text', true, 2, 3),
-(8, 'Workshop tema', 'Velg workshop tema.', 'single_choice', true, 3, NULL),
-(8, 'Erfaring med temaet', 'Beskriv din erfaring.', 'text', false, 4, 4),
-(9, 'Er du interessert i et verv?', 'Velg ett alternativ.', 'single_choice', true, 1, NULL),
-(9, 'Hvilket verv ønsker du?', 'Velg ett alternativ.', 'single_choice', false, 2, NULL),
-(9, 'Motivasjon', 'Beskriv din motivasjon.', 'text', false, 3, 5),
-(10, 'Transportmiddel', 'Velg transportmiddel.', 'single_choice', true, 1, NULL),
-(10, 'Hvor ofte reiser du til campus?', 'Velg ett alternativ.', 'single_choice', true, 2, NULL),
-(10, 'Kommentarer', 'Har du kommentarer?', 'text', false, 3, 2);
+-- Questions for Form A (positions 1..5) using all types
+INSERT INTO questions (form_id, question_title, question_description, question_type, required, position, max)
+VALUES
+((SELECT id FROM forms WHERE title='Form A'), 'A - Q1 Single choice', 'Single choice question', 'single_choice', true, 1, NULL),
+((SELECT id FROM forms WHERE title='Form A'), 'A - Q2 Multiple choice', 'Multiple choice question', 'multiple_choice', true, 2, NULL),
+((SELECT id FROM forms WHERE title='Form A'), 'A - Q3 Text', 'Open text question', 'text', false, 3, NULL),
+((SELECT id FROM forms WHERE title='Form A'), 'A - Q4 Number', 'Numeric answer', 'number', false, 4, NULL),
+((SELECT id FROM forms WHERE title='Form A'), 'A - Q5 Date', 'Date answer', 'date', false, 5, NULL);
 
--- Question Options
-INSERT INTO question_options (question_id, option_text, position) VALUES
-(3, 'Ja', 1), (3, 'Nei', 2),
-(4, 'Gluten', 1), (4, 'Laktose', 2), (4, 'Nøtter', 3), (4, 'Ingen', 4),
-(8, 'Utmerket', 1), (8, 'God', 2), (8, 'Middels', 3), (8, 'Dårlig', 4),
-(11, 'Ja', 1), (11, 'Nei', 2),
-(13, 'Sport', 1), (13, 'Musikk', 2), (13, 'Teknologi', 3), (13, 'Kunst', 4), (13, 'Friluftsliv', 5),
-(14, 'Ukentlig', 1), (14, 'Månedlig', 2), (14, 'Årlig', 3),
-(17, 'Mandag', 1), (17, 'Onsdag', 2), (17, 'Fredag', 3), (17, 'Helg', 4),
-(21, 'Teknologi', 1), (21, 'Markedsføring', 2), (21, 'Logistikk', 3), (21, 'Kunst', 4),
-(27, 'Vegetar', 1), (27, 'Veganer', 2), (27, 'Kjøtt', 3), (27, 'Fisk', 4),
-(28, 'Gluten', 1), (28, 'Laktose', 2), (28, 'Nøtter', 3), (28, 'Ingen', 4),
-(33, 'Bil', 1), (33, 'Buss', 2), (33, 'Tog', 3), (33, 'Sykkel', 4), (33, 'Gående', 5),
-(37, 'Utmerket', 1), (37, 'God', 2), (37, 'Middels', 3), (37, 'Dårlig', 4),
-(39, 'Ja', 1), (39, 'Nei', 2),
-(43, 'Teknologi', 1), (43, 'Kunst', 2), (43, 'Mat', 3), (43, 'Sport', 4),
-(46, 'Ja', 1), (46, 'Nei', 2),
-(47, 'Leder', 1), (47, 'Sekretær', 2), (47, 'Økonomiansvarlig', 3), (47, 'Arrangementsansvarlig', 4),
-(50, 'Bil', 1), (50, 'Buss', 2), (50, 'Tog', 3), (50, 'Sykkel', 4), (50, 'Gående', 5);
+-- Questions for Form B (positions 1..5) using all types
+INSERT INTO questions (form_id, question_title, question_description, question_type, required, position, max)
+VALUES
+((SELECT id FROM forms WHERE title='Form B'), 'B - Q1 Single choice', 'Single choice question', 'single_choice', true, 1, NULL),
+((SELECT id FROM forms WHERE title='Form B'), 'B - Q2 Multiple choice', 'Multiple choice question', 'multiple_choice', true, 2, NULL),
+((SELECT id FROM forms WHERE title='Form B'), 'B - Q3 Text', 'Open text question', 'text', false, 3, NULL),
+((SELECT id FROM forms WHERE title='Form B'), 'B - Q4 Number', 'Numeric answer', 'number', false, 4, NULL),
+((SELECT id FROM forms WHERE title='Form B'), 'B - Q5 Date', 'Date answer', 'date', false, 5, NULL);
 
--- Submissions
-INSERT INTO submissions (form_id, user_id) VALUES
-(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10),
-(1, 11), (2, 12), (3, 7), (4, 8), (5, 9), (6, 10);
+-- Options for single_choice and multiple_choice questions (4 options each)
+-- Form A: single (pos=1) and multiple (pos=2)
+INSERT INTO question_options (question_id, option_text, position)
+SELECT q_single.id, opts.opt_text, opts.opt_pos
+FROM (
+  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form A') AND position=1
+) q_single,
+(VALUES ('Option A1',1),('Option A2',2),('Option A3',3),('Option A4',4)) AS opts(opt_text,opt_pos)
+ORDER BY q_single.id, opts.opt_pos;
+
+INSERT INTO question_options (question_id, option_text, position)
+SELECT q_multi.id, opts.opt_text, opts.opt_pos
+FROM (
+  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form A') AND position=2
+) q_multi,
+(VALUES ('Multi A1',1),('Multi A2',2),('Multi A3',3),('Multi A4',4)) AS opts(opt_text,opt_pos)
+ORDER BY q_multi.id, opts.opt_pos;
+
+-- Form B: single (pos=1) and multiple (pos=2)
+INSERT INTO question_options (question_id, option_text, position)
+SELECT q_single.id, opts.opt_text, opts.opt_pos
+FROM (
+  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form B') AND position=1
+) q_single,
+(VALUES ('Option B1',1),('Option B2',2),('Option B3',3),('Option B4',4)) AS opts(opt_text,opt_pos)
+ORDER BY q_single.id, opts.opt_pos;
+
+INSERT INTO question_options (question_id, option_text, position)
+SELECT q_multi.id, opts.opt_text, opts.opt_pos
+FROM (
+  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form B') AND position=2
+) q_multi,
+(VALUES ('Multi B1',1),('Multi B2',2),('Multi B3',3),('Multi B4',4)) AS opts(opt_text,opt_pos)
+ORDER BY q_multi.id, opts.opt_pos;
+
+-- Create 10 submissions per form (one per user)
+INSERT INTO submissions (form_id, user_id, submitted_at)
+SELECT f.id, u.id, now()
+FROM users u CROSS JOIN forms f
+WHERE f.title='Form A';
+
+INSERT INTO submissions (form_id, user_id, submitted_at)
+SELECT f.id, u.id, now()
+FROM users u CROSS JOIN forms f
+WHERE f.title='Form B';
+
+-- Answers:
+-- 1) single_choice: one answer per submission (10 answers per single_choice question)
+INSERT INTO answers (submission_id, question_id, option_id, created_at, updated_at)
+SELECT s.id, q.id,
+  (SELECT id FROM question_options qo WHERE qo.question_id = q.id AND qo.position = ((s.user_id-1)%4)+1 LIMIT 1),
+  now(), now()
+FROM submissions s
+JOIN questions q ON q.form_id = s.form_id
+WHERE q.question_type = 'single_choice';
+
+-- 2) multiple_choice: create one answers row per submission (so 10 answers per multiple_choice question),
+--    and store chosen options in answer_options (two options per submission)
+INSERT INTO answers (submission_id, question_id, created_at, updated_at)
+SELECT s.id, q.id, now(), now()
+FROM submissions s
+JOIN questions q ON q.form_id = s.form_id
+WHERE q.question_type = 'multiple_choice';
+
+-- populate answer_options: pick two option positions per submission (pos and pos+1 wrap)
+INSERT INTO answer_options (answer_id, option_id)
+SELECT a.id,
+       qo.id
+FROM answers a
+JOIN submissions s ON s.id = a.submission_id
+JOIN questions q ON q.id = a.question_id
+JOIN question_options qo ON qo.question_id = q.id
+WHERE q.question_type = 'multiple_choice'
+  AND qo.position IN ( ((s.user_id-1)%4)+1, ((s.user_id)%4)+1 );
+
+-- 3) text answers (one per submission -> 10 answers per text question)
+INSERT INTO answers (submission_id, question_id, answer_text, created_at, updated_at)
+SELECT s.id, q.id, 'Text answer from user ' || s.user_id, now(), now()
+FROM submissions s
+JOIN questions q ON q.form_id = s.form_id
+WHERE q.question_type = 'text';
+
+-- 4) number answers (store as text in answer_text)
+INSERT INTO answers (submission_id, question_id, answer_text, created_at, updated_at)
+SELECT s.id, q.id, (s.user_id * 10)::text, now(), now()
+FROM submissions s
+JOIN questions q ON q.form_id = s.form_id
+WHERE q.question_type = 'number';
+
+-- 5) date answers (store as ISO date string in answer_text)
+INSERT INTO answers (submission_id, question_id, answer_text, created_at, updated_at)
+SELECT s.id, q.id, to_char((CURRENT_DATE + (s.user_id || ' days')::interval)::date, 'YYYY-MM-DD'), now(), now()
+FROM submissions s
+JOIN questions q ON q.form_id = s.form_id
+WHERE q.question_type = 'date';

@@ -28,19 +28,22 @@ func main() {
 	statsRepo := repository.NewStatsRepository(db)
 	formRepo := repository.NewFormRepository(db)
 	questionRepo := repository.NewQuestionRepository(db)
+	submissionRepo := repository.NewSubmissionRepository(db)
 
 	// Services
 	eventService := services.NewEventService(eventRepo)
 	statsService := services.NewStatsService(statsRepo)
 	formService := services.NewFormService(formRepo)
 	questionService := services.NewQuestionService(questionRepo)
+	submissionService := services.NewSubmissionService(submissionRepo)
 
 	// handler container
 	h := &handlers.Handler{
-		Events:    *eventService,
-		Stats:     *statsService,
-		Forms:     *formService,
-		Questions: *questionService,
+		Events:      *eventService,
+		Stats:       *statsService,
+		Forms:       *formService,
+		Questions:   *questionService,
+		Submissions: *submissionService,
 	}
 
 	router := gin.New()
