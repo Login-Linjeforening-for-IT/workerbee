@@ -9,6 +9,7 @@ import (
 
 var (
 	ErrInvalidSort = errors.New("invalid sorting data")
+	ErrInvalidId = errors.New("invalid id")
 )
 
 func HandleError(c *gin.Context, err error, msg string, status int) {

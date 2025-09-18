@@ -21,9 +21,14 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 		return nil, err
 	}
 
-	events, err := s.repo.GetEvents(search, limit, offset, orderBy, sort, historicalBool)
+	return s.repo.GetEvents(search, limit, offset, orderBy, sort, historicalBool)
+}
+
+func (s *EventService) GetEvent(id string) (models.Event, error) {
+	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		return nil, err
+		return models.Event{}, err
 	}
-	return events, nil
+
+	return s.repo.GetEvent(idInt)
 }

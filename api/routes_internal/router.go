@@ -14,7 +14,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		v2.GET("/status", handlers.GetStatus)
 		events := v2.Group("/events")
 		{
-			events.GET("/:id", handlers.PingHandler)
+			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
 			events.POST("/", handlers.PingHandler)
 			events.PATCH("/:id", handlers.PingHandler)

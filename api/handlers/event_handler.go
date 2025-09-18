@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
@@ -51,4 +52,21 @@ func (h *Handler) GetEvents(c *gin.Context) {
 		"events":      events,
 		"total_count": events[0].TotalCount,
 	})
+}
+
+func (h *Handler) GetEvent(c *gin.Context) {
+	id := c.Param("id")
+
+	event, err := h.Events.GetEvent(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, internal.ErrInvalidId):
+			internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
+		default:
+			internal.HandleError(c, err, "could not fetch event", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, event)
 }
