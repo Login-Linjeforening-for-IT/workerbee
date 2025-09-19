@@ -1,4 +1,4 @@
--- name: patch_location :one
+-- name: put_location :one
 UPDATE locations
 SET
     name_no = $2,

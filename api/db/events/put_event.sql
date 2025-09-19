@@ -1,4 +1,4 @@
--- name: patch_event :one
+-- name: put_event :one
 UPDATE events
 SET
     visible = $2,

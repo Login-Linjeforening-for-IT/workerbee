@@ -1,4 +1,4 @@
--- name: patch_organization :one
+-- name: put_organization :one
 UPDATE organizations
 SET
     shortname = $2,

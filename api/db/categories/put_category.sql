@@ -1,10 +1,9 @@
--- name: patch_rule :one
-UPDATE rules
+-- name: put_category :one
+UPDATE categories
 SET
     name_no = $2,
     name_en = $3,
     description_no = $4,
-    description_en = $5,
-    updated_at = NOW()
+    description_en = $5
 WHERE id = $1
 RETURNING *;

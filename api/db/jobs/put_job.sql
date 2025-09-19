@@ -1,4 +1,4 @@
--- name: patch_job :one
+-- name: put_job :one
 UPDATE jobs
 SET
     visible = $2,

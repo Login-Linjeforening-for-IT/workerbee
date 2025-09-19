@@ -13,7 +13,7 @@ type FormRepository interface {
 	GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error)
 	GetForm(id string) (*models.FormWithQuestion, error)
 	PostForm(form models.Form) (models.Form, error)
-	PatchForm(id string, form models.Form) (models.Form, error)
+	PutForm(id string, form models.Form) (models.Form, error)
 	DeleteForm(id string) (models.Form, error)
 }
 
@@ -91,10 +91,10 @@ func (r *formRepository) PostForm(form models.Form) (models.Form, error) {
 	return newForm, nil
 }
 
-func (r *formRepository) PatchForm(id string, form models.Form) (models.Form, error) {
+func (r *formRepository) PutForm(id string, form models.Form) (models.Form, error) {
 	updatedForm := models.Form{}
 
-	sqlBytes, err := os.ReadFile("./db/forms/patch_form.sql")
+	sqlBytes, err := os.ReadFile("./db/forms/put_form.sql")
 	if err != nil {
 		return models.Form{}, err
 	}

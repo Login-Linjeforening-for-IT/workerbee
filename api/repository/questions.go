@@ -9,10 +9,10 @@ import (
 
 type QuestionRepository interface {
 	PostQuestions(formID string, questions []models.Question) ([]models.Question, error)
-	PatchQuestions(formID string, questions []models.Question) ([]models.Question, error)
+	PutQuestions(formID string, questions []models.Question) ([]models.Question, error)
 	DeleteQuestion(id string) (models.Question, error)
 	PostQuestionOption(questionID string, options models.QuestionOption) (models.QuestionOption, error)
-	PatchQuestionOption(options models.QuestionOption) (models.QuestionOption, error)
+	PutQuestionOption(options models.QuestionOption) (models.QuestionOption, error)
 	DeleteQuestionOption(id string) (models.QuestionOption, error)
 }
 
@@ -45,10 +45,10 @@ func (r *questionRepository) PostQuestions(formID string, questions []models.Que
 	return inserted, nil
 }
 
-func (r *questionRepository) PatchQuestions(formID string, questions []models.Question) ([]models.Question, error) {
+func (r *questionRepository) PutQuestions(formID string, questions []models.Question) ([]models.Question, error) {
 	updated := []models.Question{}
 	
-	sqlBytes, err := os.ReadFile("./db/forms/questions/patch_question.sql")
+	sqlBytes, err := os.ReadFile("./db/forms/questions/put_question.sql")
 	if err != nil {
 		return nil, err
 	}
@@ -100,10 +100,10 @@ func (r *questionRepository) PostQuestionOption(questionID string, options model
 	return option, nil
 }
 
-func (r *questionRepository) PatchQuestionOption(options models.QuestionOption) (models.QuestionOption, error) {
+func (r *questionRepository) PutQuestionOption(options models.QuestionOption) (models.QuestionOption, error) {
 	option := models.QuestionOption{}
-	
-	sqlBytes, err := os.ReadFile("./db/forms/questions/patch_question_option.sql")
+
+	sqlBytes, err := os.ReadFile("./db/forms/questions/put_question_option.sql")
 	if err != nil {
 		return option, err
 	}

@@ -17,7 +17,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
 			events.POST("/", handlers.PingHandler)
-			events.PATCH("/:id", handlers.PingHandler)
+			events.PUT("/:id", handlers.PingHandler)
 			events.DELETE("/:id", h.DeleteEvent)
 			events.GET("/categories", handlers.PingHandler)
 		}
@@ -26,7 +26,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			rules.GET("/:id", handlers.PingHandler)
 			rules.GET("/", handlers.PingHandler)
 			rules.POST("/", handlers.PingHandler)
-			rules.PATCH("/:id", handlers.PingHandler)
+			rules.PUT("/:id", handlers.PingHandler)
 			rules.DELETE("/:id", handlers.PingHandler)
 		}
 		locations := v2.Group("/locations")
@@ -34,7 +34,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			locations.GET("/:id", handlers.PingHandler)
 			locations.GET("/", handlers.PingHandler)
 			locations.POST("/", handlers.PingHandler)
-			locations.PATCH("/:id", handlers.PingHandler)
+			locations.PUT("/:id", handlers.PingHandler)
 			locations.DELETE("/:id", handlers.PingHandler)
 		}
 		organizations := v2.Group("/organizations")
@@ -43,14 +43,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			organizations.GET("/", handlers.PingHandler)
 			organizations.POST("/", handlers.PingHandler)
 			organizations.DELETE("/:id", handlers.PingHandler)
-			organizations.PATCH("/:id", handlers.PingHandler)
+			organizations.PUT("/:id", handlers.PingHandler)
 		}
 		categories := v2.Group("/categories")
 		{
 			categories.GET("/", handlers.PingHandler)
 			categories.GET("/:id", handlers.PingHandler)
 			categories.POST("/", handlers.PingHandler)
-			categories.PATCH("/:id", handlers.PingHandler)
+			categories.PUT("/:id", handlers.PingHandler)
 			categories.DELETE("/:id", handlers.PingHandler)
 		}
 		jobs := v2.Group("/jobs")
@@ -58,7 +58,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/:id", handlers.PingHandler)
 			jobs.GET("/", handlers.PingHandler)
 			jobs.POST("/", handlers.PingHandler)
-			jobs.PATCH("/:id", handlers.PingHandler)
+			jobs.PUT("/:id", handlers.PingHandler)
 			jobs.DELETE("/:id", handlers.PingHandler)
 			jobs.GET("/cities", handlers.PingHandler)
 		}
@@ -73,14 +73,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			forms.GET("/:id", h.GetForm)
 			forms.GET("/", h.GetForms)
 			forms.POST("/", h.PostForm)
-			forms.PATCH("/:id", h.PatchForm)
+			forms.PUT("/:id", h.PutForm)
 			forms.DELETE("/:id", h.DeleteForm)
 			submissions := forms.Group(":id/submissions")
 			{
 				submissions.GET("/:submission_id", h.GetSubmission)
 				submissions.GET("/", handlers.PingHandler)
 				submissions.POST("/", handlers.PingHandler)
-				submissions.PATCH("/:submission_id", handlers.PingHandler)
+				submissions.PUT("/:submission_id", handlers.PingHandler)
 				submissions.DELETE("/:submission_id", handlers.PingHandler)
 			}
 		}

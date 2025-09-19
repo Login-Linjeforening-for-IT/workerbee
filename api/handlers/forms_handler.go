@@ -84,7 +84,7 @@ func (h *Handler) PostForm(c *gin.Context) {
 	c.JSON(http.StatusCreated, newForm)
 }
 
-// PatchForm godoc
+// PutForm godoc
 // @Summary      Update a form
 // @Description  Updates a form by ID
 // @Tags         forms
@@ -94,15 +94,15 @@ func (h *Handler) PostForm(c *gin.Context) {
 // @Param        form  body  models.Form  true  "Form object"
 // @Success      200   {object}  models.Form
 // @Failure      400   {object}  error
-// @Router       /api/v2/forms/{id} [patch]
-func (h *Handler) PatchForm(c *gin.Context) {
+// @Router       /api/v2/forms/{id} [put]
+func (h *Handler) PutForm(c *gin.Context) {
 	id := c.Param("id")
 	var form models.Form
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	updatedForm, err := h.Forms.PatchForm(id, form)
+	updatedForm, err := h.Forms.PutForm(id, form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

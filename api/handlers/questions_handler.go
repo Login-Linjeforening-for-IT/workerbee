@@ -7,7 +7,7 @@ import (
 	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
 )
 
-// PatchQuestions godoc
+// PutQuestions godoc
 // @Summary      Update questions for a form
 // @Description  Accepts an array of questions and updates them
 // @Tags         questions
@@ -17,8 +17,8 @@ import (
 // @Param        questions body      []models.Question true "Array of questions"
 // @Success      200  {array}  models.Question
 // @Failure      400  {object}  error
-// @Router       /api/v2/forms/{form_id}/questions [patch]
-func (h *Handler) PatchQuestions(c *gin.Context) {
+// @Router       /api/v2/forms/{form_id}/questions [put]
+func (h *Handler) PutQuestions(c *gin.Context) {
 	formID := c.Param("form_id")
 	questions := []models.Question{}
 
@@ -26,8 +26,8 @@ func (h *Handler) PatchQuestions(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
-	updatedQuestions, err := h.Questions.PatchQuestions(formID, questions)
+
+	updatedQuestions, err := h.Questions.PutQuestions(formID, questions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
