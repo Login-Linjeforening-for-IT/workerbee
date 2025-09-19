@@ -1,13 +1,14 @@
 package main
 
 import (
+	"workerbee/config"
+	"workerbee/db"
+	"workerbee/handlers"
+	"workerbee/repository"
+	"workerbee/routes_internal"
+	"workerbee/services"
+
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/config"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/db"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/handlers"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/repository"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/routes_internal"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/services"
 )
 
 func init() {

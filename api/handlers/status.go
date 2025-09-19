@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/config"
 	"net/http"
 	"time"
+	"workerbee/config"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
 )
 
 // GetStatus godoc

@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"net/http"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
 )
 
 // GetForm godoc

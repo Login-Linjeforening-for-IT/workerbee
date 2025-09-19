@@ -2,10 +2,10 @@ package db
 
 import (
 	"log"
+	"workerbee/config"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/config"
 )
 
 func Init() *sqlx.DB {

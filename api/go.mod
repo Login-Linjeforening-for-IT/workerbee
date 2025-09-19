@@ -1,4 +1,4 @@
-module gitlab.login.no/tekkom/web/beehive/admin-api/v2
+module workerbee
 
 go 1.24.7
 

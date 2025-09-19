@@ -1,8 +1,8 @@
 package services
 
 import (
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/repository"
+	"workerbee/models"
+	"workerbee/repository"
 )
 
 type QuestionService struct {

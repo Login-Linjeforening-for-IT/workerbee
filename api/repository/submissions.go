@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"os"
 	"time"
+	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/models"
 )
 
 type SubmissionRepository interface {

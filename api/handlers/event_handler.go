@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.login.no/tekkom/web/beehive/admin-api/v2/internal"
 )
 
 var allowedSortColumns = map[string]string{
