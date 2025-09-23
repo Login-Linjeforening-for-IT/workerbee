@@ -30,7 +30,7 @@ LEFT JOIN audiences AS a ON e.audience_id = a.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 WHERE 
 (
-    $4::bool    OR ((e.time_end IS NOT NULL AND e.time_end > now())
+    $2::bool    OR ((e.time_end IS NOT NULL AND e.time_end > now())
                 OR (e.time_start > now() - interval '1 day')))
     AND 
     (

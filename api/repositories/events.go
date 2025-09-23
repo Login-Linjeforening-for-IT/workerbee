@@ -3,8 +3,8 @@ package repositories
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"os"
+	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
 
@@ -26,16 +26,16 @@ func NewEventrepositories(db *sqlx.DB) Eventrepositories {
 }
 
 func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
-	var events []models.EventWithTotalCount
+	events, err := db.FetchAllElements[models.EventWithTotalCount](
+		r.db,
+		"./db/events/get_events.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+		historical,
+	)
 
-	sqlBytes, err := os.ReadFile("./db/events/get_events.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), sort, orderBy)
-
-	err = r.db.Select(&events, query, search, limit, offset, historical)
 	if err != nil {
 		return nil, err
 	}
