@@ -60,7 +60,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/", h.GetJobs)
 			jobs.POST("/", handlers.PingHandler)
 			jobs.PUT("/:id", handlers.PingHandler)
-			jobs.DELETE("/:id", handlers.PingHandler)
+			jobs.DELETE("/:id", h.DeleteJob)
 			jobs.GET("/cities", handlers.PingHandler)
 		}
 		stats := v2.Group("/stats")

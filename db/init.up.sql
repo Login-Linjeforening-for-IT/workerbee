@@ -77,7 +77,7 @@ CREATE TABLE "audiences" (
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "job_advertisements" (
+CREATE TABLE "jobs" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
@@ -100,9 +100,9 @@ CREATE TABLE "job_advertisements" (
 );
 
 CREATE TABLE "ad_city_relation" (
-    "job_advertisement_id" int NOT NULL,
+    "job_id" int NOT NULL,
     "city_id" int NOT NULL,
-    PRIMARY KEY ("job_advertisement_id", "city_id")
+    PRIMARY KEY ("job_id", "city_id")
 );
 
 CREATE TABLE "cities" (
@@ -111,9 +111,9 @@ CREATE TABLE "cities" (
 );
 
 CREATE TABLE "ad_skill_relation" (
-    "job_advertisement_id" int NOT NULL,
+    "job_id" int NOT NULL,
     "skill_id" int NOT NULL,
-    PRIMARY KEY ("job_advertisement_id", "skill_id")
+    PRIMARY KEY ("job_id", "skill_id")
 );
 
 CREATE TABLE "skills" (
@@ -188,11 +188,11 @@ CREATE INDEX ON "organizations" ("created_at");
 CREATE INDEX ON "locations" ("updated_at");
 CREATE INDEX ON "locations" ("created_at");
 
-CREATE INDEX ON "job_advertisements" ("updated_at");
-CREATE INDEX ON "job_advertisements" ("created_at");
-CREATE INDEX ON "ad_city_relation" ("job_advertisement_id");
+CREATE INDEX ON "jobs" ("updated_at");
+CREATE INDEX ON "jobs" ("created_at");
+CREATE INDEX ON "ad_city_relation" ("job_id");
 CREATE INDEX ON "ad_city_relation" ("city_id");
-CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
+CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
 ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
@@ -202,10 +202,10 @@ ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 
-ALTER TABLE "job_advertisements" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id");
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id");
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");

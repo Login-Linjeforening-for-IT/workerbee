@@ -12,7 +12,7 @@ SELECT * FROM (
   UNION ALL
   SELECT "id", "created_at", 'locations', COALESCE("name_en", "name_no") AS "name" FROM "locations"
   UNION ALL
-  SELECT "id", "created_at", 'job_advertisements', COALESCE("title_en", "title_no") AS "name" FROM "job_advertisements"
+  SELECT "id", "created_at", 'jobs', COALESCE("title_en", "title_no") AS "name" FROM "jobs"
 ) AS newest_additions
 ORDER BY "created_at" DESC
 LIMIT $1;

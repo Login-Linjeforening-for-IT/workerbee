@@ -53,3 +53,14 @@ func (h *Handler) GetJob(c *gin.Context) {
 
 	c.JSON(http.StatusOK, job)
 }
+
+func (h *Handler) DeleteJob(c *gin.Context) {
+	id := c.Param("id")
+
+	job, err := h.Jobs.DeleteJob(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, job)
+}

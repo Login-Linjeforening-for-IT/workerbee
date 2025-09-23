@@ -27,3 +27,12 @@ func (s *JobsService) GetJob(id string) (models.Job, error) {
 
 	return s.repo.GetJob(idInt)
 }
+
+func (s *JobsService) DeleteJob(id string) (models.Job, error) {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return models.Job{}, internal.ErrInvalid
+	}
+
+	return s.repo.DeleteJob(idInt)
+}

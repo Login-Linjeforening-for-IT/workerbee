@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"workerbee/internal"
@@ -12,6 +14,7 @@ import (
 type JobsRepository interface {
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 	GetJob(id int) (models.Job, error)
+	DeleteJob(id int) (models.Job, error)
 }
 
 type jobsRepository struct {
@@ -50,6 +53,25 @@ func (r *jobsRepository) GetJob(id int) (models.Job, error) {
 	err = r.db.Get(&job, string(sqlBytes), id)
 	if err != nil {
 		return job, internal.ErrInvalid
+	}
+
+	return job, nil
+}
+
+func (r *jobsRepository) DeleteJob(id int) (models.Job, error) {
+	var job models.Job
+
+	sqlBytes, err := os.ReadFile("./db/jobs/delete_job.sql")
+	if err != nil {
+		return job, err
+	}
+
+	err = r.db.Get(&job, string(sqlBytes), id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return job, internal.ErrInvalid
+		}
+		return job, err
 	}
 
 	return job, nil

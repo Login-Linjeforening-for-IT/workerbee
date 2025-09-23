@@ -120,7 +120,7 @@ CREATE TABLE "locations" (
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE "job_advertisements" (
+CREATE TABLE "jobs" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
@@ -144,9 +144,9 @@ CREATE TABLE "job_advertisements" (
 );
 
 CREATE TABLE "ad_city_relation" (
-    "job_advertisement_id" int NOT NULL,
+    "job_id" int NOT NULL,
     "city_id" int NOT NULL,
-    PRIMARY KEY ("job_advertisement_id", "city_id")
+    PRIMARY KEY ("job_id", "city_id")
 );
 
 CREATE TABLE "cities" (
@@ -155,9 +155,9 @@ CREATE TABLE "cities" (
 );
 
 CREATE TABLE "ad_skill_relation" (
-    "job_advertisement_id" int NOT NULL,
+    "job_id" int NOT NULL,
     "skill_id" int NOT NULL,
-    PRIMARY KEY ("job_advertisement_id", "skill_id")
+    PRIMARY KEY ("job_id", "skill_id")
 );
 
 CREATE TABLE "skills" (
@@ -189,11 +189,11 @@ CREATE INDEX ON "organizations" ("created_at");
 CREATE INDEX ON "locations" ("updated_at");
 CREATE INDEX ON "locations" ("created_at");
 
-CREATE INDEX ON "job_advertisements" ("updated_at");
-CREATE INDEX ON "job_advertisements" ("created_at");
-CREATE INDEX ON "ad_city_relation" ("job_advertisement_id");
+CREATE INDEX ON "jobs" ("updated_at");
+CREATE INDEX ON "jobs" ("created_at");
+CREATE INDEX ON "ad_city_relation" ("job_id");
 CREATE INDEX ON "ad_city_relation" ("city_id");
-CREATE INDEX ON "ad_skill_relation" ("job_advertisement_id");
+CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
 ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
@@ -203,11 +203,11 @@ ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 
-ALTER TABLE "job_advertisements" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_advertisement_id") REFERENCES "job_advertisements" ("id");
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
@@ -514,7 +514,7 @@ VALUES
    'https://www.facebook.com/SINTEF', 'https://www.instagram.com/sintef', 
    'logo.png', now(), now());
 
-INSERT INTO "job_advertisements" (
+INSERT INTO "jobs" (
   "visible", 
   "highlight", 
   "title_no", 
@@ -572,7 +572,7 @@ VALUES
   'full', now(), '2025-07-31', '2025-06-01', 'https://www.example.com/banner5.jpg', 
   2, 'https://www.ntnu.no/job-apply', now(), now());
 
-INSERT INTO "ad_skill_relation" ("job_advertisement_id", "skill_id")
+INSERT INTO "ad_skill_relation" ("job_id", "skill_id")
 VALUES
 (1, 1), -- Software Developer (UiO) - Programmering
 (1, 2), -- Software Developer (UiO) - Datavisualisering
@@ -580,7 +580,7 @@ VALUES
 (3, 4), -- Project Manager (Telenor) - Markedsføring
 (3, 5); -- Project Manager (Telenor) - Kundebehandling
 
-INSERT INTO "ad_city_relation" ("job_advertisement_id", "city_id")
+INSERT INTO "ad_city_relation" ("job_id", "city_id")
 VALUES
 (1, 26),  -- Software Developer (UiO) - Oslo
 (2, 29),  -- Marketing Coordinator (DNB) - Stavanger
