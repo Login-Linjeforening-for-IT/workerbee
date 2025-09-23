@@ -15,6 +15,7 @@ type JobsRepository interface {
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 	GetJob(id int) (models.Job, error)
 	DeleteJob(id int) (models.Job, error)
+	GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
 
 type jobsRepository struct {
@@ -75,4 +76,21 @@ func (r *jobsRepository) DeleteJob(id int) (models.Job, error) {
 	}
 
 	return job, nil
+}
+
+func (r *jobsRepository) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
+	var cities []models.CitiesWithTotalCount
+
+	sqlBytes, err := os.ReadFile("./db/jobs/get_cities.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), sort, orderBy)
+
+	err = r.db.Select(&cities, query, search, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	return cities, nil
 }

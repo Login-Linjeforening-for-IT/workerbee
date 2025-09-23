@@ -36,3 +36,7 @@ func (s *JobsService) DeleteJob(id string) (models.Job, error) {
 
 	return s.repo.DeleteJob(idInt)
 }
+
+func (s *JobsService) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
+	return s.repo.GetCities(search, limit, offset, orderBy, sort)
+}

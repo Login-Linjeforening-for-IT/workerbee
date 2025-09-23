@@ -31,6 +31,21 @@ type Job struct {
 	UpdatedAt           time.Time      `db:"updated_at"`
 }
 
+type Cities struct {
+	ID   int    `db:"id"`
+	Name string `db:"name"`
+}
+
+type CitiesWithTotalCount struct {
+	Cities
+	TotalCount int `db:"total_count"`
+}
+
+type CitiesResponse struct {
+	Jobs       []CitiesWithTotalCount `json:"cities"`
+	TotalCount int                    `json:"total_count"`
+}
+
 type JobWithTotalCount struct {
 	Job
 	TotalCount int `db:"total_count"`

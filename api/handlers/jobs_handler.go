@@ -22,6 +22,11 @@ var allowedSortColumnsJobs = map[string]string{
 	"updated_at":   "ja.updated_at",
 }
 
+var allowedSortColumnsCities = map[string]string{
+	"id":   "c.id",
+	"name": "c.name",
+}
+
 func (h *Handler) GetJobs(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
@@ -40,7 +45,10 @@ func (h *Handler) GetJobs(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, jobs)
+	c.JSON(http.StatusOK, gin.H{
+		"jobs":        jobs,
+		"total_count": jobs[0].TotalCount,
+	})
 }
 
 func (h *Handler) GetJob(c *gin.Context) {
@@ -63,4 +71,24 @@ func (h *Handler) DeleteJob(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, job)
+}
+
+func (h *Handler) GetCities(c *gin.Context) {
+	search := c.DefaultQuery("search", "")
+	limit := c.DefaultQuery("limit", "20")
+	offset := c.DefaultQuery("offset", "0")
+	sort := c.DefaultQuery("direction", "asc")
+	orderBy := c.DefaultQuery("order_by", "id")
+
+	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsCities)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	cities, err := h.Jobs.GetCities(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
+
+	c.JSON(http.StatusOK, gin.H{
+		"cities":      cities,
+		"total_count": cities[0].TotalCount,
+	})
 }
