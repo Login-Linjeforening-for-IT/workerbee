@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+	"workerbee/db"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
@@ -26,16 +26,14 @@ func NewFormrepositories(db *sqlx.DB) Formrepositories {
 }
 
 func (r *formrepositories) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
-	forms := []models.FormWithTotalCount{}
-
-	sqlBytes, err := os.ReadFile("./db/forms/get_forms.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), orderBy, sort)
-
-	err = r.db.Select(&forms, query, search, limit, offset)
+	forms, err := db.FetchAllElements[models.FormWithTotalCount](
+		r.db,
+		"./db/forms/get_forms.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+	)
 	if err != nil {
 		return nil, err
 	}

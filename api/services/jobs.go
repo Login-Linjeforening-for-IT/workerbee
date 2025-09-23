@@ -7,6 +7,19 @@ import (
 	"workerbee/repositories"
 )
 
+var allowedSortColumnsJobs = map[string]string{
+	"id":           "ja.id",
+	"visible":      "ja.visible",
+	"highlight":    "ja.highlight",
+	"title_no":     "ja.title_no",
+	"title_en":     "ja.title_en",
+	"job_type":     "ja.job_type",
+	"time_expire":  "ja.time_expire",
+	"time_publish": "ja.time_publish",
+	"created_at":   "ja.created_at",
+	"updated_at":   "ja.updated_at",
+}
+
 type JobsService struct {
 	repo repositories.Jobsrepositories
 }
@@ -16,7 +29,12 @@ func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 }
 
 func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
-	return s.repo.GetJobs(search, limit, offset, orderBy, sort)
+	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
+	if ok != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetJobs(search, limit, offset, orderBySanitized, sortSanitized)
 }
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {

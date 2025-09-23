@@ -23,10 +23,10 @@ func FetchAllElements[T any](
 	// append limit and offset to args
 	args = append(args, limit, offset)
 
-	query := fmt.Sprintf("%s ORDER BY %s %s LIMIT $%d OFFSET $%d",
+	query := fmt.Sprintf("%s ORDER BY %s %s LIMIT $%d OFFSET $%d;",
 		string(sqlBytes),
-		sort,
 		orderBy,
+		sort,
 		len(args)-1, // limit is second to last
 		len(args),   // offset is last
 	)

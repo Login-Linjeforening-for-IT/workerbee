@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
 
@@ -27,16 +28,14 @@ func NewJobrepositories(db *sqlx.DB) Jobsrepositories {
 }
 
 func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
-	var jobs []models.JobWithTotalCount
-
-	sqlBytes, err := os.ReadFile("./db/jobs/get_jobs.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), sort, orderBy)
-
-	err = r.db.Select(&jobs, query, search, limit, offset)
+	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
+		r.db,
+		"./db/jobs/get_jobs.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+	)
 	if err != nil {
 		return nil, err
 	}

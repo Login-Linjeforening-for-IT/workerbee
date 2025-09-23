@@ -2,23 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
 )
-
-var allowedSortColumnsEvents = map[string]string{
-	"id":           "e.id",
-	"name_no":      "e.name_no",
-	"name_en":      "e.name_en",
-	"time_start":   "e.time_start",
-	"time_end":     "e.time_end",
-	"time_publish": "e.time_publish",
-	"canceled":     "e.canceled",
-	"capacity":     "e.capacity",
-	"full":         "e.full",
-}
 
 // GetEvents godoc
 // @Summary      Get events
@@ -35,16 +22,11 @@ func (h *Handler) GetEvents(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
-	sort := c.DefaultQuery("direction", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "desc")
 	historical := c.DefaultQuery("historical", "false")
 
-	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
-	if internal.HandleError(c, err) {
-		return
-	}
-
-	events, err := h.Services.Events.GetEvents(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized, historical)
+	events, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, historical)
 	if internal.HandleError(c, err) {
 		return
 	}
