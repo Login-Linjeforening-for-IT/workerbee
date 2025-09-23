@@ -1,8 +1,14 @@
 package repositories
 
-import "github.com/jmoiron/sqlx"
+import (
+	"workerbee/db"
+	"workerbee/models"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type LocationRepository interface {
+	GetLocations(search, limit, offset, orderBy, sort string) ([]models.LocationWithTotalCount, error)
 }
 
 type locationRepository struct {
@@ -11,4 +17,19 @@ type locationRepository struct {
 
 func NewLocationRepository(db *sqlx.DB) LocationRepository {
 	return &locationRepository{db: db}
+}
+
+func (r *locationRepository) GetLocations(search, limit, offset, orderBy, sort string) ([]models.LocationWithTotalCount, error) {
+	locations, err := db.FetchAllElements[models.LocationWithTotalCount](
+		r.db,
+		"./db/locations/get_locations.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return locations, nil
 }

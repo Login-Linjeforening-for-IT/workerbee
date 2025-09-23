@@ -33,7 +33,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		locations := v2.Group("/locations")
 		{
 			locations.GET("/:id", handlers.PingHandler)
-			locations.GET("/", handlers.PingHandler)
+			locations.GET("/", h.GetLocations)
 			locations.POST("/", handlers.PingHandler)
 			locations.PUT("/:id", handlers.PingHandler)
 			locations.DELETE("/:id", handlers.PingHandler)
@@ -48,8 +48,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		categories := v2.Group("/categories")
 		{
-			categories.GET("/", handlers.PingHandler)
 			categories.GET("/:id", handlers.PingHandler)
+			categories.GET("/", )
 			categories.POST("/", handlers.PingHandler)
 			categories.PUT("/:id", handlers.PingHandler)
 			categories.DELETE("/:id", handlers.PingHandler)
