@@ -2,14 +2,14 @@ package services
 
 import (
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type SubmissionService struct {
-	repo repository.SubmissionRepository
+	repo repositories.Submissionrepositories
 }
 
-func NewSubmissionService(repo repository.SubmissionRepository) *SubmissionService {
+func NewSubmissionService(repo repositories.Submissionrepositories) *SubmissionService {
 	return &SubmissionService{repo: repo}
 }
 

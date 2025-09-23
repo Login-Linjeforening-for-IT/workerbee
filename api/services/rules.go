@@ -2,14 +2,14 @@ package services
 
 import (
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type RuleService struct {
-	repo repository.RuleRepository
+	repo repositories.Rulerepositories
 }
 
-func NewRuleService(repo repository.RuleRepository) *RuleService {
+func NewRuleService(repo repositories.Rulerepositories) *RuleService {
 	return &RuleService{repo: repo}
 }
 

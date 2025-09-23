@@ -3,14 +3,14 @@ package services
 
 import (
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type StatsService struct {
-	repo repository.StatsRepository
+	repo repositories.Statsrepositories
 }
 
-func NewStatsService(repo repository.StatsRepository) *StatsService {
+func NewStatsService(repo repositories.Statsrepositories) *StatsService {
 	return &StatsService{repo: repo}
 }
 

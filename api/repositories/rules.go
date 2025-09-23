@@ -1,4 +1,4 @@
-package repository
+package repositories
 
 import (
 	"fmt"
@@ -8,19 +8,19 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type RuleRepository interface {
+type Rulerepositories interface {
 	GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error)
 }
 
-type ruleRepository struct {
+type rulerepositories struct {
 	db *sqlx.DB
 }
 
-func NewRuleRepository(db *sqlx.DB) RuleRepository {
-	return &ruleRepository{db: db}
+func NewRulerepositories(db *sqlx.DB) Rulerepositories {
+	return &rulerepositories{db: db}
 }
 
-func (r *ruleRepository) GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
+func (r *rulerepositories) GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
 	var rules []models.RuleWithTotalCount
 
 	sqlBytes, err := os.ReadFile("./db/rules/get_rules.sql")

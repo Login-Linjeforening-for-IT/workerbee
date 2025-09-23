@@ -4,14 +4,14 @@ import (
 	"strconv"
 	"workerbee/internal"
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type EventService struct {
-	repo repository.EventRepository
+	repo repositories.Eventrepositories
 }
 
-func NewEventService(repo repository.EventRepository) *EventService {
+func NewEventService(repo repositories.Eventrepositories) *EventService {
 	return &EventService{repo: repo}
 }
 

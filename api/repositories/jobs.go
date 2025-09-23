@@ -1,4 +1,4 @@
-package repository
+package repositories
 
 import (
 	"database/sql"
@@ -11,22 +11,22 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type JobsRepository interface {
+type Jobsrepositories interface {
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 	GetJob(id int) (models.Job, error)
 	DeleteJob(id int) (models.Job, error)
 	GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
 
-type jobsRepository struct {
+type jobsrepositories struct {
 	db *sqlx.DB
 }
 
-func NewJobRepository(db *sqlx.DB) JobsRepository {
-	return &jobsRepository{db: db}
+func NewJobrepositories(db *sqlx.DB) Jobsrepositories {
+	return &jobsrepositories{db: db}
 }
 
-func (r *jobsRepository) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
+func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
 	var jobs []models.JobWithTotalCount
 
 	sqlBytes, err := os.ReadFile("./db/jobs/get_jobs.sql")
@@ -43,7 +43,7 @@ func (r *jobsRepository) GetJobs(search, limit, offset, orderBy, sort string) ([
 	return jobs, nil
 }
 
-func (r *jobsRepository) GetJob(id int) (models.Job, error) {
+func (r *jobsrepositories) GetJob(id int) (models.Job, error) {
 	var job models.Job
 
 	sqlBytes, err := os.ReadFile("./db/jobs/get_job.sql")
@@ -59,7 +59,7 @@ func (r *jobsRepository) GetJob(id int) (models.Job, error) {
 	return job, nil
 }
 
-func (r *jobsRepository) DeleteJob(id int) (models.Job, error) {
+func (r *jobsrepositories) DeleteJob(id int) (models.Job, error) {
 	var job models.Job
 
 	sqlBytes, err := os.ReadFile("./db/jobs/delete_job.sql")
@@ -78,7 +78,7 @@ func (r *jobsRepository) DeleteJob(id int) (models.Job, error) {
 	return job, nil
 }
 
-func (r *jobsRepository) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
+func (r *jobsrepositories) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
 	var cities []models.CitiesWithTotalCount
 
 	sqlBytes, err := os.ReadFile("./db/jobs/get_cities.sql")

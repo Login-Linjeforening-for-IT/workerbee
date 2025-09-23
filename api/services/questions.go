@@ -2,14 +2,14 @@ package services
 
 import (
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type QuestionService struct {
-	repo repository.QuestionRepository
+	repo repositories.Questionrepositories
 }
 
-func NewQuestionService(repo repository.QuestionRepository) *QuestionService {
+func NewQuestionService(repo repositories.Questionrepositories) *QuestionService {
 	return &QuestionService{repo: repo}
 }
 

@@ -4,7 +4,7 @@ import (
 	"workerbee/config"
 	"workerbee/db"
 	"workerbee/handlers"
-	"workerbee/repository"
+	repositories "workerbee/repositories"
 	"workerbee/routes_internal"
 	"workerbee/services"
 
@@ -25,13 +25,13 @@ func main() {
 	db := db.Init()
 
 	// Repos
-	eventRepo := repository.NewEventRepository(db)
-	ruleRepo := repository.NewRuleRepository(db)
-	jobRepo := repository.NewJobRepository(db)
-	statsRepo := repository.NewStatsRepository(db)
-	formRepo := repository.NewFormRepository(db)
-	questionRepo := repository.NewQuestionRepository(db)
-	submissionRepo := repository.NewSubmissionRepository(db)
+	eventRepo := repositories.NewEventrepositories(db)
+	ruleRepo := repositories.NewRulerepositories(db)
+	jobRepo := repositories.NewJobrepositories(db)
+	statsRepo := repositories.NewStatsrepositories(db)
+	formRepo := repositories.NewFormrepositories(db)
+	questionRepo := repositories.NewQuestionrepositories(db)
+	submissionRepo := repositories.NewSubmissionrepositories(db)
 
 	// Services
 	eventService := services.NewEventService(eventRepo)

@@ -1,5 +1,5 @@
-// repository/stats_repository.go
-package repository
+// repositories/stats_repositories.go
+package repositories
 
 import (
 	"log"
@@ -9,21 +9,21 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type StatsRepository interface {
+type Statsrepositories interface {
 	GetTotalStats() ([]models.TotalStats, error)
 	GetCategoriesStats() ([]models.CategoriesStats, error)
 	GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error)
 }
 
-type statsRepository struct {
+type statsrepositories struct {
 	db *sqlx.DB
 }
 
-func NewStatsRepository(db *sqlx.DB) StatsRepository {
-	return &statsRepository{db: db}
+func NewStatsrepositories(db *sqlx.DB) Statsrepositories {
+	return &statsrepositories{db: db}
 }
 
-func (r *statsRepository) GetTotalStats() ([]models.TotalStats, error) {
+func (r *statsrepositories) GetTotalStats() ([]models.TotalStats, error) {
 	totalStats := []models.TotalStats{}
 	sqlBytes, err := os.ReadFile("./db/stats/get_total_stats.sql")
 	if err != nil {
@@ -40,7 +40,7 @@ func (r *statsRepository) GetTotalStats() ([]models.TotalStats, error) {
 	return totalStats, nil
 }
 
-func (r *statsRepository) GetCategoriesStats() ([]models.CategoriesStats, error) {
+func (r *statsrepositories) GetCategoriesStats() ([]models.CategoriesStats, error) {
 	categoriesStats := []models.CategoriesStats{}
 	sqlBytes, err := os.ReadFile("./db/stats/get_categories_stats.sql")
 	if err != nil {
@@ -57,7 +57,7 @@ func (r *statsRepository) GetCategoriesStats() ([]models.CategoriesStats, error)
 	return categoriesStats, nil
 }
 
-func (r *statsRepository) GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error) {
+func (r *statsrepositories) GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error) {
 	newAdditions := []models.NewAdditionsStats{}
 	sqlBytes, err := os.ReadFile("./db/stats/get_new_additions_stats.sql")
 	if err != nil {

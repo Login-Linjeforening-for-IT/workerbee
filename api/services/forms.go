@@ -2,14 +2,14 @@ package services
 
 import (
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type FormService struct {
-	repo repository.FormRepository
+	repo repositories.Formrepositories
 }
 
-func NewFormService(repo repository.FormRepository) *FormService {
+func NewFormService(repo repositories.Formrepositories) *FormService {
 	return &FormService{repo: repo}
 }
 

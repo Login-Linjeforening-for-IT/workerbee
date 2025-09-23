@@ -4,14 +4,14 @@ import (
 	"strconv"
 	"workerbee/internal"
 	"workerbee/models"
-	"workerbee/repository"
+	"workerbee/repositories"
 )
 
 type JobsService struct {
-	repo repository.JobsRepository
+	repo repositories.Jobsrepositories
 }
 
-func NewJobsService(repo repository.JobsRepository) *JobsService {
+func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 	return &JobsService{repo: repo}
 }
 

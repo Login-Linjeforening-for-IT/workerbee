@@ -1,4 +1,4 @@
-package repository
+package repositories
 
 import (
 	"database/sql"
@@ -11,21 +11,21 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type EventRepository interface {
+type Eventrepositories interface {
 	GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error)
 	GetEvent(id int) (models.Event, error)
 	DeleteEvent(id int) (models.Event, error)
 }
 
-type eventRepository struct {
+type eventrepositories struct {
 	db *sqlx.DB
 }
 
-func NewEventRepository(db *sqlx.DB) EventRepository {
-	return &eventRepository{db: db}
+func NewEventrepositories(db *sqlx.DB) Eventrepositories {
+	return &eventrepositories{db: db}
 }
 
-func (r *eventRepository) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
+func (r *eventrepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
 	var events []models.EventWithTotalCount
 
 	sqlBytes, err := os.ReadFile("./db/events/get_events.sql")
@@ -42,7 +42,7 @@ func (r *eventRepository) GetEvents(search, limit, offset, orderBy, sort string,
 	return events, nil
 }
 
-func (r *eventRepository) GetEvent(id int) (models.Event, error) {
+func (r *eventrepositories) GetEvent(id int) (models.Event, error) {
 	var event models.Event
 
 	sqlBytes, err := os.ReadFile("./db/events/get_event.sql")
@@ -58,7 +58,7 @@ func (r *eventRepository) GetEvent(id int) (models.Event, error) {
 	return event, nil
 }
 
-func (r *eventRepository) DeleteEvent(id int) (models.Event, error) {
+func (r *eventrepositories) DeleteEvent(id int) (models.Event, error) {
 	var event models.Event
 
 	sqlBytes, err := os.ReadFile("./db/events/delete_event.sql")

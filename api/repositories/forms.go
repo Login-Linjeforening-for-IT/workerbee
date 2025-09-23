@@ -1,4 +1,4 @@
-package repository
+package repositories
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type FormRepository interface {
+type Formrepositories interface {
 	GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error)
 	GetForm(id string) (*models.FormWithQuestion, error)
 	PostForm(form models.Form) (models.Form, error)
@@ -17,15 +17,15 @@ type FormRepository interface {
 	DeleteForm(id string) (models.Form, error)
 }
 
-type formRepository struct {
+type formrepositories struct {
 	db *sqlx.DB
 }
 
-func NewFormRepository(db *sqlx.DB) FormRepository {
-	return &formRepository{db: db}
+func NewFormrepositories(db *sqlx.DB) Formrepositories {
+	return &formrepositories{db: db}
 }
 
-func (r *formRepository) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
+func (r *formrepositories) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
 	forms := []models.FormWithTotalCount{}
 
 	sqlBytes, err := os.ReadFile("./db/forms/get_forms.sql")
@@ -43,45 +43,45 @@ func (r *formRepository) GetForms(search, limit, offset, orderBy, sort string) (
 	return forms, nil
 }
 
-func (r *formRepository) GetForm(id string) (*models.FormWithQuestion, error) {
-       type formWithQuestionsRaw struct {
-	       models.FormWithQuestion
-	       QuestionsRaw json.RawMessage `db:"questions"`
-	       UserRaw      json.RawMessage `db:"user"`
-       }
-       f := formWithQuestionsRaw{}
+func (r *formrepositories) GetForm(id string) (*models.FormWithQuestion, error) {
+	type formWithQuestionsRaw struct {
+		models.FormWithQuestion
+		QuestionsRaw json.RawMessage `db:"questions"`
+		UserRaw      json.RawMessage `db:"user"`
+	}
+	f := formWithQuestionsRaw{}
 
-       sqlBytes, err := os.ReadFile("./db/forms/get_form.sql")
-       if err != nil {
-	       return nil, err
-       }
+	sqlBytes, err := os.ReadFile("./db/forms/get_form.sql")
+	if err != nil {
+		return nil, err
+	}
 
-       query := string(sqlBytes)
-       err = r.db.Get(&f, query, id)
-       if err != nil {
-	       return nil, err
-       }
+	query := string(sqlBytes)
+	err = r.db.Get(&f, query, id)
+	if err != nil {
+		return nil, err
+	}
 
-       if len(f.QuestionsRaw) > 0 {
-	       _ = json.Unmarshal(f.QuestionsRaw, &f.Questions)
-       }
-       if len(f.UserRaw) > 0 {
-	       var user models.User
-	       _ = json.Unmarshal(f.UserRaw, &user)
-	       f.User = &user
-       }
+	if len(f.QuestionsRaw) > 0 {
+		_ = json.Unmarshal(f.QuestionsRaw, &f.Questions)
+	}
+	if len(f.UserRaw) > 0 {
+		var user models.User
+		_ = json.Unmarshal(f.UserRaw, &user)
+		f.User = &user
+	}
 
-       return &f.FormWithQuestion, nil
+	return &f.FormWithQuestion, nil
 }
 
-func (r *formRepository) PostForm(form models.Form) (models.Form, error) {
+func (r *formrepositories) PostForm(form models.Form) (models.Form, error) {
 	newForm := models.Form{}
 
 	sqlBytes, err := os.ReadFile("./db/forms/post_form.sql")
 	if err != nil {
 		return models.Form{}, err
 	}
-	
+
 	query := string(sqlBytes)
 	err = r.db.Get(&newForm, query, form.UserID, form.Title, form.Description, form.Capacity, form.OpenAt, form.CloseAt)
 	if err != nil {
@@ -91,7 +91,7 @@ func (r *formRepository) PostForm(form models.Form) (models.Form, error) {
 	return newForm, nil
 }
 
-func (r *formRepository) PutForm(id string, form models.Form) (models.Form, error) {
+func (r *formrepositories) PutForm(id string, form models.Form) (models.Form, error) {
 	updatedForm := models.Form{}
 
 	sqlBytes, err := os.ReadFile("./db/forms/put_form.sql")
@@ -107,7 +107,7 @@ func (r *formRepository) PutForm(id string, form models.Form) (models.Form, erro
 	return updatedForm, nil
 }
 
-func (r *formRepository) DeleteForm(id string) (models.Form, error) {
+func (r *formrepositories) DeleteForm(id string) (models.Form, error) {
 	deletedForm := models.Form{}
 
 	sqlBytes, err := os.ReadFile("./db/forms/delete_form.sql")
