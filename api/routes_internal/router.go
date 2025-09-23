@@ -24,7 +24,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		rules := v2.Group("/rules")
 		{
-			rules.GET("/:id", handlers.PingHandler)
+			rules.GET("/:id", h.GetRule)
 			rules.GET("/", h.GetRules)
 			rules.POST("/", handlers.PingHandler)
 			rules.PUT("/:id", handlers.PingHandler)

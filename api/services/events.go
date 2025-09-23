@@ -42,19 +42,9 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return models.Event{}, internal.ErrInvalid
-	}
-
-	return s.repo.GetEvent(idInt)
+	return s.repo.GetEvent(id)
 }
 
 func (s *EventService) DeleteEvent(id string) (models.Event, error) {
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return models.Event{}, internal.ErrInvalid
-	}
-
-	return s.repo.DeleteEvent(idInt)
+	return s.repo.DeleteEvent(id)
 }

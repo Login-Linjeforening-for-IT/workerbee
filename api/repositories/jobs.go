@@ -14,8 +14,8 @@ import (
 
 type Jobsrepositories interface {
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
-	GetJob(id int) (models.Job, error)
-	DeleteJob(id int) (models.Job, error)
+	GetJob(id string) (models.Job, error)
+	DeleteJob(id string) (models.Job, error)
 	GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
 
@@ -42,23 +42,16 @@ func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) 
 	return jobs, nil
 }
 
-func (r *jobsrepositories) GetJob(id int) (models.Job, error) {
-	var job models.Job
-
-	sqlBytes, err := os.ReadFile("./db/jobs/get_job.sql")
+func (r *jobsrepositories) GetJob(id string) (models.Job, error) {
+	job, err := db.FetchOneRow[models.Job](r.db, "./db/jobs/get_job.sql", id)
 	if err != nil {
-		return job, err
-	}
-
-	err = r.db.Get(&job, string(sqlBytes), id)
-	if err != nil {
-		return job, internal.ErrInvalid
+		return models.Job{}, internal.ErrInvalid
 	}
 
 	return job, nil
 }
 
-func (r *jobsrepositories) DeleteJob(id int) (models.Job, error) {
+func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {
 	var job models.Job
 
 	sqlBytes, err := os.ReadFile("./db/jobs/delete_job.sql")

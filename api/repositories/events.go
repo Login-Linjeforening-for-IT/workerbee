@@ -13,8 +13,8 @@ import (
 
 type Eventrepositories interface {
 	GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error)
-	GetEvent(id int) (models.Event, error)
-	DeleteEvent(id int) (models.Event, error)
+	GetEvent(id string) (models.Event, error)
+	DeleteEvent(id string) (models.Event, error)
 }
 
 type eventRepositories struct {
@@ -42,23 +42,16 @@ func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort strin
 	return events, nil
 }
 
-func (r *eventRepositories) GetEvent(id int) (models.Event, error) {
-	var event models.Event
-
-	sqlBytes, err := os.ReadFile("./db/events/get_event.sql")
+func (r *eventRepositories) GetEvent(id string) (models.Event, error) {
+	event, err := db.FetchOneRow[models.Event](r.db, "./db/events/get_event.sql", id)
 	if err != nil {
-		return event, err
-	}
-
-	err = r.db.Get(&event, string(sqlBytes), id)
-	if err != nil {
-		return event, internal.ErrInvalid
+		return models.Event{}, internal.ErrInvalid
 	}
 
 	return event, nil
 }
 
-func (r *eventRepositories) DeleteEvent(id int) (models.Event, error) {
+func (r *eventRepositories) DeleteEvent(id string) (models.Event, error) {
 	var event models.Event
 
 	sqlBytes, err := os.ReadFile("./db/events/delete_event.sql")

@@ -38,3 +38,19 @@ func FetchAllElements[T any](
 
 	return result, nil
 }
+
+func FetchOneRow[T any](db *sqlx.DB, sqlPath string, id string) (T, error) {
+	var result T
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Get(&result, string(sqlBytes), id)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"strconv"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -38,21 +37,11 @@ func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]mo
 }
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return models.Job{}, internal.ErrInvalid
-	}
-
-	return s.repo.GetJob(idInt)
+	return s.repo.GetJob(id)
 }
 
 func (s *JobsService) DeleteJob(id string) (models.Job, error) {
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		return models.Job{}, internal.ErrInvalid
-	}
-
-	return s.repo.DeleteJob(idInt)
+	return s.repo.DeleteJob(id)
 }
 
 func (s *JobsService) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {

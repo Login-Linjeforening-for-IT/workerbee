@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"workerbee/internal"
 
@@ -17,12 +16,22 @@ func (h *Handler) GetRules(c *gin.Context) {
 
 	rules, err := h.Services.Rules.GetRules(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
-		log.Println(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"rules":        rules,
+		"rules":       rules,
 		"total_count": rules[0].TotalCount,
 	})
+}
+
+func (h *Handler) GetRule(c *gin.Context) {
+	id := c.Param("id")
+
+	rule, err := h.Services.Rules.GetRule(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, rule)
 }
