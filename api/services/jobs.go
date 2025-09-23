@@ -13,6 +13,6 @@ func NewJobsService(repo repository.JobsRepository) *JobsService {
 	return &JobsService{repo: repo}
 }
 
-func (s *JobsService) GetJobs(search, limit, offset string) ([]models.JobWithTotalCount, error) {
-	return s.repo.GetJobs(search, limit, offset)
+func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
+	return s.repo.GetJobs(search, limit, offset, orderBy, sort)
 }

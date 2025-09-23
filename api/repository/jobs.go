@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"os"
 	"workerbee/models"
 
@@ -8,7 +9,7 @@ import (
 )
 
 type JobsRepository interface {
-	GetJobs(search, limit, offset string) ([]models.JobWithTotalCount, error)
+	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 }
 
 type jobsRepository struct {
@@ -19,7 +20,7 @@ func NewJobRepository(db *sqlx.DB) JobsRepository {
 	return &jobsRepository{db: db}
 }
 
-func (r *jobsRepository) GetJobs(search, limit, offset string) ([]models.JobWithTotalCount, error) {
+func (r *jobsRepository) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
 	var jobs []models.JobWithTotalCount
 
 	sqlBytes, err := os.ReadFile("./db/jobs/get_jobs.sql")
@@ -27,7 +28,7 @@ func (r *jobsRepository) GetJobs(search, limit, offset string) ([]models.JobWith
 		return nil, err
 	}
 
-	query := string(sqlBytes)
+	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), sort, orderBy)
 
 	err = r.db.Select(&jobs, query, search, limit, offset)
 	if err != nil {

@@ -1,9 +1,9 @@
 -- name: get_job :one
--- name: get_jobs :many
 SELECT
 	ja.*,
-	array_agg(DISTINCT c.name) AS cities,
-	array_agg(DISTINCT s.name) AS skills
+	array_agg(DISTINCT c.name) FILTER (WHERE c.name IS NOT NULL) AS cities,
+	array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) AS skills,
+	COUNT(*) OVER() AS total_count
 FROM job_advertisements ja
 LEFT JOIN ad_city_relation acr ON ja.id = acr.job_advertisement_id
 LEFT JOIN cities c ON acr.city_id = c.id
