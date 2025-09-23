@@ -13,7 +13,8 @@ type Location struct {
 	MazemapPoiID    *int      `db:"mazemap_poi_id" json:"mazemap_poi_id,omitempty"`
 	AddressStreet   *string   `db:"address_street" json:"address_street,omitempty"`
 	AddressPostcode *int      `db:"address_postcode" json:"address_postcode,omitempty"`
-	CityName        string    `db:"city_name" json:"city_name"`
+	CityID          *int      `db:"city_id" json:"city_id,omitempty"`
+	CityName        string    `db:"city_name" json:"city_name,omitempty"`
 	CoordinateLat   *float64  `db:"coordinate_lat" json:"coordinate_lat,omitempty"`
 	CoordinateLong  *float64  `db:"coordinate_long" json:"coordinate_long,omitempty"`
 	URL             *string   `db:"url" json:"url,omitempty"`

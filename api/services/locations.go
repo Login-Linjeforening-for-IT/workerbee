@@ -8,13 +8,13 @@ import (
 )
 
 var allowedSortColumnsLocs = map[string]string{
-	"id":           "l.id",
-	"name_no":      "l.name_no",
-	"name_en":      "l.name_en",
-	"type":         "l.type",
-	"city_name": 	"city_name",
-	"created_at":   "l.created_at",
-	"updated_at":   "l.updated_at",
+	"id":         "l.id",
+	"name_no":    "l.name_no",
+	"name_en":    "l.name_en",
+	"type":       "l.type",
+	"city_name":  "city_name",
+	"created_at": "l.created_at",
+	"updated_at": "l.updated_at",
 }
 
 type LocationService struct {
@@ -33,3 +33,12 @@ func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort stri
 
 	return s.repo.GetLocations(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
 }
+
+func (s *LocationService) GetLocation(id string) (models.Location, error) {
+	return s.repo.GetLocation(id)
+}
+
+func (s *LocationService) DeleteLocation(id string) (models.Location, error) {
+	return s.repo.DeleteLocation(id)
+}
+

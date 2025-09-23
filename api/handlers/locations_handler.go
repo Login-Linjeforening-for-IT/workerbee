@@ -15,14 +15,36 @@ func (h *Handler) GetLocations(c *gin.Context) {
 	sort := c.DefaultQuery("sort", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
 
-	orgs, err := h.Services.Locations.GetLocations(search, limit, offset, orderBy, sort)
+	locs, err := h.Services.Locations.GetLocations(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
 		log.Println(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"organizations": orgs,
-		"count":         orgs[0].TotalCount,
+		"locations": locs,
+		"count":     locs[0].TotalCount,
 	})
+}
+
+func (h *Handler) GetLocation(c *gin.Context) {
+	id := c.Param("id")
+
+	loc, err := h.Services.Locations.GetLocation(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, loc)
+}
+
+func (h *Handler) DeleteLocation(c *gin.Context) {
+	id := c.Param("id")
+
+	loc, err := h.Services.Locations.DeleteLocation(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, loc)
 }

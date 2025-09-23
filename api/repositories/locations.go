@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"workerbee/db"
+	"workerbee/internal"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
@@ -9,6 +10,8 @@ import (
 
 type LocationRepository interface {
 	GetLocations(search, limit, offset, orderBy, sort string) ([]models.LocationWithTotalCount, error)
+	GetLocation(id string) (models.Location, error)
+	DeleteLocation(id string) (models.Location, error)
 }
 
 type locationRepository struct {
@@ -32,4 +35,24 @@ func (r *locationRepository) GetLocations(search, limit, offset, orderBy, sort s
 		return nil, err
 	}
 	return locations, nil
+}
+
+func (r *locationRepository) GetLocation(id string) (models.Location, error) {
+	location, err := db.ExecuteOneRow[models.Location](
+		r.db, "./db/locations/get_location.sql", id,
+	)
+	if err != nil {
+		return models.Location{}, internal.ErrInvalid
+	}
+	return location, nil
+}
+
+func (r *locationRepository) DeleteLocation(id string) (models.Location, error) {
+	location, err := db.ExecuteOneRow[models.Location](
+		r.db, "./db/locations/delete_location.sql", id,
+	)
+	if err != nil {
+		return models.Location{}, internal.ErrInvalid
+	}
+	return location, nil
 }
