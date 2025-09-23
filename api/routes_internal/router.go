@@ -56,7 +56,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		jobs := v2.Group("/jobs")
 		{
-			jobs.GET("/:id", handlers.PingHandler)
+			jobs.GET("/:id", h.GetJob)
 			jobs.GET("/", h.GetJobs)
 			jobs.POST("/", handlers.PingHandler)
 			jobs.PUT("/:id", handlers.PingHandler)

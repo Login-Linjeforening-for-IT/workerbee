@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"os"
+	"workerbee/internal"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
@@ -10,6 +11,7 @@ import (
 
 type JobsRepository interface {
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
+	GetJob(id int) (models.Job, error)
 }
 
 type jobsRepository struct {
@@ -35,4 +37,20 @@ func (r *jobsRepository) GetJobs(search, limit, offset, orderBy, sort string) ([
 		return nil, err
 	}
 	return jobs, nil
+}
+
+func (r *jobsRepository) GetJob(id int) (models.Job, error) {
+	var job models.Job
+
+	sqlBytes, err := os.ReadFile("./db/jobs/get_job.sql")
+	if err != nil {
+		return job, err
+	}
+
+	err = r.db.Get(&job, string(sqlBytes), id)
+	if err != nil {
+		return job, internal.ErrInvalid
+	}
+
+	return job, nil
 }

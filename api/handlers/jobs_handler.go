@@ -13,8 +13,8 @@ var allowedSortColumnsJobs = map[string]string{
 	"id":           "ja.id",
 	"visible":      "ja.visible",
 	"highlight":    "ja.highlight",
-	"title_no":      "ja.title_no",
-	"title_en":      "ja.title_en",
+	"title_no":     "ja.title_no",
+	"title_en":     "ja.title_en",
 	"job_type":     "ja.job_type",
 	"time_expire":  "ja.time_expire",
 	"time_publish": "ja.time_publish",
@@ -41,4 +41,15 @@ func (h *Handler) GetJobs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, jobs)
+}
+
+func (h *Handler) GetJob(c *gin.Context) {
+	id := c.Param("id")
+
+	job, err := h.Jobs.GetJob(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, job)
 }

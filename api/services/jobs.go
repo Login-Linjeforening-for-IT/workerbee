@@ -1,6 +1,8 @@
 package services
 
 import (
+	"strconv"
+	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repository"
 )
@@ -15,4 +17,13 @@ func NewJobsService(repo repository.JobsRepository) *JobsService {
 
 func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
 	return s.repo.GetJobs(search, limit, offset, orderBy, sort)
+}
+
+func (s *JobsService) GetJob(id string) (models.Job, error) {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return models.Job{}, internal.ErrInvalid
+	}
+
+	return s.repo.GetJob(idInt)
 }
