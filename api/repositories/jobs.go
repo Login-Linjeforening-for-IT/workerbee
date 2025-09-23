@@ -1,10 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-	"errors"
-	"fmt"
-	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -43,7 +39,7 @@ func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) 
 }
 
 func (r *jobsrepositories) GetJob(id string) (models.Job, error) {
-	job, err := db.FetchOneRow[models.Job](r.db, "./db/jobs/get_job.sql", id)
+	job, err := db.ExecuteOneRow[models.Job](r.db, "./db/jobs/get_job.sql", id)
 	if err != nil {
 		return models.Job{}, internal.ErrInvalid
 	}
@@ -52,35 +48,23 @@ func (r *jobsrepositories) GetJob(id string) (models.Job, error) {
 }
 
 func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {
-	var job models.Job
-
-	sqlBytes, err := os.ReadFile("./db/jobs/delete_job.sql")
+	job, err := db.ExecuteOneRow[models.Job](r.db, "./db/jobs/delete_job.sql", id)
 	if err != nil {
-		return job, err
-	}
-
-	err = r.db.Get(&job, string(sqlBytes), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return job, internal.ErrInvalid
-		}
-		return job, err
+		return models.Job{}, internal.ErrInvalid
 	}
 
 	return job, nil
 }
 
 func (r *jobsrepositories) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
-	var cities []models.CitiesWithTotalCount
-
-	sqlBytes, err := os.ReadFile("./db/jobs/get_cities.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	query := fmt.Sprintf("%s ORDER BY %s %s\nLIMIT $2 OFFSET $3;", string(sqlBytes), sort, orderBy)
-
-	err = r.db.Select(&cities, query, search, limit, offset)
+	cities, err := db.FetchAllElements[models.CitiesWithTotalCount](
+		r.db,
+		"./db/jobs/get_cities.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+	)
 	if err != nil {
 		return nil, err
 	}

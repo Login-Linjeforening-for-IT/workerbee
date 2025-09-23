@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strings"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -17,6 +18,11 @@ var allowedSortColumnsJobs = map[string]string{
 	"time_publish": "ja.time_publish",
 	"created_at":   "ja.created_at",
 	"updated_at":   "ja.updated_at",
+}
+
+var allowedSortColumnsCities = map[string]string{
+	"id":   "c.id",
+	"name": "c.name",
 }
 
 type JobsService struct {
@@ -45,5 +51,9 @@ func (s *JobsService) DeleteJob(id string) (models.Job, error) {
 }
 
 func (s *JobsService) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
-	return s.repo.GetCities(search, limit, offset, orderBy, sort)
+	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsCities)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+	return s.repo.GetCities(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
 }

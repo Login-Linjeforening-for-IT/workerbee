@@ -199,7 +199,7 @@ CREATE INDEX ON "ad_skill_relation" ("skill_id");
 ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 

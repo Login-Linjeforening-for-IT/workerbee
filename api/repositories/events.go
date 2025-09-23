@@ -1,9 +1,6 @@
 package repositories
 
 import (
-	"database/sql"
-	"errors"
-	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -43,29 +40,17 @@ func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort strin
 }
 
 func (r *eventRepositories) GetEvent(id string) (models.Event, error) {
-	event, err := db.FetchOneRow[models.Event](r.db, "./db/events/get_event.sql", id)
+	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/get_event.sql", id)
 	if err != nil {
 		return models.Event{}, internal.ErrInvalid
 	}
-
 	return event, nil
 }
 
 func (r *eventRepositories) DeleteEvent(id string) (models.Event, error) {
-	var event models.Event
-
-	sqlBytes, err := os.ReadFile("./db/events/delete_event.sql")
+	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/delete_event.sql", id)
 	if err != nil {
-		return event, err
+		return models.Event{}, internal.ErrInvalid
 	}
-
-	err = r.db.Get(&event, string(sqlBytes), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return event, internal.ErrInvalid
-		}
-		return event, err
-	}
-
 	return event, nil
 }

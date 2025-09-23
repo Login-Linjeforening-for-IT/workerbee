@@ -34,3 +34,7 @@ func (s *RuleService) GetRules(search, limit, offset, orderBy, sort string) ([]m
 func (s *RuleService) GetRule(id string) (models.Rule, error) {
 	return s.repo.GetRule(id)
 }
+
+func (s *RuleService) DeleteRule(id string) (models.Rule, error) {
+	return s.repo.DeleteRule(id)
+}

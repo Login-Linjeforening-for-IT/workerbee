@@ -35,3 +35,14 @@ func (h *Handler) GetRule(c *gin.Context) {
 
 	c.JSON(http.StatusOK, rule)
 }
+
+func (h *Handler) DeleteRule(c *gin.Context) {
+	id := c.Param("id")
+
+	rule, err := h.Services.Rules.DeleteRule(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, rule)
+}

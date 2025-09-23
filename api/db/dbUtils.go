@@ -39,7 +39,7 @@ func FetchAllElements[T any](
 	return result, nil
 }
 
-func FetchOneRow[T any](db *sqlx.DB, sqlPath string, id string) (T, error) {
+func ExecuteOneRow[T any](db *sqlx.DB, sqlPath, id string) (T, error) {
 	var result T
 
 	sqlBytes, err := os.ReadFile(sqlPath)

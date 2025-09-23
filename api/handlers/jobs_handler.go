@@ -2,16 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
 )
-
-var allowedSortColumnsCities = map[string]string{
-	"id":   "c.id",
-	"name": "c.name",
-}
 
 func (h *Handler) GetJobs(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
@@ -57,15 +51,13 @@ func (h *Handler) GetCities(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
-	sort := c.DefaultQuery("direction", "asc")
+	sort := c.DefaultQuery("sort", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
 
-	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsCities)
+	cities, err := h.Services.Jobs.GetCities(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
 		return
 	}
-
-	cities, err := h.Services.Jobs.GetCities(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
 
 	c.JSON(http.StatusOK, gin.H{
 		"cities":      cities,

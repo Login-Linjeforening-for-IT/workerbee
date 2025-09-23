@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"workerbee/db"
+	"workerbee/internal"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
@@ -10,6 +11,7 @@ import (
 type Rulerepositories interface {
 	GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error)
 	GetRule(id string) (models.Rule, error)
+	DeleteRule(id string) (models.Rule, error)
 }
 
 type ruleRepositories struct {
@@ -36,9 +38,17 @@ func (r *ruleRepositories) GetRules(search, limit, offset, orderBy, sort string)
 }
 
 func (r *ruleRepositories) GetRule(id string) (models.Rule, error) {
-	rule, err := db.FetchOneRow[models.Rule](r.db, "./db/rules/get_rule.sql", id)
+	rule, err := db.ExecuteOneRow[models.Rule](r.db, "./db/rules/get_rule.sql", id)
 	if err != nil {
-		return rule, err
+		return rule, internal.ErrInvalid
+	}
+	return rule, nil
+}
+
+func (r *ruleRepositories) DeleteRule(id string) (models.Rule, error) {
+	rule, err := db.ExecuteOneRow[models.Rule](r.db, "./db/rules/delete_rule.sql", id)
+	if err != nil {
+		return rule, internal.ErrInvalid
 	}
 	return rule, nil
 }
