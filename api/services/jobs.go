@@ -39,7 +39,7 @@ func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]mo
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetJobs(search, limit, offset, orderBySanitized, sortSanitized)
+	return s.repo.GetJobs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {

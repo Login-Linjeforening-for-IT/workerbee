@@ -6,7 +6,6 @@ import (
 
 type Organization struct {
 	ID            int       `db:"id" json:"id"`
-	ShortName     string    `db:"shortname" json:"short_name"`
 	NameNo        string    `db:"name_no" json:"name_no"`
 	NameEn        string    `db:"name_en" json:"name_en"`
 	DescriptionNo string    `db:"description_no" json:"description_no"`

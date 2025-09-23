@@ -88,7 +88,6 @@ CREATE TABLE "rules" (
 
 CREATE TABLE "organizations" (
     "id" SERIAL PRIMARY KEY,
-    "shortname" varchar,
     "name_no" varchar NOT NULL,
     "name_en" varchar NOT NULL,
     "description_no" varchar NOT NULL,
@@ -197,13 +196,13 @@ CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
 ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 
-ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -468,7 +467,6 @@ VALUES
   now(), now());
 
 INSERT INTO "organizations" (
-  "shortname", 
   "name_no", 
   "name_en", 
   "description_no", 
@@ -483,31 +481,31 @@ INSERT INTO "organizations" (
   "created_at"
 )
 VALUES
-  ('UiO', 'Universitetet i Oslo', 'University of Oslo', 
+  ('Universitetet i Oslo', 'University of Oslo', 
    'Universitetet i Oslo er Norges største universitet, med et bredt fagtilbud.', 
    'The University of Oslo is Norways largest university, offering a wide range of programs.', 
    1, 'https://www.uio.no', 'https://www.linkedin.com/school/university-of-oslo', 
    'https://www.facebook.com/uni.oslo', 'https://www.instagram.com/uniofoslo', 
    'logo.png', now(), now()),
-  ('NTNU', 'Norges teknisk-naturvitenskapelige universitet', 'Norwegian University of Science and Technology', 
+  ('Norges teknisk-naturvitenskapelige universitet', 'Norwegian University of Science and Technology', 
    'NTNU er et teknisk universitet i Trondheim, kjent for sin forskning på teknologi og naturvitenskap.', 
    'NTNU is a technical university in Trondheim, known for its research in technology and natural sciences.', 
    2, 'https://www.ntnu.no', 'https://www.linkedin.com/school/ntnu', 
    'https://www.facebook.com/NTNU.no', 'https://www.instagram.com/ntnu_official', 
    'logo.png', now(), now()),
-  ('DNB', 'DNB ASA', 'DNB ASA', 
+  ('DNB ASA', 'DNB ASA', 
    'DNB er Norges største finanskonsern med et bredt tilbud av finansielle tjenester.', 
    'DNB is Norways largest financial group, offering a wide range of financial services.', 
    3, 'https://www.dnb.no', 'https://www.linkedin.com/company/dnb', 
    'https://www.facebook.com/dnb.no', 'https://www.instagram.com/dnb.no', 
    'logo.png', now(), now()),
-  ('Telenor', 'Telenor ASA', 'Telenor ASA', 
+  ('Telenor ASA', 'Telenor ASA', 
    'Telenor er et ledende teleselskap som tilbyr mobil- og bredbåndstjenester.', 
    'Telenor is a leading telecommunications company offering mobile and broadband services.', 
    3, 'https://www.telenor.no', 'https://www.linkedin.com/company/telenor', 
    'https://www.facebook.com/telenor', 'https://www.instagram.com/telenor', 
    'logo.png', now(), now()),
-  ('SINTEF', 'SINTEF', 'SINTEF', 
+  ('SINTEF', 'SINTEF', 
    'SINTEF er en av Europas største uavhengige forskningsorganisasjoner, kjent for sitt arbeid innen teknologi og innovasjon.', 
    'SINTEF is one of Europes largest independent research organizations, known for its work in technology and innovation.', 
    4, 'https://www.sintef.no', 'https://www.linkedin.com/company/sintef', 

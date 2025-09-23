@@ -40,11 +40,11 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		organizations := v2.Group("/organizations")
 		{
-			organizations.GET("/:id", handlers.PingHandler)
-			organizations.GET("/", handlers.PingHandler)
+			organizations.GET("/:id", h.GetOrganization)
+			organizations.GET("/", h.GetOranizations)
 			organizations.POST("/", handlers.PingHandler)
-			organizations.DELETE("/:id", handlers.PingHandler)
 			organizations.PUT("/:id", handlers.PingHandler)
+			organizations.DELETE("/:id", h.DeleteOrganization)
 		}
 		categories := v2.Group("/categories")
 		{

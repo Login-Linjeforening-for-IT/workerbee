@@ -1,10 +1,9 @@
 -- name: get_organizations :many
 SELECT *,
     COUNT(*) OVER() AS total_count
-FROM organizations
+FROM organizations as o
 WHERE
     (
         $1 = '' OR
-        to_json(organizations)::text ILIKE '%' || $1 || '%'
+        to_json(o)::text ILIKE '%' || $1 || '%'
     )
-LIMIT $2 OFFSET $3;
