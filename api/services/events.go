@@ -38,6 +38,6 @@ func (s *EventService) DeleteEvent(id string) (models.Event, error) {
 	if err != nil {
 		return models.Event{}, internal.ErrInvalid
 	}
-	
+
 	return s.repo.DeleteEvent(idInt)
 }

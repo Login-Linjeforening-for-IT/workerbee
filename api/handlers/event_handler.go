@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var allowedSortColumns = map[string]string{
+var allowedSortColumnsEvents = map[string]string{
 	"id":           "e.id",
 	"name_no":      "e.name_no",
 	"name_en":      "e.name_en",
@@ -39,7 +39,7 @@ func (h *Handler) GetEvents(c *gin.Context) {
 	orderBy := c.DefaultQuery("order_by", "id")
 	historical := c.DefaultQuery("historical", "false")
 
-	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumns)
+	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if internal.HandleError(c, err) {
 		return
 	}

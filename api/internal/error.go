@@ -9,14 +9,14 @@ import (
 
 var (
 	ErrNotFound     = errors.New("could not find id")
-	ErrInvalid  = errors.New("invalid user data")
+	ErrInvalid      = errors.New("invalid user data")
 	ErrUnauthorized = errors.New("unauthorized opperation")
 	ErrorMap        = map[error]struct {
 		Status  int
 		Message string
 	}{
 		ErrNotFound:     {Status: http.StatusBadRequest, Message: "did not find document"},
-		ErrInvalid:  {Status: http.StatusBadRequest, Message: "invalid user data"},
+		ErrInvalid:      {Status: http.StatusBadRequest, Message: "invalid user data"},
 		ErrUnauthorized: {Status: http.StatusUnauthorized, Message: "unauthorized operation"},
 	}
 )
