@@ -1,10 +1,9 @@
 -- name: get_rules :many
 SELECT *,
     COUNT(*) OVER() AS total_count
-FROM rules
+FROM rules as r
 WHERE
     (
         $1 = '' OR
-        to_json(rules)::text ILIKE '%' || $1 || '%'
+        to_json(r)::text ILIKE '%' || $1 || '%'
     )
-LIMIT $2 OFFSET $3;

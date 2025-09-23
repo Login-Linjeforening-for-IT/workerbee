@@ -26,6 +26,7 @@ func main() {
 
 	// Repos
 	eventRepo := repository.NewEventRepository(db)
+	ruleRepo := repository.NewRuleRepository(db)
 	jobRepo := repository.NewJobRepository(db)
 	statsRepo := repository.NewStatsRepository(db)
 	formRepo := repository.NewFormRepository(db)
@@ -34,6 +35,7 @@ func main() {
 
 	// Services
 	eventService := services.NewEventService(eventRepo)
+	ruleService := services.NewRuleService(ruleRepo)
 	jobService := services.NewJobsService(jobRepo)
 	statsService := services.NewStatsService(statsRepo)
 	formService := services.NewFormService(formRepo)
@@ -43,6 +45,7 @@ func main() {
 	// handler container
 	h := &handlers.Handler{
 		Events:      *eventService,
+		Rules:       *ruleService,
 		Jobs:        *jobService,
 		Stats:       *statsService,
 		Forms:       *formService,

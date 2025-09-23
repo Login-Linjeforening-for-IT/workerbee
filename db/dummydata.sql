@@ -200,7 +200,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("i
 ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
