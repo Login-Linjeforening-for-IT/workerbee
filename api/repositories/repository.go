@@ -2,32 +2,19 @@ package repositories
 
 import (
 	"github.com/jmoiron/sqlx"
-	"workerbee/models"
 )
 
 type Repositories struct {
-	Forms       Formrepositories
-	Events      Eventrepositories
-	Jobs        Jobsrepositories
-	Questions   Questionrepositories
-	Rules       Rulerepositories
-	Stats       Statsrepositories
-	Submissions Submissionrepositories
-}
-
-// DeleteEvent implements Eventrepositories.
-func (r *Repositories) DeleteEvent(id int) (models.Event, error) {
-	panic("unimplemented")
-}
-
-// GetEvent implements Eventrepositories.
-func (r *Repositories) GetEvent(id int) (models.Event, error) {
-	panic("unimplemented")
-}
-
-// GetEvents implements Eventrepositories.
-func (r *Repositories) GetEvents(search string, limit string, offset string, orderBy string, sort string, historical bool) ([]models.EventWithTotalCount, error) {
-	panic("unimplemented")
+	Forms         Formrepositories
+	Categories    CategoireRepository
+	Locations     LocationRepository
+	Organizations OrganizationRepository
+	Events        Eventrepositories
+	Jobs          Jobsrepositories
+	Questions     Questionrepositories
+	Rules         Rulerepositories
+	Stats         Statsrepositories
+	Submissions   Submissionrepositories
 }
 
 func NewRepositories(db *sqlx.DB) *Repositories {
@@ -39,5 +26,8 @@ func NewRepositories(db *sqlx.DB) *Repositories {
 		Rules:       NewRulerepositories(db),
 		Stats:       NewStatsrepositories(db),
 		Submissions: NewSubmissionrepositories(db),
+		Categories: NewCategoireRepository(db),
+		Locations: NewLocationRepository(db),
+		Organizations: NewOrganizationRepository(db),
 	}
 }

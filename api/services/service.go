@@ -3,23 +3,29 @@ package services
 import "workerbee/repositories"
 
 type Services struct {
-	Events      *EventService
-	Forms       *FormService
-	Jobs        *JobsService
-	Questions   *QuestionService
-	Rules       *RuleService
-	Stats       *StatsService
-	Submissions *SubmissionService
+	Events        *EventService
+	Categories    *CategorieService
+	Locations     *LocationService
+	Organizations *OrganizationService
+	Forms         *FormService
+	Jobs          *JobsService
+	Questions     *QuestionService
+	Rules         *RuleService
+	Stats         *StatsService
+	Submissions   *SubmissionService
 }
 
 func NewServices(repos *repositories.Repositories) *Services {
 	return &Services{
-		Events:      NewEventService(repos.Events),
-		Forms:       NewFormService(repos.Forms),
-		Jobs:        NewJobsService(repos.Jobs),
-		Questions:   NewQuestionService(repos.Questions),
-		Rules:       NewRuleService(repos.Rules),
-		Stats:       NewStatsService(repos.Stats),
-		Submissions: NewSubmissionService(repos.Submissions),
+		Events:        NewEventService(repos.Events),
+		Forms:         NewFormService(repos.Forms),
+		Jobs:          NewJobsService(repos.Jobs),
+		Questions:     NewQuestionService(repos.Questions),
+		Rules:         NewRuleService(repos.Rules),
+		Stats:         NewStatsService(repos.Stats),
+		Submissions:   NewSubmissionService(repos.Submissions),
+		Categories:    NewCategorieService(repos.Categories),
+		Locations:     NewLocationService(repos.Locations),
+		Organizations: NewOrganizationService(repos.Organizations),
 	}
 }
