@@ -55,7 +55,7 @@ func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
 	limit := c.DefaultQuery("limit", "20")
 	limitInt, err := strconv.Atoi(limit)
 	if err != nil {
-		internal.HandleError(c, err, "Bad request", http.StatusBadRequest)
+		internal.HandleError(c,internal.ErrInvalid)
 		return
 	}
 

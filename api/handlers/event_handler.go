@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 	"strings"
 	"workerbee/internal"
@@ -41,19 +40,12 @@ func (h *Handler) GetEvents(c *gin.Context) {
 	historical := c.DefaultQuery("historical", "false")
 
 	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumns)
-	if err != nil {
-		internal.HandleError(c, err, "Bad input", http.StatusBadRequest)
+	if internal.HandleError(c, err) {
 		return
 	}
 
 	events, err := h.Events.GetEvents(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized, historical)
-	if err != nil {
-		switch { 
-		case errors.Is(err, internal.ErrInvalidSort):
-			internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
-		default:
-			internal.HandleError(c, err, "could not fetch event", http.StatusInternalServerError)
-		}
+	if internal.HandleError(c, err) {
 		return
 	}
 
@@ -67,13 +59,7 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	id := c.Param("id")
 
 	event, err := h.Events.GetEvent(id)
-	if err != nil {
-		switch { 
-		case errors.Is(err, internal.ErrInvalidId):
-			internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
-		default:
-			internal.HandleError(c, err, "could not fetch event", http.StatusInternalServerError)
-		}
+	if internal.HandleError(c, err) {
 		return
 	}
 
@@ -84,13 +70,7 @@ func (h *Handler) DeleteEvent(c *gin.Context) {
 	id := c.Param("id")
 
 	event, err := h.Events.DeleteEvent(id)
-	if err != nil {
-		switch {
-		case errors.Is(err, internal.ErrInvalidId):
-						internal.HandleError(c, err, "invalid event id", http.StatusBadRequest)
-		default:
-			internal.HandleError(c, err, "could not fetch event", http.StatusInternalServerError)
-		}
+	if internal.HandleError(c, err) {
 		return
 	}
 	c.JSON(http.StatusOK, event)

@@ -52,7 +52,7 @@ func (r *eventRepository) GetEvent(id int) (models.Event, error) {
 
 	err = r.db.Get(&event, string(sqlBytes), id)
 	if err != nil {
-		return event, internal.ErrInvalidSort
+		return event, internal.ErrInvalid
 	}
 
 	return event, nil
@@ -69,7 +69,7 @@ func (r *eventRepository) DeleteEvent(id int) (models.Event, error) {
 	err = r.db.Get(&event, string(sqlBytes), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return event, internal.ErrInvalidId
+			return event, internal.ErrInvalid
 		}
 		return event, err
 	}
