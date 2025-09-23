@@ -5,11 +5,5 @@ import (
 )
 
 type Handler struct {
-	Events      services.EventService
-	Rules       services.RuleService
-	Stats       services.StatsService
-	Forms       services.FormService
-	Questions   services.QuestionService
-	Submissions services.SubmissionService
-	Jobs        services.JobsService
+	Services *services.Services
 }

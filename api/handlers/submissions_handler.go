@@ -19,7 +19,7 @@ func (h *Handler) GetSubmission(c *gin.Context) {
        formID := c.Param("id")
        submissionID := c.Param("submission_id")
 	   
-       submission, err := h.Submissions.GetSubmission(formID, submissionID)
+       submission, err := h.Services.Submissions.GetSubmission(formID, submissionID)
        if err != nil {
 	       c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	       return

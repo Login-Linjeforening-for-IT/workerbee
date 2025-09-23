@@ -17,15 +17,15 @@ type Eventrepositories interface {
 	DeleteEvent(id int) (models.Event, error)
 }
 
-type eventrepositories struct {
+type eventRepositories struct {
 	db *sqlx.DB
 }
 
 func NewEventrepositories(db *sqlx.DB) Eventrepositories {
-	return &eventrepositories{db: db}
+	return &eventRepositories{db: db}
 }
 
-func (r *eventrepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
 	var events []models.EventWithTotalCount
 
 	sqlBytes, err := os.ReadFile("./db/events/get_events.sql")
@@ -42,7 +42,7 @@ func (r *eventrepositories) GetEvents(search, limit, offset, orderBy, sort strin
 	return events, nil
 }
 
-func (r *eventrepositories) GetEvent(id int) (models.Event, error) {
+func (r *eventRepositories) GetEvent(id int) (models.Event, error) {
 	var event models.Event
 
 	sqlBytes, err := os.ReadFile("./db/events/get_event.sql")
@@ -58,7 +58,7 @@ func (r *eventrepositories) GetEvent(id int) (models.Event, error) {
 	return event, nil
 }
 
-func (r *eventrepositories) DeleteEvent(id int) (models.Event, error) {
+func (r *eventRepositories) DeleteEvent(id int) (models.Event, error) {
 	var event models.Event
 
 	sqlBytes, err := os.ReadFile("./db/events/delete_event.sql")

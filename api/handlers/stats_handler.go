@@ -17,7 +17,7 @@ import (
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/total [get]
 func (h *Handler) GetTotalStats(c *gin.Context) {
-	totalStats, err := h.Stats.GetTotalStats()
+	totalStats, err := h.Services.Stats.GetTotalStats()
 	if err != nil {
 
 	}
@@ -34,7 +34,7 @@ func (h *Handler) GetTotalStats(c *gin.Context) {
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/categories [get]
 func (h *Handler) GetCategoriesStats(c *gin.Context) {
-	categoriesStats, err := h.Stats.GetCategoriesStats()
+	categoriesStats, err := h.Services.Stats.GetCategoriesStats()
 	if err != nil {
 
 	}
@@ -59,7 +59,7 @@ func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
 		return
 	}
 
-	NewAdditionsStats, err := h.Stats.GetNewAdditionsStats(limitInt)
+	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats(limitInt)
 
 	c.JSON(http.StatusOK, NewAdditionsStats)
 }

@@ -27,7 +27,7 @@ func (h *Handler) PutQuestions(c *gin.Context) {
 		return
 	}
 
-	updatedQuestions, err := h.Questions.PutQuestions(formID, questions)
+	updatedQuestions, err := h.Services.Questions.PutQuestions(formID, questions)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -47,7 +47,7 @@ func (h *Handler) PutQuestions(c *gin.Context) {
 func (h *Handler) DeleteQuestion(c *gin.Context) {
 	id := c.Param("id")
 	
-	deletedQuestion, err := h.Questions.DeleteQuestion(id)
+	deletedQuestion, err := h.Services.Questions.DeleteQuestion(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

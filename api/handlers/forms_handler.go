@@ -18,7 +18,7 @@ import (
 func (h *Handler) GetForm(c *gin.Context) {
 	id := c.Param("id")
 
-	form, err := h.Forms.GetForm(id)
+	form, err := h.Services.Forms.GetForm(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,7 +49,7 @@ func (h *Handler) GetForms(c *gin.Context) {
 	orderBy := c.DefaultQuery("order_by", "created_at")
 	sort := c.DefaultQuery("sort", "desc")
 
-	forms, err := h.Forms.GetForms(search, limit, offset, orderBy, sort)
+	forms, err := h.Services.Forms.GetForms(search, limit, offset, orderBy, sort)
 	if err != nil {
 
 	}
@@ -76,7 +76,7 @@ func (h *Handler) PostForm(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	newForm, err := h.Forms.PostForm(form)
+	newForm, err := h.Services.Forms.PostForm(form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -102,7 +102,7 @@ func (h *Handler) PutForm(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	updatedForm, err := h.Forms.PutForm(id, form)
+	updatedForm, err := h.Services.Forms.PutForm(id, form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -120,7 +120,7 @@ func (h *Handler) PutForm(c *gin.Context) {
 // @Router       /api/v2/forms/{id} [delete]
 func (h *Handler) DeleteForm(c *gin.Context) {
 	id := c.Param("id")
-	deletedForm, err := h.Forms.DeleteForm(id)
+	deletedForm, err := h.Services.Forms.DeleteForm(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -44,7 +44,7 @@ func (h *Handler) GetEvents(c *gin.Context) {
 		return
 	}
 
-	events, err := h.Events.GetEvents(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized, historical)
+	events, err := h.Services.Events.GetEvents(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized, historical)
 	if internal.HandleError(c, err) {
 		return
 	}
@@ -58,7 +58,7 @@ func (h *Handler) GetEvents(c *gin.Context) {
 func (h *Handler) GetEvent(c *gin.Context) {
 	id := c.Param("id")
 
-	event, err := h.Events.GetEvent(id)
+	event, err := h.Services.Events.GetEvent(id)
 	if internal.HandleError(c, err) {
 		return
 	}
@@ -69,7 +69,7 @@ func (h *Handler) GetEvent(c *gin.Context) {
 func (h *Handler) DeleteEvent(c *gin.Context) {
 	id := c.Param("id")
 
-	event, err := h.Events.DeleteEvent(id)
+	event, err := h.Services.Events.DeleteEvent(id)
 	if internal.HandleError(c, err) {
 		return
 	}

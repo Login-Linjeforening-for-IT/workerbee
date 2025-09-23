@@ -29,7 +29,7 @@ func (h *Handler) GetRules(c *gin.Context) {
 		return
 	}
 
-	rules, err := h.Rules.GetRules(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
+	rules, err := h.Services.Rules.GetRules(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
 	if internal.HandleError(c, err) {
 		log.Println(err)
 		return

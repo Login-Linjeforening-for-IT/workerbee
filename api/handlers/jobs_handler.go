@@ -39,7 +39,7 @@ func (h *Handler) GetJobs(c *gin.Context) {
 		return
 	}
 
-	jobs, err := h.Jobs.GetJobs(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
+	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
 	if internal.HandleError(c, err) {
 		log.Println(err)
 		return
@@ -54,7 +54,7 @@ func (h *Handler) GetJobs(c *gin.Context) {
 func (h *Handler) GetJob(c *gin.Context) {
 	id := c.Param("id")
 
-	job, err := h.Jobs.GetJob(id)
+	job, err := h.Services.Jobs.GetJob(id)
 	if internal.HandleError(c, err) {
 		return
 	}
@@ -65,7 +65,7 @@ func (h *Handler) GetJob(c *gin.Context) {
 func (h *Handler) DeleteJob(c *gin.Context) {
 	id := c.Param("id")
 
-	job, err := h.Jobs.DeleteJob(id)
+	job, err := h.Services.Jobs.DeleteJob(id)
 	if internal.HandleError(c, err) {
 		return
 	}
@@ -85,7 +85,7 @@ func (h *Handler) GetCities(c *gin.Context) {
 		return
 	}
 
-	cities, err := h.Jobs.GetCities(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
+	cities, err := h.Services.Jobs.GetCities(search, limit, offset, strings.ToUpper(sortSanitized), orderBySanitized)
 
 	c.JSON(http.StatusOK, gin.H{
 		"cities":      cities,

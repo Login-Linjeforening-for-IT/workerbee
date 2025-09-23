@@ -25,33 +25,13 @@ func main() {
 	db := db.Init()
 
 	// Repos
-	eventRepo := repositories.NewEventrepositories(db)
-	ruleRepo := repositories.NewRulerepositories(db)
-	jobRepo := repositories.NewJobrepositories(db)
-	statsRepo := repositories.NewStatsrepositories(db)
-	formRepo := repositories.NewFormrepositories(db)
-	questionRepo := repositories.NewQuestionrepositories(db)
-	submissionRepo := repositories.NewSubmissionrepositories(db)
+	repos := repositories.NewRepositories(db)
 
 	// Services
-	eventService := services.NewEventService(eventRepo)
-	ruleService := services.NewRuleService(ruleRepo)
-	jobService := services.NewJobsService(jobRepo)
-	statsService := services.NewStatsService(statsRepo)
-	formService := services.NewFormService(formRepo)
-	questionService := services.NewQuestionService(questionRepo)
-	submissionService := services.NewSubmissionService(submissionRepo)
+	svcs := services.NewServices(repos)
 
 	// handler container
-	h := &handlers.Handler{
-		Events:      *eventService,
-		Rules:       *ruleService,
-		Jobs:        *jobService,
-		Stats:       *statsService,
-		Forms:       *formService,
-		Questions:   *questionService,
-		Submissions: *submissionService,
-	}
+	h := &handlers.Handler{ Services: svcs }
 
 	router := gin.New()
 
