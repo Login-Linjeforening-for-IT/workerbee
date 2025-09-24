@@ -48,11 +48,11 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		categories := v2.Group("/categories")
 		{
-			categories.GET("/:id", handlers.PingHandler)
-			categories.GET("/", )
+			categories.GET("/:id",  h.GetCategory)
+			categories.GET("/", h.GetCategories)
 			categories.POST("/", handlers.PingHandler)
 			categories.PUT("/:id", handlers.PingHandler)
-			categories.DELETE("/:id", handlers.PingHandler)
+			categories.DELETE("/:id", h.DeleteCategory)
 		}
 		jobs := v2.Group("/jobs")
 		{

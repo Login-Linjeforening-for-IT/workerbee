@@ -1,8 +1,17 @@
 package repositories
 
-import "github.com/jmoiron/sqlx"
+import (
+	"workerbee/db"
+	"workerbee/internal"
+	"workerbee/models"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type CategoireRepository interface {
+	GetCategories(search, limit, offset, orderBy, sort string) ([]models.CategoryWithTotalCount, error)
+	GetCategory(id string) (models.Category, error)
+	DeleteCategory(id string) (models.Category, error)
 }
 
 type categoireRepository struct {
@@ -11,4 +20,35 @@ type categoireRepository struct {
 
 func NewCategoireRepository(db *sqlx.DB) CategoireRepository {
 	return &categoireRepository{db: db}
+}
+
+func (r *categoireRepository) GetCategories(search, limit, offset, orderBy, sort string) ([]models.CategoryWithTotalCount, error) {
+	categories, err := db.FetchAllElements[models.CategoryWithTotalCount](
+		r.db,
+		"./db/categories/get_categories.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
+
+func (r *categoireRepository) GetCategory(id string) (models.Category, error) {
+	category, err := db.ExecuteOneRow[models.Category](r.db, "./db/categories/get_category.sql", id)
+	if err != nil {
+		return models.Category{}, internal.ErrInvalid
+	}
+	return category, nil
+}
+
+func (r *categoireRepository) DeleteCategory(id string) (models.Category, error) {
+	category, err := db.ExecuteOneRow[models.Category](r.db, "./db/categories/delete_category.sql", id)
+	if err != nil {
+		return models.Category{}, internal.ErrInvalid
+	}
+	return category, nil
 }

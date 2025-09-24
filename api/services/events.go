@@ -2,6 +2,7 @@ package services
 
 import (
 	"strconv"
+	"strings"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -38,7 +39,7 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, sanitizedSort, historicalBool)
+	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {

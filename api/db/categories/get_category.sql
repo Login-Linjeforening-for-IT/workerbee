@@ -1,10 +1,4 @@
 -- name: get_category :many
-SELECT *,
-    COUNT(*) OVER() AS total_count
+SELECT * 
 FROM categories
-WHERE
-    (
-        $1 = '' OR
-        to_json(categories)::text ILIKE '%' || $1 || '%'
-    )
-LIMIT $2 OFFSET $3;
+WHERE id = $1;
