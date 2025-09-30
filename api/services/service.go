@@ -1,6 +1,10 @@
 package services
 
-import "workerbee/repositories"
+import (
+	"workerbee/repositories"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type Services struct {
 	Events        *EventService
@@ -13,6 +17,7 @@ type Services struct {
 	Rules         *RuleService
 	Stats         *StatsService
 	Submissions   *SubmissionService
+	Validate      *validator.Validate
 }
 
 func NewServices(repos *repositories.Repositories) *Services {
@@ -27,5 +32,6 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Categories:    NewCategorieService(repos.Categories),
 		Locations:     NewLocationService(repos.Locations),
 		Organizations: NewOrganizationService(repos.Organizations),
+		Validate:      validator.New(),
 	}
 }

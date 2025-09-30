@@ -28,9 +28,7 @@ INSERT INTO events (
     parent_id, 
     rule_id, 
     audience_id, 
-    organization_id, 
-    updated_at, 
-    created_at
+    organization_id
 ) VALUES (
     :visible, 
     :name_no, 
@@ -61,8 +59,6 @@ INSERT INTO events (
     :parent_id, 
     :rule_id, 
     :audience_id, 
-    :organization_id,
-    :updated_at, 
-    :created_at
+    :organization_id
 )
 RETURNING *;

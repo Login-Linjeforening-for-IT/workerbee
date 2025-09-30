@@ -17,6 +17,11 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 		})
 		return
 	}
+
+	if internal.HandleValidationError(c, event, *h.Services.Validate) {
+		return
+	}
+
 	event, err := h.Services.Events.CreateEvent(event)
 	if internal.HandleError(c, err) {
 		return

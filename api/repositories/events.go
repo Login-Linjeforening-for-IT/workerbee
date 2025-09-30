@@ -30,7 +30,7 @@ func (r *eventRepositories) CreateEvent(event models.Event) (models.Event, error
 		event,
 	)
 	if err != nil {
-		return models.Event{}, err
+		return result, err
 	}
 
 	return result, nil

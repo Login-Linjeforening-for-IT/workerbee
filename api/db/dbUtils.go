@@ -1,10 +1,13 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"workerbee/internal"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 func FetchAllElements[T any](
@@ -56,7 +59,9 @@ func ExecuteOneRow[T any](db *sqlx.DB, sqlPath, id string) (T, error) {
 }
 
 func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
+	var pqErr *pq.Error
 	var result T
+
 	sqlBytes, err := os.ReadFile(sqlPath)
 	if err != nil {
 		return result, err
@@ -64,7 +69,10 @@ func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
 
 	rows, err := db.NamedQuery(string(sqlBytes), body)
 	if err != nil {
-		return result, err
+		if errors.As(err, &pqErr) && pqErr.Code == "23503" {
+			return result, internal.ErrInvalidForeignKey
+		}
+		return result, internal.ErrInvalid
 	}
 	defer rows.Close()
 
