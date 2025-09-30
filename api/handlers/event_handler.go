@@ -1,11 +1,29 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (h *Handler) CreateEvent(c *gin.Context) {
+	var event models.Event
+
+	if err := c.ShouldBindBodyWithJSON(&event); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+	log.Println(event)
+	_, err := h.Services.Events.CreateEvent(event)
+	if internal.HandleError(c, err) {
+		return
+	}
+}
 
 // GetEvents godoc
 // @Summary      Get events

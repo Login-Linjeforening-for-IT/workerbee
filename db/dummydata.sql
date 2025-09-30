@@ -13,7 +13,7 @@ CREATE TYPE "location_type" AS ENUM (
 );
 
 CREATE TYPE "job_type" AS ENUM (
-    'full',
+    'is_full',
     'part',
     'summer',
     'verv'
@@ -31,7 +31,7 @@ CREATE TABLE "events" (
     "time_type" time_type_enum NOT NULL DEFAULT 'default',
     "time_start" timestamp NOT NULL,
     "time_end" timestamp NOT NULL,
-    "time_publish" timestamp,
+    "time_publish" timestamp NOT NULL,
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
     "canceled" bool NOT NULL DEFAULT false,
@@ -44,7 +44,7 @@ CREATE TABLE "events" (
     "link_signup" varchar,
     "link_stream" varchar,
     "capacity" int,
-    "full" bool NOT NULL DEFAULT false,
+    "is_full" bool NOT NULL DEFAULT false,
     "category_id" int NOT NULL,
     "organization_id" int,
     "location_id" int,
@@ -131,7 +131,7 @@ CREATE TABLE "jobs" (
     "description_short_en" varchar NOT NULL,
     "description_long_no" varchar NOT NULL,
     "description_long_en" varchar NOT NULL,
-    "job_type" job_type NOT NULL DEFAULT 'full',
+    "job_type" job_type NOT NULL DEFAULT 'is_full',
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
     "application_deadline" timestamp NOT NULL,
@@ -539,7 +539,7 @@ VALUES
   'An exciting opportunity for recent graduates to develop software.', 
   'Som Junior Software Developer vil du være med på utvikling av applikasjoner og programvare.', 
   'As a Junior Software Developer, you will be involved in the development of applications and software.', 
-  'full', now(), '2025-03-31', '2025-03-01', 'https://www.example.com/banner.jpg', 
+  'is_full', now(), '2025-03-31', '2025-03-01', 'https://www.example.com/banner.jpg', 
   1, 'https://www.uio.no/job-apply', now(), now()),
 (true, true, 'Markedsføringskoordinator', 'Marketing Coordinator', 'Markedsføringsspesialist', 
   'Marketing Specialist', 'Bli en del av vårt markedsføringsteam og jobb med spennende prosjekter.', 
@@ -553,7 +553,7 @@ VALUES
   'We are looking for an experienced project manager to lead large projects.', 
   'Som prosjektleder vil du ha ansvar for å lede prosjekter fra start til slutt, inkludert budsjett og tidsplanlegging.', 
   'As a Project Manager, you will be responsible for leading projects from start to finish, including budgeting and scheduling.', 
-  'full', now(), '2027-06-30', '2027-05-01', 'https://www.example.com/banner3.jpg', 
+  'is_full', now(), '2027-06-30', '2027-05-01', 'https://www.example.com/banner3.jpg', 
   4, 'https://www.telenor.no/job-apply', now(), now()),
 (true, false, 'Kundestøtteagent', 'Customer Support Agent', 'Kundestøtteansvarlig', 
   'Customer Support Manager', 'Bli en del av vårt kundeserviceteam og hjelp kunder med deres henvendelser.', 
@@ -567,7 +567,7 @@ VALUES
   'Are you a data analyst who loves to derive insights from large datasets?', 
   'Som dataanalytiker vil du analysere data for å identifisere trender og lage rapporter som støtter beslutningstaking.', 
   'As a Data Analyst, you will analyze data to identify trends and create reports that support decision-making.', 
-  'full', now(), '2025-07-31', '2025-06-01', 'https://www.example.com/banner5.jpg', 
+  'is_full', now(), '2025-07-31', '2025-06-01', 'https://www.example.com/banner5.jpg', 
   2, 'https://www.ntnu.no/job-apply', now(), now());
 
 INSERT INTO "ad_skill_relation" ("job_id", "skill_id")
@@ -591,7 +591,7 @@ INSERT INTO "events" (
   "informational_no", "informational_en", "time_type", "time_start", "time_end", 
   "time_publish", "time_signup_release", "time_signup_deadline", "canceled", 
   "digital", "highlight", "image_small", "image_banner", "link_facebook", 
-  "link_discord", "link_signup", "link_stream", "capacity", "full", "category_id", 
+  "link_discord", "link_signup", "link_stream", "capacity", "is_full", "category_id", 
   "organization_id", "location_id", "parent_id", "rule_id", "audience_id", "created_at", "updated_at"
 )
 VALUES

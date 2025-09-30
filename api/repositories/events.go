@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -12,6 +13,7 @@ type Eventrepositories interface {
 	GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	DeleteEvent(id string) (models.Event, error)
+	CreateEvent(event models.Event) error
 }
 
 type eventRepositories struct {
@@ -20,6 +22,16 @@ type eventRepositories struct {
 
 func NewEventrepositories(db *sqlx.DB) Eventrepositories {
 	return &eventRepositories{db: db}
+}
+
+func (r *eventRepositories) CreateEvent(event models.Event) error {
+	sqlBytes, err := os.ReadFile("./db/events/post_event.sql")
+	if err != nil {
+		return err
+	}
+	_, err = r.db.NamedExec(string(sqlBytes), event)
+
+	return err
 }
 
 func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {

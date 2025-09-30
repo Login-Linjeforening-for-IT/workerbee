@@ -28,6 +28,10 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 	return &EventService{repo: repo}
 }
 
+func (s *EventService) CreateEvent(body models.Event) (models.Event, error) {
+	return models.Event{}, s.repo.CreateEvent(body)
+}
+
 func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {

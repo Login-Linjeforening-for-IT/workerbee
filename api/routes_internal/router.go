@@ -17,10 +17,10 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
-			events.POST("/", handlers.PingHandler)
+			events.POST("/", h.CreateEvent)
 			events.PUT("/:id", handlers.PingHandler)
 			events.DELETE("/:id", h.DeleteEvent)
-			events.GET("/categories", handlers.PingHandler)
+			events.GET("/categories", h.GetCategories)
 		}
 		rules := v2.Group("/rules")
 		{
