@@ -54,3 +54,27 @@ func ExecuteOneRow[T any](db *sqlx.DB, sqlPath, id string) (T, error) {
 
 	return result, nil
 }
+
+func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
+	var result T
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return result, err
+	}
+
+	rows, err := db.NamedQuery(string(sqlBytes), body)
+	if err != nil {
+		return result, err
+	}
+	defer rows.Close()
+
+	// Get inserted row back
+	if rows.Next() {
+		err = rows.StructScan(&result)
+		if err != nil {
+			return result, err
+		}
+	}
+
+	return result, nil
+}

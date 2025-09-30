@@ -29,7 +29,7 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 }
 
 func (s *EventService) CreateEvent(body models.Event) (models.Event, error) {
-	return models.Event{}, s.repo.CreateEvent(body)
+	return s.repo.CreateEvent(body)
 }
 
 func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical string) ([]models.EventWithTotalCount, error) {

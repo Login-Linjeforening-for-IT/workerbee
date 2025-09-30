@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -18,11 +17,12 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 		})
 		return
 	}
-	log.Println(event)
-	_, err := h.Services.Events.CreateEvent(event)
+	event, err := h.Services.Events.CreateEvent(event)
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	c.JSON(http.StatusCreated, event)
 }
 
 // GetEvents godoc
