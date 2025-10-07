@@ -1,10 +1,10 @@
 -- name: put_rule :one
 UPDATE rules
 SET
-    name_no = $2,
-    name_en = $3,
-    description_no = $4,
-    description_en = $5,
+    name_no = :name_no,
+    name_en = :name_en,
+    description_no = :description_no,
+    description_en = :description_en,
     updated_at = NOW()
-WHERE id = $1
+WHERE id = :id
 RETURNING *;

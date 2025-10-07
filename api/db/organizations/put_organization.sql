@@ -1,17 +1,17 @@
 -- name: put_organization :one
 UPDATE organizations
 SET
-    shortname = $2,
-    name_no = $3,
-    name_en = $4,
-    description_no = $5,
-    description_en = $6,
-    type = $7,
-    link_homepage = $8,
-    link_linkedin = $9,
-    link_facebook = $10,
-    link_instagram = $11,
-    logo = $12,
+    shortname = :shortname,
+    name_no = :name_no,
+    name_en = :name_en,
+    description_no = :description_no,
+    description_en = :description_en,
+    type = :type,
+    link_homepage = :link_homepage,
+    link_linkedin = :link_linkedin,
+    link_facebook = :link_facebook,
+    link_instagram = :link_instagram,
+    logo = :logo,
     updated_at = NOW()
-WHERE id = $1
+WHERE id = :id
 RETURNING *;
