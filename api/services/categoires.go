@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strconv"
 	"strings"
 	"workerbee/internal"
 	"workerbee/models"
@@ -38,4 +39,19 @@ func (s *CategorieService) GetCategory(id string) (models.Category, error) {
 
 func (s *CategorieService) DeleteCategory(id string) (models.Category, error) {
 	return s.repo.DeleteCategory(id)
+}
+
+func (s *CategorieService) CreateCateory(category models.Category) (models.Category, error) {
+	return s.repo.CreateCateory(category)
+}
+
+func (s *CategorieService) UpdateCategory(category models.Category, id_str string) (models.Category, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Category{}, internal.ErrInvalid
+	}
+
+	category.ID = id
+
+	return s.repo.UpdateCateory(category, id)
 }

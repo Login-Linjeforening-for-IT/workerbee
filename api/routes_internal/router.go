@@ -42,16 +42,16 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			organizations.GET("/:id", h.GetOrganization)
 			organizations.GET("/", h.GetOranizations)
-			organizations.POST("/", handlers.PingHandler)
+			organizations.POST("/")
 			organizations.PUT("/:id", handlers.PingHandler)
 			organizations.DELETE("/:id", h.DeleteOrganization)
 		}
 		categories := v2.Group("/categories")
 		{
-			categories.GET("/:id",  h.GetCategory)
+			categories.GET("/:id", h.GetCategory)
 			categories.GET("/", h.GetCategories)
-			categories.POST("/", handlers.PingHandler)
-			categories.PUT("/:id", handlers.PingHandler)
+			categories.POST("/", h.CreateCateory)
+			categories.PUT("/:id", h.UpdateCategory)
 			categories.DELETE("/:id", h.DeleteCategory)
 		}
 		jobs := v2.Group("/jobs")

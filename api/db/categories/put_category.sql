@@ -1,9 +1,10 @@
--- name: put_category :one
 UPDATE categories
-SET
-    name_no = $2,
-    name_en = $3,
-    description_no = $4,
-    description_en = $5
-WHERE id = $1
+SET 
+    color = :color,
+    name_no = :name_no,
+    name_en = :name_en,
+    description_no = :description_no,
+    description_en = :description_en,
+    updated_at = NOW()
+WHERE id = :id
 RETURNING *;

@@ -12,6 +12,8 @@ type CategoireRepository interface {
 	GetCategories(search, limit, offset, orderBy, sort string) ([]models.CategoryWithTotalCount, error)
 	GetCategory(id string) (models.Category, error)
 	DeleteCategory(id string) (models.Category, error)
+	CreateCateory(category models.Category) (models.Category, error)
+	UpdateCateory(category models.Category, id int) (models.Category, error)
 }
 
 type categoireRepository struct {
@@ -51,4 +53,20 @@ func (r *categoireRepository) DeleteCategory(id string) (models.Category, error)
 		return models.Category{}, internal.ErrInvalid
 	}
 	return category, nil
+}
+
+func (r *categoireRepository) UpdateCateory(category models.Category, id int) (models.Category, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/categories/put_category.sql", 
+		category,
+	)
+}
+
+func (r *categoireRepository) CreateCateory(category models.Category) (models.Category, error) {
+	return db.AddOneRow(
+		r.db, 
+		"./db/categories/post_category.sql", 
+		category,
+	)
 }

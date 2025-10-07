@@ -1,10 +1,16 @@
--- name: post_category :one
 INSERT INTO categories
 (
+    color,
     name_no,
     name_en,
     description_no,
     description_en
 )
-VALUES ($1, $2, $3, $4)
+VALUES (
+    :color,
+    :name_no,
+    :name_en,
+    :description_no,
+    :description_en
+)
 RETURNING *;

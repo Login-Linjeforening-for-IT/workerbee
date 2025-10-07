@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +35,51 @@ func (h *Handler) GetCategory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, category)
+}
+
+func (h *Handler) CreateCateory(c *gin.Context) {
+	var category models.Category
+
+	if err := c.ShouldBindBodyWithJSON(&category); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, category, *h.Services.Validate) {
+		return
+	}
+
+	categoryResponse, err := h.Services.Categories.CreateCateory(category)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, categoryResponse)
+}
+
+func (h *Handler) UpdateCategory(c *gin.Context) {
+	id := c.Param("id")
+	var category models.Category
+
+	if err := c.ShouldBindBodyWithJSON(&category); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, category, *h.Services.Validate) {
+		return
+	}
+
+	categoryResponse, err := h.Services.Categories.UpdateCategory(category, id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, categoryResponse)
 }
 
 func (h *Handler) DeleteCategory(c *gin.Context) {

@@ -25,16 +25,11 @@ func NewEventrepositories(db *sqlx.DB) Eventrepositories {
 }
 
 func (r *eventRepositories) CreateEvent(event models.Event) (models.Event, error) {
-	result, err := db.AddOneRow(
+	return db.AddOneRow(
 		r.db,
 		"./db/events/post_event.sql",
 		event,
 	)
-	if err != nil {
-		return result, err
-	}
-
-	return result, nil
 }
 
 func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
