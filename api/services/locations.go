@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strconv"
 	"strings"
 	"workerbee/internal"
 	"workerbee/models"
@@ -46,3 +47,13 @@ func (s *LocationService) DeleteLocation(id string) (models.Location, error) {
 	return s.repo.DeleteLocation(id)
 }
 
+func (s *LocationService) UpdateLocation(id_str string, location models.Location) (models.Location, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Location{}, err
+	}
+
+	location.ID = id
+
+	return s.repo.UpdateLocation(location)
+}

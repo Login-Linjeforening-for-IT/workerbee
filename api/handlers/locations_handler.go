@@ -61,6 +61,29 @@ func (h *Handler) GetLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, loc)
 }
 
+func (h *Handler) UpdateLocation(c *gin.Context) {
+	var location models.Location
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&location); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, location, *h.Services.Validate) {
+		return
+	}
+
+	location, err := h.Services.Locations.UpdateLocation(id, location)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, location)
+}
+
 func (h *Handler) DeleteLocation(c *gin.Context) {
 	id := c.Param("id")
 
