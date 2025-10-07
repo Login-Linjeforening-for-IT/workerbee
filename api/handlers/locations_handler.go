@@ -4,9 +4,32 @@ import (
 	"log"
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (h *Handler) CreateLocation(c *gin.Context) {
+	var location models.Location
+
+	if err := c.ShouldBindBodyWithJSON(&location); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, location, *h.Services.Validate) {
+		return
+	}
+
+	locationResponse, err := h.Services.Locations.CreateLocation(location)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusCreated, locationResponse)
+}
 
 func (h *Handler) GetLocations(c *gin.Context) {
 	search := c.DefaultQuery("search", "")

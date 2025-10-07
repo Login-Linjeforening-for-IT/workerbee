@@ -113,7 +113,7 @@ CREATE TABLE "locations" (
     "address_postcode" int,
     "city_id" int,
     "coordinate_lat" float,
-    "coordinate_long" float,
+    "coordinate_lon" float,
     "url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -368,7 +368,7 @@ INSERT INTO "locations" (
   "address_postcode", 
   "city_id", 
   "coordinate_lat", 
-  "coordinate_long", 
+  "coordinate_lon", 
   "url", 
   "updated_at", 
   "created_at"

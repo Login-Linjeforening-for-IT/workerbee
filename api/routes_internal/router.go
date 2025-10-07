@@ -34,7 +34,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			locations.GET("/:id", h.GetLocation)
 			locations.GET("/", h.GetLocations)
-			locations.POST("/", handlers.PingHandler)
+			locations.POST("/", h.CreateLocation)
 			locations.PUT("/:id", handlers.PingHandler)
 			locations.DELETE("/:id", h.DeleteLocation)
 		}

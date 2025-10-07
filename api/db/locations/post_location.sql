@@ -1,4 +1,3 @@
--- name: post_location :one
 INSERT INTO locations
 (
     name_no,
@@ -10,7 +9,20 @@ INSERT INTO locations
     address_postcode,
     city_id,
     coordinate_lat,
-    coordinate_lon
+    coordinate_lon,
+    url
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+VALUES (
+    :name_no,
+    :name_en,
+    :type,
+    :mazemap_campus_id,
+    :mazemap_poi_id,
+    :address_street,
+    :address_postcode,
+    :city_id,
+    :coordinate_lat,
+    :coordinate_lon,
+    :url
+)
 RETURNING *;

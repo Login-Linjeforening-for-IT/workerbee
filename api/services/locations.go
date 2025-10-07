@@ -25,6 +25,10 @@ func NewLocationService(repo repositories.LocationRepository) *LocationService {
 	return &LocationService{repo: repo}
 }
 
+func (s *LocationService) CreateLocation(location models.Location) (models.Location, error) {
+	return s.repo.CreateLocation(location)
+}
+
 func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort string) ([]models.LocationWithTotalCount, error) {
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsLocs)
 	if ok != nil {

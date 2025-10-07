@@ -1,10 +1,9 @@
--- name: put_location :one
 UPDATE locations
 SET
-    name_no = $2,
-    name_en = $3,
-    type = $4,
-    mazemap_campus_id = $5,
+    name_no = :name_no,
+    name_en = :name_en,
+    type = :type,
+    mazemap_campus_id = :mazemap_campus_id,
     mazemap_poi_id = $6,
     address_street = $7,
     address_postcode = $8,

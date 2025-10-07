@@ -10,7 +10,7 @@ SELECT
     l.address_postcode,
     c.name AS city_name,
     l.coordinate_lat,
-    l.coordinate_long,
+    l.coordinate_lon,
     l.url,
     l.created_at,
     l.updated_at,
