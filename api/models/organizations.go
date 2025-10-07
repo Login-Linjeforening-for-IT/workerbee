@@ -11,7 +11,7 @@ type Organization struct {
 	DescriptionNo string    `db:"description_no" json:"description_no" validate:"required"`
 	DescriptionEn string    `db:"description_en" json:"description_en" validate:"required"`
 	Type          *int       `db:"type" json:"type"`
-	LinkHomepage  *string    `db:"link_homepage" json:"link_homepage"`
+	LinkHomepage  *string    `db:"link_homepage" json:"link_homepage" validate:"required"`
 	LinkLinkedin  *string    `db:"link_linkedin" json:"link_linkedin"`
 	LinkFacebook  *string    `db:"link_facebook" json:"link_facebook"`
 	LinkInstagram *string    `db:"link_instagram" json:"link_instagram"`

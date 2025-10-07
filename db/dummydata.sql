@@ -93,7 +93,7 @@ CREATE TABLE "organizations" (
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
     "type" int NOT NULL DEFAULT 1,
-    "link_homepage" varchar,
+    "link_homepage" varchar NOT NULL,
     "link_linkedin" varchar,
     "link_facebook" varchar,
     "link_instagram" varchar,

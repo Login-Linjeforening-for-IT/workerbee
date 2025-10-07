@@ -1,4 +1,3 @@
--- name: put_rule :one
 UPDATE rules
 SET
     name_no = :name_no,

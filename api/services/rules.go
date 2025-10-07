@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strconv"
 	"strings"
 	"workerbee/internal"
 	"workerbee/models"
@@ -37,4 +38,19 @@ func (s *RuleService) GetRule(id string) (models.Rule, error) {
 
 func (s *RuleService) DeleteRule(id string) (models.Rule, error) {
 	return s.repo.DeleteRule(id)
+}
+
+func (s *RuleService) CreateRule(rule models.Rule) (models.Rule, error) {
+	return s.repo.CreateRule(rule)
+}
+
+func (s *RuleService) UpdateRule(id_str string, rule models.Rule) (models.Rule, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Rule{}, internal.ErrInvalid
+	}
+
+	rule.ID = id
+
+	return s.repo.UpdateRule(rule)
 }

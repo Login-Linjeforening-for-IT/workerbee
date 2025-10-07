@@ -1,4 +1,3 @@
--- name: post_rule :one
 INSERT INTO rules
 (
     name_no,

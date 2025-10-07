@@ -3,9 +3,55 @@ package handlers
 import (
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (h *Handler) CreateRule(c *gin.Context) {
+	var rule models.Rule
+
+	if err := c.ShouldBindBodyWithJSON(&rule); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, rule, *h.Services.Validate) {
+		return
+	}
+
+	ruleResponse, err := h.Services.Rules.CreateRule(rule)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusCreated, ruleResponse)
+}
+
+func (h *Handler) UpdateRule(c *gin.Context) {
+	var rule models.Rule
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&rule); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, rule, *h.Services.Validate) {
+		return
+	}
+
+	ruleResponse, err := h.Services.Rules.UpdateRule(id, rule)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, ruleResponse)
+}
 
 func (h *Handler) GetRules(c *gin.Context) {
 	search := c.DefaultQuery("search", "")

@@ -26,8 +26,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			rules.GET("/:id", h.GetRule)
 			rules.GET("/", h.GetRules)
-			rules.POST("/", handlers.PingHandler)
-			rules.PUT("/:id", handlers.PingHandler)
+			rules.POST("/", h.CreateRule)
+			rules.PUT("/:id", h.UpdateRule)
 			rules.DELETE("/:id", h.DeleteRule)
 		}
 		locations := v2.Group("/locations")

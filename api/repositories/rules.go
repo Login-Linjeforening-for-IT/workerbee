@@ -9,8 +9,10 @@ import (
 )
 
 type Rulerepositories interface {
+	CreateRule(rule models.Rule) (models.Rule, error)
 	GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error)
 	GetRule(id string) (models.Rule, error)
+	UpdateRule(rule models.Rule) (models.Rule, error)
 	DeleteRule(id string) (models.Rule, error)
 }
 
@@ -20,6 +22,22 @@ type ruleRepositories struct {
 
 func NewRulerepositories(db *sqlx.DB) Rulerepositories {
 	return &ruleRepositories{db: db}
+}
+
+func (r *ruleRepositories)	CreateRule(rule models.Rule) (models.Rule, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/rules/post_rule.sql",
+		rule,
+	)
+}
+
+func (r *ruleRepositories) UpdateRule(rule models.Rule) (models.Rule, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/rules/put_rule.sql",
+		rule,
+	)
 }
 
 func (r *ruleRepositories) GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
