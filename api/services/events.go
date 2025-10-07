@@ -32,6 +32,15 @@ func (s *EventService) CreateEvent(body models.Event) (models.Event, error) {
 	return s.repo.CreateEvent(body)
 }
 
+func (s *EventService) UpdateEvent(body models.Event, id_str string) (models.Event, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Event{}, internal.ErrInvalid
+	}
+	
+	return s.repo.UpdateOneEvent(id, body)
+}
+
 func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {

@@ -14,7 +14,7 @@ type Event struct {
 	TimeType           string     `db:"time_type" json:"time_type,omitempty" validate:"omitempty"`
 	TimeStart          time.Time  `db:"time_start" json:"time_start" validate:"required"`
 	TimeEnd            time.Time  `db:"time_end" json:"time_end" validate:"required"`
-	TimePublish        *time.Time `db:"time_publish" json:"time_publish,omitempty" validate:"required"`
+	TimePublish        time.Time `db:"time_publish" json:"time_publish" validate:"required"`
 	TimeSignupRelease  *time.Time `db:"time_signup_release" json:"time_signup_release,omitempty" validate:"omitempty"`
 	TimeSignupDeadline *time.Time `db:"time_signup_deadline" json:"time_signup_deadline,omitempty" validate:"omitempty"`
 	Canceled           bool       `db:"canceled" json:"canceled,omitempty" validate:"omitempty"`
@@ -30,7 +30,7 @@ type Event struct {
 	IsFull             bool       `db:"is_full" json:"is_full,omitempty" validate:"omitempty"`
 	Category           *int       `db:"category_id" json:"category_id" validate:"required"`
 	CategoryNameNo     *string    `db:"category_name_no" json:"category_name_no,omitempty" validate:"omitempty"`
-	CategoryNameEn     *string    `db:"category_name_en" json:"category_name_enomitempty" validate:"omitempty"`
+	CategoryNameEn     *string    `db:"category_name_en" json:"category_name_en,omitempty" validate:"omitempty"`
 	Location           *int       `db:"location_id" json:"location_id,omitempty" validate:"omitempty"`
 	LocationNameNo     *string    `db:"location_name_no" json:"location_name_no,omitempty" validate:"omitempty"`
 	LocationNameEn     *string    `db:"location_name_en" json:"location_name_en,omitempty" validate:"omitempty"`
@@ -49,9 +49,4 @@ type Event struct {
 type EventWithTotalCount struct {
 	Event
 	TotalCount int `db:"total_count"`
-}
-
-type EventResponse struct {
-	Events     []Event `json:"events"`
-	TotalCount int     `json:"total_count"`
 }

@@ -30,6 +30,29 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 	c.JSON(http.StatusCreated, event)
 }
 
+func (h *Handler) UpdateEvent(c *gin.Context) {
+	var event models.Event
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&event); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, event, *h.Services.Validate) {
+		return
+	}
+
+	event, err := h.Services.Events.UpdateEvent(event, id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, event)
+}
+
 // GetEvents godoc
 // @Summary      Get events
 // @Description  Returns a list of events with details, including category, location, audience, and organizer info. Supports historical filtering, limit, and offset.

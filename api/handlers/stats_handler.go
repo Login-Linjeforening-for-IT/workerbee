@@ -60,6 +60,9 @@ func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
 	}
 
 	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats(limitInt)
+	if internal.HandleError(c, err){
+		return
+	}
 
 	c.JSON(http.StatusOK, NewAdditionsStats)
 }

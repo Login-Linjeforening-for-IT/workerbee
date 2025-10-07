@@ -18,7 +18,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
 			events.POST("/", h.CreateEvent)
-			events.PUT("/:id", handlers.PingHandler)
+			events.PUT("/:id", h.UpdateEvent)
 			events.DELETE("/:id", h.DeleteEvent)
 			events.GET("/categories", h.GetCategories)
 		}

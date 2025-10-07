@@ -30,8 +30,8 @@ func FetchAllElements[T any](
 		string(sqlBytes),
 		orderBy,
 		sort,
-		len(args)-1, // limit is second to last
-		len(args),   // offset is last
+		len(args)-1,
+		len(args),
 	)
 
 	err = db.Select(&result, query, args...)
@@ -76,12 +76,13 @@ func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
 	}
 	defer rows.Close()
 
-	// Get inserted row back
-	if rows.Next() {
-		err = rows.StructScan(&result)
-		if err != nil {
-			return result, err
-		}
+	if !rows.Next() {
+		return result, internal.ErrNotFound
+	}
+
+	err = rows.StructScan(&result)
+	if err != nil {
+		return result, err
 	}
 
 	return result, nil
