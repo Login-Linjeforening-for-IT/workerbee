@@ -42,8 +42,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			organizations.GET("/:id", h.GetOrganization)
 			organizations.GET("/", h.GetOranizations)
-			organizations.POST("/")
-			organizations.PUT("/:id", handlers.PingHandler)
+			organizations.POST("/", h.CreateOranization)
+			organizations.PUT("/:id", h.UpdateOranization)
 			organizations.DELETE("/:id", h.DeleteOrganization)
 		}
 		categories := v2.Group("/categories")

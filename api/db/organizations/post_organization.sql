@@ -1,7 +1,5 @@
--- name: post_organization :one
 INSERT INTO organizations
 (
-    shortname,
     name_no,
     name_en,
     description_no,
@@ -14,7 +12,6 @@ INSERT INTO organizations
     logo
 )
 VALUES (
-    :shortname,
     :name_no,
     :name_en,
     :description_no,

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strconv"
 	"strings"
 	"workerbee/internal"
 	"workerbee/models"
@@ -38,4 +39,19 @@ func (s *OrganizationService) GetOrg(id string) (models.Organization, error) {
 
 func (s *OrganizationService) DeleteOrg(id string) (models.Organization, error) {
 	return s.repo.DeleteOrg(id)
+}
+
+func (s *OrganizationService) UpdateOrg(id_str string, org models.Organization) (models.Organization, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Organization{}, internal.ErrInvalid
+	}
+
+	org.ID = id
+
+	return s.repo.UpdateOrg(org)
+}
+
+func (s *OrganizationService) CreateOrg(org models.Organization) (models.Organization, error) {
+	return s.repo.CreateOrg(org)
 }

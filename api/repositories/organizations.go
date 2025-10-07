@@ -9,8 +9,10 @@ import (
 )
 
 type OrganizationRepository interface {
+	CreateOrg(org models.Organization) (models.Organization, error)
 	GetOrgs(search, limit, offset, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
 	GetOrg(id string) (models.Organization, error)
+	UpdateOrg(org models.Organization) (models.Organization, error)
 	DeleteOrg(id string) (models.Organization, error)
 }
 
@@ -54,4 +56,20 @@ func (r *organizationRepository) DeleteOrg(id string) (models.Organization, erro
 	}
 
 	return org, nil
+}
+
+func (r *organizationRepository) UpdateOrg(org models.Organization) (models.Organization, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/organizations/put_organization.sql",
+		org,
+	)
+}
+
+func (r *organizationRepository) CreateOrg(org models.Organization) (models.Organization, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/organizations/post_organization.sql",
+		org,
+	)
 }

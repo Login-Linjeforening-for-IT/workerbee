@@ -1,7 +1,5 @@
--- name: put_organization :one
 UPDATE organizations
 SET
-    shortname = :shortname,
     name_no = :name_no,
     name_en = :name_en,
     description_no = :description_no,
