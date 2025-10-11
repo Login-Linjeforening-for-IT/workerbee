@@ -36,6 +36,7 @@ func FetchAllElements[T any](
 	)
 
 	err = db.Select(&result, query, args...)
+	log.Println(err)
 	if err != nil {
 		return nil, err
 	}

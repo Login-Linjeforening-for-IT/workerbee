@@ -66,13 +66,14 @@ func (h *Handler) UpdateEvent(c *gin.Context) {
 // @Router       /api/v2/events [get]
 func (h *Handler) GetEvents(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
+	categories := c.DefaultQuery("categories", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "desc")
 	historical := c.DefaultQuery("historical", "false")
 
-	events, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, historical)
+	events, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, historical, categories)
 	if internal.HandleError(c, err) {
 		return
 	}

@@ -6,10 +6,11 @@ import (
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type Eventrepositories interface {
-	GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error)
+	GetEvents(search, limit, offset, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	DeleteEvent(id string) (models.Event, error)
 	UpdateOneEvent(id int, event models.Event) (models.Event, error)
@@ -32,7 +33,7 @@ func (r *eventRepositories) CreateEvent(event models.Event) (models.Event, error
 	)
 }
 
-func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_events.sql",
@@ -41,6 +42,7 @@ func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort strin
 		offset,
 		search,
 		historical,
+		pq.Array(categories),
 	)
 
 	if err != nil {

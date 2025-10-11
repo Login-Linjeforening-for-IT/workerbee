@@ -49,3 +49,7 @@ WHERE (
         $1 = ''
         OR to_json(e)::text ILIKE '%' || $1 || '%'
     )
+    AND (
+        cardinality($3::int[]) = 0
+        OR e.category_id = ANY($3)
+    )

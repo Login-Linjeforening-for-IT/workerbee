@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -37,11 +39,11 @@ func (s *EventService) UpdateEvent(body models.Event, id_str string) (models.Eve
 	if err != nil {
 		return models.Event{}, internal.ErrInvalid
 	}
-	
+
 	return s.repo.UpdateOneEvent(id, body)
 }
 
-func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical string) ([]models.EventWithTotalCount, error) {
+func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
 		return nil, internal.ErrInvalid
@@ -52,7 +54,26 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool)
+	var numbers []int
+	if categories_str != "" {
+		decoded, err := url.QueryUnescape(categories_str)
+		if err != nil {
+			return nil, internal.ErrInvalid
+		}
+
+		parts := strings.Split(decoded, ",")
+
+		numbers = make([]int, 0, len(parts))
+		for _, p := range parts {
+			var n int
+			fmt.Sscanf(p, "%d", &n)
+			numbers = append(numbers, n)
+		}
+	} else {
+		numbers = make([]int, 0)
+	}
+
+	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, numbers)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
