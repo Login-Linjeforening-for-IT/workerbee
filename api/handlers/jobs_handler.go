@@ -57,6 +57,29 @@ func (h *Handler) GetJob(c *gin.Context) {
 	c.JSON(http.StatusOK, job)
 }
 
+func (h *Handler) UpdateJob(c *gin.Context) {
+	id := c.Param("id")
+	var job models.Job
+
+	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, job, *h.Services.Validate) {
+		return
+	}
+
+	jobResponse, err := h.Services.Jobs.UpdateJob(id, job)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, jobResponse)
+}
+
 func (h *Handler) DeleteJob(c *gin.Context) {
 	id := c.Param("id")
 

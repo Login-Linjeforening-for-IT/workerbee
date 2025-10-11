@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"database/sql"
-	"log"
 	"os"
+	"strconv"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -15,6 +15,7 @@ type Jobsrepositories interface {
 	CreateJob(job models.Job) error
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
+	UpdateJob(job models.Job) (models.Job, error)
 	DeleteJob(id string) (models.Job, error)
 	GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
@@ -40,7 +41,6 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		var skillID int
 
 		err = tx.QueryRow(`SELECT id FROM skills WHERE LOWER(name) = LOWER($1)`, skillName).Scan(&skillID)
-		log.Println("Skill ID", skillID)
 		if err == sql.ErrNoRows {
 			err = tx.QueryRow(`
 				INSERT INTO skills (name) 
@@ -147,6 +147,128 @@ func (r *jobsrepositories) GetJob(id string) (models.Job, error) {
 	}
 
 	return job, nil
+}
+
+func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return models.Job{}, err
+	}
+
+	defer tx.Rollback()
+
+	sqlFile, err := os.ReadFile("./db/jobs/put_job.sql")
+	if err != nil {
+		return models.Job{}, err
+	}
+
+	if _, err := tx.Exec(
+		string(sqlFile),
+		job.ID,
+		job.Visible,
+		job.Highlight,
+		job.TitleNo,
+		job.TitleEn,
+		job.PositionTitleNo,
+		job.PositionTitleEn,
+		job.DescriptionShortNo,
+		job.DescriptionShortEn,
+		job.DescriptionLongNo,
+		job.DescriptionLongEn,
+		job.JobType,
+		job.TimePublish,
+		job.TimeExpire,
+		job.ApplicationDeadline,
+		job.BannerImage,
+		job.OrganizationID,
+		job.ApplicationURL,
+	); err != nil {
+		return models.Job{}, err
+	}
+
+	var skillIDs []int
+	for _, skillName := range job.Skills {
+		var skillID int
+		err = tx.QueryRow(`SELECT id FROM skills WHERE LOWER(name) = LOWER($1)`, skillName).Scan(&skillID)
+		if err == sql.ErrNoRows {
+			err = tx.QueryRow(`
+				INSERT INTO skills (name) 
+				VALUES ($1) RETURNING id
+			`, skillName).Scan(&skillID)
+		}
+
+		if err != nil {
+			return models.Job{}, err
+		}
+		skillIDs = append(skillIDs, skillID)
+	}
+
+	if _, err := tx.Exec(`DELETE FROM ad_skill_relation WHERE job_id = $1`, job.ID); err != nil {
+		return models.Job{}, err
+	}
+
+	for _, skillID := range skillIDs {
+		if _, err := tx.Exec(`
+			INSERT INTO ad_skill_relation (job_id, skill_id) 
+			VALUES ($1, $2)
+		`, job.ID, skillID); err != nil {
+			return models.Job{}, err
+		}
+	}
+
+	var cityIDs []int
+	for _, cityName := range job.Cities {
+		var cityID int
+		err = tx.QueryRow(`SELECT id FROM cities WHERE LOWER(name) = LOWER($1)`, cityName).Scan(&cityID)
+		if err == sql.ErrNoRows {
+			err = tx.QueryRow(`
+				INSERT INTO cities (name) 
+				VALUES ($1) RETURNING id
+			`, cityName).Scan(&cityID)
+		}
+
+		if err != nil {
+			return models.Job{}, err
+		}
+		cityIDs = append(cityIDs, cityID)
+	}
+
+	if _, err := tx.Exec(`DELETE FROM ad_city_relation WHERE job_id = $1`, job.ID); err != nil {
+		return models.Job{}, err
+	}
+
+	for _, cityID := range cityIDs {
+		if _, err := tx.Exec(`
+			INSERT INTO ad_city_relation (job_id, city_id) 
+			VALUES ($1, $2)
+		`, job.ID, cityID); err != nil {
+			return models.Job{}, err
+		}
+	}
+
+	// Clean up unused skills and cities
+	_, err = tx.Exec(`
+		DELETE FROM skills
+		WHERE id NOT IN (SELECT DISTINCT skill_id FROM ad_skill_relation)
+	`)
+	if err != nil {
+		return models.Job{}, err
+	}
+
+	_, err = tx.Exec(`
+		DELETE FROM cities
+		WHERE id NOT IN (SELECT DISTINCT city_id FROM ad_city_relation)
+		AND id NOT IN (SELECT DISTINCT city_id FROM locations)
+	`)
+	if err != nil {
+		return models.Job{}, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return models.Job{}, err
+	}
+
+	return r.GetJob(strconv.Itoa(job.ID))
 }
 
 func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {
