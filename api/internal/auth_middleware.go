@@ -25,12 +25,14 @@ func AuthMiddleware() gin.HandlerFunc {
 		authHeader := c.Request.Header.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			HandleError(c, ErrUnauthorized)
+			c.Abort()
 			return
 		}
 
 		tokenParts := strings.Split(authHeader, " ")
 		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
 			HandleError(c, ErrUnauthorized)
+			c.Abort()
 			return
 		}
 
@@ -51,6 +53,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		if resp.StatusCode != 200 {
 			HandleError(c, ErrUnauthorized)
+			c.Abort()
 			return
 		}
 
@@ -60,11 +63,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		var respStruct response
 		if err := decoder.Decode(&respStruct); err != nil {
 			HandleError(c, ErrUnauthorized)
+			c.Abort()
 			return
 		}
 
 		if !slices.Contains(respStruct.Groups, QUEENBEE_GROUP) {
 			HandleError(c, ErrUnauthorized)
+			c.Abort()
 			return
 		}
 

@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) CreateOranization(c *gin.Context) {
+func (h *Handler) CreateOrganization(c *gin.Context) {
 	var org models.Organization
 
 	if err := c.ShouldBindBodyWithJSON(&org); err != nil {
@@ -31,7 +31,7 @@ func (h *Handler) CreateOranization(c *gin.Context) {
 	c.JSON(http.StatusCreated, orgResponse)
 }
 
-func (h *Handler) UpdateOranization(c *gin.Context) {
+func (h *Handler) UpdateOrganization(c *gin.Context) {
 	var org models.Organization
 	id := c.Param("id")
 
@@ -54,7 +54,7 @@ func (h *Handler) UpdateOranization(c *gin.Context) {
 	c.JSON(http.StatusOK, orgResponse)
 }
 
-func (h *Handler) GetOranizations(c *gin.Context) {
+func (h *Handler) GetOrganizations(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")

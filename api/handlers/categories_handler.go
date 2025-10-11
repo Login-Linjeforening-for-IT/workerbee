@@ -37,7 +37,7 @@ func (h *Handler) GetCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, category)
 }
 
-func (h *Handler) CreateCateory(c *gin.Context) {
+func (h *Handler) CreateCategory(c *gin.Context) {
 	var category models.Category
 
 	if err := c.ShouldBindBodyWithJSON(&category); err != nil {

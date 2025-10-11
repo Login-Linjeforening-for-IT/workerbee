@@ -31,11 +31,12 @@ func main() {
 	svcs := services.NewServices(repos)
 
 	// handler container
-	h := &handlers.Handler{ Services: svcs }
+	h := &handlers.Handler{Services: svcs}
 
 	router := gin.New()
 
 	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
 	routes_internal.Route(router, h)
 
