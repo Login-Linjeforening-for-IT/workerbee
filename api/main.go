@@ -4,6 +4,7 @@ import (
 	"workerbee/config"
 	"workerbee/db"
 	"workerbee/handlers"
+	"workerbee/internal/middleware"
 	repositories "workerbee/repositories"
 	"workerbee/routes_internal"
 	"workerbee/services"
@@ -37,6 +38,7 @@ func main() {
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(middleware.CORS())
 
 	routes_internal.Route(router, h)
 

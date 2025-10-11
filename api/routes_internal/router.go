@@ -3,6 +3,7 @@ package routes_internal
 import (
 	"workerbee/handlers"
 	"workerbee/internal"
+	"workerbee/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,50 +18,50 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
-			events.POST("/", internal.AuthMiddleware(), h.CreateEvent)
-			events.PUT("/:id", internal.AuthMiddleware(), h.UpdateEvent)
-			events.DELETE("/:id", internal.AuthMiddleware(), h.DeleteEvent)
+			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
+			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
+			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
 			events.GET("/categories", h.GetCategories)
 		}
 		rules := v2.Group("/rules")
 		{
 			rules.GET("/:id", h.GetRule)
 			rules.GET("/", h.GetRules)
-			rules.POST("/", internal.AuthMiddleware(), h.CreateRule)
-			rules.PUT("/:id", internal.AuthMiddleware(), h.UpdateRule)
-			rules.DELETE("/:id", internal.AuthMiddleware(), h.DeleteRule)
+			rules.POST("/", middleware.AuthMiddleware(), h.CreateRule)
+			rules.PUT("/:id", middleware.AuthMiddleware(), h.UpdateRule)
+			rules.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteRule)
 		}
 		locations := v2.Group("/locations")
 		{
 			locations.GET("/:id", h.GetLocation)
 			locations.GET("/", h.GetLocations)
-			locations.POST("/", internal.AuthMiddleware(), h.CreateLocation)
-			locations.PUT("/:id", internal.AuthMiddleware(), h.UpdateLocation)
-			locations.DELETE("/:id", internal.AuthMiddleware(), h.DeleteLocation)
+			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
+			locations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateLocation)
+			locations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteLocation)
 		}
 		organizations := v2.Group("/organizations")
 		{
 			organizations.GET("/:id", h.GetOrganization)
 			organizations.GET("/", h.GetOrganizations)
-			organizations.POST("/", internal.AuthMiddleware(), h.CreateOrganization)
-			organizations.PUT("/:id", internal.AuthMiddleware(), h.UpdateOrganization)
-			organizations.DELETE("/:id", internal.AuthMiddleware(), h.DeleteOrganization)
+			organizations.POST("/", middleware.AuthMiddleware(), h.CreateOrganization)
+			organizations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateOrganization)
+			organizations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteOrganization)
 		}
 		categories := v2.Group("/categories")
 		{
 			categories.GET("/:id", h.GetCategory)
 			categories.GET("/", h.GetCategories)
-			categories.POST("/", internal.AuthMiddleware(), h.CreateCategory)
-			categories.PUT("/:id", internal.AuthMiddleware(), h.UpdateCategory)
-			categories.DELETE("/:id", internal.AuthMiddleware(), h.DeleteCategory)
+			categories.POST("/", middleware.AuthMiddleware(), h.CreateCategory)
+			categories.PUT("/:id", middleware.AuthMiddleware(), h.UpdateCategory)
+			categories.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteCategory)
 		}
 		jobs := v2.Group("/jobs")
 		{
 			jobs.GET("/:id", h.GetJob)
 			jobs.GET("/", h.GetJobs)
-			jobs.POST("/", internal.AuthMiddleware(), h.CreateJob)
-			jobs.PUT("/:id", internal.AuthMiddleware(), h.UpdateJob)
-			jobs.DELETE("/:id", internal.AuthMiddleware(), h.DeleteJob)
+			jobs.POST("/", middleware.AuthMiddleware(), h.CreateJob)
+			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
+			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)
 		}
 		stats := v2.Group("/stats")

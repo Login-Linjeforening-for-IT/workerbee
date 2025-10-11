@@ -1,10 +1,12 @@
-package internal
+package middleware
 
 import (
 	"encoding/json"
 	"net/http"
 	"slices"
 	"strings"
+
+	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,22 +26,22 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			HandleError(c, ErrUnauthorized)
+			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return
 		}
 
 		tokenParts := strings.Split(authHeader, " ")
 		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
-			HandleError(c, ErrUnauthorized)
+			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return
 		}
 
 		token := tokenParts[1]
 
-		req, err := http.NewRequest(http.MethodGet, USERINFO_URL, nil)
-		if HandleError(c, err) {
+		req, err := http.NewRequest(http.MethodGet, internal.USERINFO_URL, nil)
+		if internal.HandleError(c, err) {
 			return
 		}
 
@@ -47,12 +49,12 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		client := &http.Client{}
 		resp, err := client.Do(req)
-		if HandleError(c, err) {
+		if internal.HandleError(c, err) {
 			return
 		}
 
 		if resp.StatusCode != 200 {
-			HandleError(c, ErrUnauthorized)
+			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return
 		}
@@ -62,13 +64,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		decoder := json.NewDecoder(resp.Body)
 		var respStruct response
 		if err := decoder.Decode(&respStruct); err != nil {
-			HandleError(c, ErrUnauthorized)
+			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return
 		}
 
-		if !slices.Contains(respStruct.Groups, QUEENBEE_GROUP) {
-			HandleError(c, ErrUnauthorized)
+		if !slices.Contains(respStruct.Groups, internal.QUEENBEE_GROUP) {
+			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return
 		}
