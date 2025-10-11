@@ -1,6 +1,9 @@
 package repositories
 
 import (
+	"database/sql"
+	"log"
+	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -9,6 +12,7 @@ import (
 )
 
 type Jobsrepositories interface {
+	CreateJob(job models.Job) error
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
 	DeleteJob(id string) (models.Job, error)
@@ -21,6 +25,77 @@ type jobsrepositories struct {
 
 func NewJobrepositories(db *sqlx.DB) Jobsrepositories {
 	return &jobsrepositories{db: db}
+}
+
+func (r *jobsrepositories) CreateJob(job models.Job) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	var skillIDs []int
+	for _, skillName := range job.Skills {
+		var skillID int
+
+		err = tx.QueryRow(`SELECT id FROM skills WHERE LOWER(name) = LOWER($1)`, skillName).Scan(&skillID)
+		log.Println("Skill ID", skillID)
+		if err == sql.ErrNoRows {
+			err = tx.QueryRow(`
+				INSERT INTO skills (name) 
+				VALUES ($1) RETURNING id
+			`, skillName).Scan(&skillID)
+		}
+
+		if err != nil {
+			return err
+		}
+		skillIDs = append(skillIDs, skillID)
+	}
+
+	sqlFile, err := os.ReadFile("./db/jobs/post_job.sql")
+	if err != nil {
+		return err
+	}
+
+	row := tx.QueryRow(
+		string(sqlFile),
+		job.Visible,
+		job.Highlight,
+		job.TitleNo,
+		job.TitleEn,
+		job.PositionTitleNo,
+		job.PositionTitleEn,
+		job.DescriptionShortNo,
+		job.DescriptionShortEn,
+		job.DescriptionLongNo,
+		job.DescriptionLongEn,
+		job.JobType,
+		job.TimeExpire,
+		job.ApplicationDeadline,
+		job.BannerImage,
+		job.OrganizationID,
+		job.ApplicationURL,
+	)
+	// Example: scan the returned id (adjust as needed)
+	var insertedID int
+	err = row.Scan(&insertedID)
+	if err != nil {
+		return err
+	}
+
+	for _, skillID := range skillIDs {
+		_, err = tx.Exec(`
+			INSERT INTO ad_skill_relation (job_id, skill_id) 
+			VALUES ($1, $2)
+		`, insertedID, skillID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
 }
 
 func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {

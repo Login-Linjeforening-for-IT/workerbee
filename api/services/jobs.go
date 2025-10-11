@@ -33,6 +33,10 @@ func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 	return &JobsService{repo: repo}
 }
 
+func (s *JobsService) CreateJob(job models.Job) error {
+	return s.repo.CreateJob(job)
+}
+
 func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
 	if ok != nil {

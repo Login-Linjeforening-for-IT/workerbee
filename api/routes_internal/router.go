@@ -58,7 +58,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			jobs.GET("/:id", h.GetJob)
 			jobs.GET("/", h.GetJobs)
-			jobs.POST("/", handlers.PingHandler)
+			jobs.POST("/", h.CreateJob)
 			jobs.PUT("/:id", handlers.PingHandler)
 			jobs.DELETE("/:id", h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)

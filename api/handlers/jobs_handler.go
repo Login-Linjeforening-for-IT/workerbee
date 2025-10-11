@@ -3,9 +3,30 @@ package handlers
 import (
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (h *Handler) CreateJob(c *gin.Context) {
+	var job models.Job
+
+	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid body",
+		})
+		return
+	}
+
+	if internal.HandleValidationError(c, job, *h.Services.Validate) {
+		return
+	}
+
+	err := h.Services.Jobs.CreateJob(job)
+	if internal.HandleError(c, err) {
+		return
+	}
+}
 
 func (h *Handler) GetJobs(c *gin.Context) {
 	search := c.DefaultQuery("search", "")

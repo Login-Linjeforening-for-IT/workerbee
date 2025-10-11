@@ -1,4 +1,3 @@
--- name: post_job :one
 INSERT INTO jobs
 (
     visible,
@@ -12,12 +11,28 @@ INSERT INTO jobs
     description_long_no,
     description_long_en,
     job_type,
-    time_publish,
     time_expire,
     application_deadline,
     banner_image,
     organization_id,
     application_url
 )
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-RETURNING *;
+VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9,
+    $10,
+    $11,
+    $12,
+    $13,
+    $14,
+    $15,
+    $16
+)
+RETURNING id;
