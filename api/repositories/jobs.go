@@ -54,6 +54,23 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		skillIDs = append(skillIDs, skillID)
 	}
 
+	var cityIDs []int
+	for _, cityName := range job.Cities {
+		var cityID int
+		err = tx.QueryRow(`SELECT id FROM cities WHERE LOWER(name) = LOWER($1)`, cityName).Scan(&cityID)
+		if err == sql.ErrNoRows {
+			err = tx.QueryRow(`
+				INSERT INTO cities (name) 
+				VALUES ($1) RETURNING id
+			`, cityName).Scan(&cityID)
+		}
+
+		if err != nil {
+			return err
+		}
+		cityIDs = append(cityIDs, cityID)
+	}
+
 	sqlFile, err := os.ReadFile("./db/jobs/post_job.sql")
 	if err != nil {
 		return err
@@ -90,6 +107,16 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 			INSERT INTO ad_skill_relation (job_id, skill_id) 
 			VALUES ($1, $2)
 		`, insertedID, skillID)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, cityID := range cityIDs {
+		_, err = tx.Exec(`
+			INSERT INTO ad_city_relation (job_id, city_id) 
+			VALUES ($1, $2)
+		`, insertedID, cityID)
 		if err != nil {
 			return err
 		}
