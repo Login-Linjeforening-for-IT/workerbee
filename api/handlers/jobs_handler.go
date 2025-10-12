@@ -113,3 +113,13 @@ func (h *Handler) GetJobTypes(c *gin.Context) {
 	})
 }
 
+func (h *Handler) GetJobSkills(c *gin.Context) {
+	jobSkills, err := h.Services.Jobs.GetJobSkills()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"job_skills": jobSkills,
+	})
+}

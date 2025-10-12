@@ -64,9 +64,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)
 			jobs.GET("/types", h.GetJobTypes)
-			/*
 			jobs.GET("/skills", h.GetJobSkills)
-			*/
 		}
 
 		stats := v2.Group("/stats")
