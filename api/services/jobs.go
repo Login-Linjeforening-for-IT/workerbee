@@ -51,6 +51,10 @@ func (s *JobsService) GetJob(id string) (models.Job, error) {
 	return s.repo.GetJob(id)
 }
 
+func (s *JobsService) GetJobsCities() ([]models.Cities, error) {
+	return s.repo.GetJobsCities()
+}
+
 func (s *JobsService) UpdateJob(id_str string, job models.Job) (models.Job, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {

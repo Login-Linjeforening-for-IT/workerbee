@@ -15,6 +15,7 @@ type Jobsrepositories interface {
 	CreateJob(job models.Job) error
 	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
+	GetJobsCities() ([]models.Cities, error)
 	UpdateJob(job models.Job) (models.Job, error)
 	DeleteJob(id string) (models.Job, error)
 	GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
@@ -138,6 +139,21 @@ func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) 
 		return nil, err
 	}
 	return jobs, nil
+}
+
+func (r *jobsrepositories) GetJobsCities() ([]models.Cities, error) {
+	var cities []models.Cities
+
+	var sqlBytes, err = os.ReadFile("./db/jobs/get_cities.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.db.Select(&cities, string(sqlBytes))
+	if err != nil {
+		return nil, err
+	}
+	return cities, nil
 }
 
 func (r *jobsrepositories) GetJob(id string) (models.Job, error) {

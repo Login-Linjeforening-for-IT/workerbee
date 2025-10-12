@@ -92,19 +92,12 @@ func (h *Handler) DeleteJob(c *gin.Context) {
 }
 
 func (h *Handler) GetCities(c *gin.Context) {
-	search := c.DefaultQuery("search", "")
-	limit := c.DefaultQuery("limit", "20")
-	offset := c.DefaultQuery("offset", "0")
-	sort := c.DefaultQuery("sort", "asc")
-	orderBy := c.DefaultQuery("order_by", "id")
-
-	cities, err := h.Services.Jobs.GetCities(search, limit, offset, orderBy, sort)
+	cities, err := h.Services.Jobs.GetJobsCities()
 	if internal.HandleError(c, err) {
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"cities":      cities,
-		"total_count": cities[0].TotalCount,
+		"cities": cities,
 	})
 }
