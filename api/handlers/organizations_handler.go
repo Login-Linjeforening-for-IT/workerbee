@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -63,7 +62,6 @@ func (h *Handler) GetOrganizations(c *gin.Context) {
 
 	orgs, err := h.Services.Organizations.GetOrgs(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
-		log.Println(err)
 		return
 	}
 

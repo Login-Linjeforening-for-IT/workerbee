@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -40,7 +39,6 @@ func (h *Handler) GetLocations(c *gin.Context) {
 
 	locs, err := h.Services.Locations.GetLocations(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
-		log.Println(err)
 		return
 	}
 

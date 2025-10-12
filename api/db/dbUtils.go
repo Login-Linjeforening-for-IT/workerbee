@@ -3,7 +3,6 @@ package db
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"workerbee/internal"
 
@@ -36,7 +35,6 @@ func FetchAllElements[T any](
 	)
 
 	err = db.Select(&result, query, args...)
-	log.Println(err)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +69,6 @@ func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
 
 	rows, err := db.NamedQuery(string(sqlBytes), body)
 	if err != nil {
-		log.Println(err)
 		if errors.As(err, &pqErr) && pqErr.Code == "23503" {
 			return result, internal.ErrInvalidForeignKey
 		}
