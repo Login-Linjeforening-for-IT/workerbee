@@ -13,7 +13,7 @@ CREATE TYPE "location_type" AS ENUM (
 );
 
 CREATE TYPE "job_type" AS ENUM (
-    'full',
+    'is_full',
     'part',
     'summer',
     'verv'
@@ -22,29 +22,29 @@ CREATE TYPE "job_type" AS ENUM (
 CREATE TABLE "events" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
-    "highlight" bool NOT NULL DEFAULT false,
-    "name_no" text NOT NULL,
-    "name_en" text NOT NULL,
-    "informational_no" text NOT NULL,
-    "informational_en" text NOT NULL,
-    "description_no" text NOT NULL,
-    "description_en" text NOT NULL,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar NOT NULL,
+    "informational_no" varchar NOT NULL,
+    "informational_en" varchar NOT NULL,
     "time_type" time_type_enum NOT NULL DEFAULT 'default',
     "time_start" timestamp NOT NULL,
     "time_end" timestamp NOT NULL,
-    "time_publish" timestamp,
+    "time_publish" timestamp NOT NULL,
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
-    "link_signup" text,
-    "capacity" int,
-    "full" bool NOT NULL DEFAULT false,
     "canceled" bool NOT NULL DEFAULT false,
     "digital" bool NOT NULL DEFAULT false,
-    "image_small" text,
-    "image_banner" text NOT NULL,
-    "link_facebook" text,
-    "link_discord" text,
-    "link_stream" text,
+    "highlight" bool NOT NULL DEFAULT false,
+    "image_small" varchar,
+    "image_banner" varchar NOT NULL,
+    "link_facebook" varchar,
+    "link_discord" varchar,
+    "link_signup" varchar,
+    "link_stream" varchar,
+    "capacity" int,
+    "is_full" bool NOT NULL DEFAULT false,
     "category_id" int NOT NULL,
     "organization_id" int,
     "location_id" int,
@@ -55,24 +55,66 @@ CREATE TABLE "events" (
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE "categories" (
     "id" SERIAL PRIMARY KEY,
-    "name_no" text NOT NULL,
-    "name_en" text NOT NULL,
+    "color" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
     "description_no" text NOT NULL,
     "description_en" text NOT NULL,
-    "color" text NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "audiences" (
     "id" SERIAL PRIMARY KEY,
-    "name_no" text NOT NULL,
-    "name_en" text NOT NULL,
-    "description_no" text NOT NULL,
-    "description_en" text NOT NULL,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "rules" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "organizations" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "description_no" varchar NOT NULL,
+    "description_en" varchar NOT NULL,
+    "type" int NOT NULL DEFAULT 1,
+    "link_homepage" varchar NOT NULL,
+    "link_linkedin" varchar,
+    "link_facebook" varchar,
+    "link_instagram" varchar,
+    "logo" varchar,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "locations" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" varchar NOT NULL,
+    "name_en" varchar NOT NULL,
+    "type" location_type NOT NULL DEFAULT 'digital',
+    "mazemap_campus_id" int,
+    "mazemap_poi_id" int,
+    "address_street" varchar,
+    "address_postcode" int,
+    "city_id" int,
+    "coordinate_lat" float,
+    "coordinate_lon" float,
+    "url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -81,20 +123,21 @@ CREATE TABLE "jobs" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
-    "title_no" text NOT NULL,
-    "title_en" text NOT NULL,
-    "position_title_no" text NOT NULL,
-    "position_title_en" text NOT NULL,
-    "description_short_no" text NOT NULL,
-    "description_short_en" text NOT NULL,
-    "description_long_no" text NOT NULL,
-    "description_long_en" text NOT NULL,
-    "job_type" job_type NOT NULL DEFAULT 'full',
+    "title_no" varchar NOT NULL,
+    "title_en" varchar NOT NULL,
+    "position_title_no" varchar NOT NULL,
+    "position_title_en" varchar NOT NULL,
+    "description_short_no" varchar NOT NULL,
+    "description_short_en" varchar NOT NULL,
+    "description_long_no" varchar NOT NULL,
+    "description_long_en" varchar NOT NULL,
+    "job_type" job_type NOT NULL DEFAULT 'is_full',
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
-    "application_url" text,
-    "banner_image" text,
+    "application_deadline" timestamp NOT NULL,
+    "banner_image" varchar,
     "organization_id" int NOT NULL,
+    "application_url" varchar,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -107,7 +150,7 @@ CREATE TABLE "ad_city_relation" (
 
 CREATE TABLE "cities" (
     "id" SERIAL PRIMARY KEY,
-    "name" text UNIQUE
+    "name" varchar UNIQUE
 );
 
 CREATE TABLE "ad_skill_relation" (
@@ -118,50 +161,7 @@ CREATE TABLE "ad_skill_relation" (
 
 CREATE TABLE "skills" (
     "id" SERIAL PRIMARY KEY,
-    "name" text NOT NULL
-);
-
-CREATE TABLE "organizations" (
-    "id" SERIAL PRIMARY KEY,
-    "name_no" text NOT NULL,
-    "name_en" text NOT NULL,
-    "description_no" text NOT NULL,
-    "description_en" text NOT NULL,
-    "type" int NOT NULL DEFAULT 1,
-    "link_homepage" text,
-    "link_linkedin" text,
-    "link_facebook" text,
-    "link_instagram" text,
-    "logo" text,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "locations" (
-    "id" SERIAL PRIMARY KEY,
-    "name_no" text NOT NULL,
-    "name_en" text NOT NULL,
-    "type" location_type NOT NULL DEFAULT 'digital',
-    "mazemap_campus_id" int,
-    "mazemap_poi_id" int,
-    "address_street" text,
-    "address_postcode" int,
-    "city_id" int,
-    "coordinate_lat" float,
-    "coordinate_lon" float,
-    "url" text,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "rules" (
-    "id" SERIAL PRIMARY KEY,
-    "name_no" text NOT NULL,
-    "name_en" text NOT NULL,
-    "description_no" text NOT NULL,
-    "description_en" text NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "name" varchar NOT NULL
 );
 
 CREATE INDEX ON "events" ("visible");
@@ -195,18 +195,18 @@ CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id");
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id");
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id");
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id");
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id");
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id");
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
