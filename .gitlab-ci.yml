@@ -1,0 +1,5 @@
+---
+include:
+  project: tekkom/infrastructure/pipline-templates
+  ref: main
+  file: .container-build.gitlab-ci.yml
