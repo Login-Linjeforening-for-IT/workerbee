@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -12,6 +13,7 @@ import (
 type Eventrepositories interface {
 	GetEvents(search, limit, offset, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
+	GetEventCategories() ([]models.EventCategory, error)
 	DeleteEvent(id string) (models.Event, error)
 	UpdateOneEvent(id int, event models.Event) (models.Event, error)
 	CreateEvent(event models.Event) (models.Event, error)
@@ -49,6 +51,21 @@ func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort strin
 		return nil, err
 	}
 	return events, nil
+}
+
+func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error) {
+	var categories []models.EventCategory
+
+	sqlBytes, err := os.ReadFile("./db/events/get_categories.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.db.Select(&categories, string(sqlBytes))
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+	return categories, nil
 }
 
 func (r *eventRepositories) GetEvent(id string) (models.Event, error) {

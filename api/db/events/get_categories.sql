@@ -6,3 +6,4 @@ WHERE
     e.time_end > NOW() AND
     e.time_publish < NOW() AND
     e.canceled = FALSE;
+    
