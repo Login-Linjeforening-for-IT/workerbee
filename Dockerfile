@@ -7,7 +7,7 @@ COPY go.sum .
 
 RUN go mod download
 
-COPY . .
+COPY ./api .
 
 RUN go build -o main main.go
 
