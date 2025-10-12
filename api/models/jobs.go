@@ -37,6 +37,10 @@ type Cities struct {
 	Name string `db:"name"`
 }
 
+type JobType struct {
+	Type string `db:"job_type"`
+}
+
 type CitiesWithTotalCount struct {
 	Cities
 	TotalCount int `db:"total_count"`

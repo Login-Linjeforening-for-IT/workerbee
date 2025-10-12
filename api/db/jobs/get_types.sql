@@ -1,0 +1,1 @@
+SELECT DISTINCT job_type FROM jobs;

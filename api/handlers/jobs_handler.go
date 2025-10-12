@@ -101,3 +101,15 @@ func (h *Handler) GetCities(c *gin.Context) {
 		"cities": cities,
 	})
 }
+
+func (h *Handler) GetJobTypes(c *gin.Context) {
+	jobTypes, err := h.Services.Jobs.GetJobTypes()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"job_types": jobTypes,
+	})
+}
+
