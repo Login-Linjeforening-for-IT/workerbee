@@ -56,7 +56,7 @@ func (s *RuleService) UpdateRule(id_str string, rule models.Rule) (models.Rule, 
 		return models.Rule{}, internal.ErrInvalid
 	}
 
-	rule.ID = id
+	rule.ID = &id
 
 	return s.repo.UpdateRule(rule)
 }

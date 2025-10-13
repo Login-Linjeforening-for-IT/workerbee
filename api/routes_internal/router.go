@@ -18,8 +18,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
-			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
-			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
+			events.POST("/", /*middleware.AuthMiddleware(),*/ h.CreateEvent)
+			events.PUT("/:id", /*middleware.AuthMiddleware(),*/ h.UpdateEvent)
 			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
 			events.GET("/categories", h.GetEventCategories)
 		}

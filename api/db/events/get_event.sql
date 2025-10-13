@@ -27,7 +27,6 @@ SELECT
     e.capacity,
     e.updated_at,
     e.created_at,
-
     e.parent_id,
 
     r.id AS "rules.id",
@@ -75,7 +74,7 @@ SELECT
     o.link_linkedin AS "organization.link_linkedin",
     o.created_at AS "organization.created_at",
     o.updated_at AS "organization.updated_at",
-    o.logo AS "organization.logo",
+    o.logo AS "organization.logo"
 FROM events AS e
 LEFT JOIN categories AS c ON e.category_id = c.id
 LEFT JOIN locations AS l ON e.location_id = l.id

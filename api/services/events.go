@@ -28,16 +28,16 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 	return &EventService{repo: repo}
 }
 
-func (s *EventService) CreateEvent(body models.Event) (models.Event, error) {
+func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error) {
 	return s.repo.CreateEvent(body)
 }
 
-func (s *EventService) UpdateEvent(body models.Event, id_str string) (models.Event, error) {
+func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.NewEvent, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
-		return models.Event{}, internal.ErrInvalid
+		return models.NewEvent{}, internal.ErrInvalid
 	}
-
+	
 	return s.repo.UpdateOneEvent(id, body)
 }
 

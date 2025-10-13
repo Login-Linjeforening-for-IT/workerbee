@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateEvent(c *gin.Context) {
-	var event models.Event
+	var event models.NewEvent
 
 	if err := c.ShouldBindBodyWithJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -31,7 +31,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 }
 
 func (h *Handler) UpdateEvent(c *gin.Context) {
-	var event models.Event
+	var event models.NewEvent
 	id := c.Param("id")
 
 	if err := c.ShouldBindBodyWithJSON(&event); err != nil {

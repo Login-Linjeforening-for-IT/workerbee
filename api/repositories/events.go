@@ -15,8 +15,8 @@ type Eventrepositories interface {
 	GetEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
 	DeleteEvent(id string) (models.Event, error)
-	UpdateOneEvent(id int, event models.Event) (models.Event, error)
-	CreateEvent(event models.Event) (models.Event, error)
+	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
+	CreateEvent(event models.NewEvent) (models.NewEvent, error)
 }
 
 type eventRepositories struct {
@@ -27,7 +27,7 @@ func NewEventrepositories(db *sqlx.DB) Eventrepositories {
 	return &eventRepositories{db: db}
 }
 
-func (r *eventRepositories) CreateEvent(event models.Event) (models.Event, error) {
+func (r *eventRepositories) CreateEvent(event models.NewEvent) (models.NewEvent, error) {
 	return db.AddOneRow(
 		r.db,
 		"./db/events/post_event.sql",
@@ -76,7 +76,7 @@ func (r *eventRepositories) GetEvent(id string) (models.Event, error) {
 	return event, nil
 }
 
-func (r *eventRepositories) UpdateOneEvent(id int, event models.Event) (models.Event, error) {
+func (r *eventRepositories) UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error) {
 	event.ID = id
 
 	return db.AddOneRow(r.db, "./db/events/put_event.sql", event)

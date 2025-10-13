@@ -70,7 +70,7 @@ func (s *LocationService) UpdateLocation(id_str string, location models.Location
 		return models.Location{}, err
 	}
 
-	location.ID = id
+	location.ID = &id
 
 	return s.repo.UpdateLocation(location)
 }

@@ -106,7 +106,7 @@ func (s *JobsService) UpdateJob(id_str string, job models.Job) (models.Job, erro
 		return models.Job{}, internal.ErrInvalid
 	}
 
-	job.ID = id
+	job.ID = &id
 
 	return s.repo.UpdateJob(job)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Job struct {
-	ID                  int            `db:"id" json:"id"`
+	ID                  *int           `db:"id" json:"id"`
 	Visible             bool           `db:"visible" json:"visible"`
 	Highlight           bool           `db:"highlight" json:"highlight"`
 	TitleNo             string         `db:"title_no" json:"title_no"`
@@ -30,7 +30,6 @@ type Job struct {
 	CreatedAt           time.Time      `db:"created_at" json:"created_at"`
 	UpdatedAt           time.Time      `db:"updated_at" json:"updated_at"`
 }
-
 
 type Cities struct {
 	ID   int    `db:"id" json:"id,omitempty"`

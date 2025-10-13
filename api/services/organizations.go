@@ -52,7 +52,7 @@ func (s *OrganizationService) UpdateOrg(id_str string, org models.Organization) 
 		return models.Organization{}, internal.ErrInvalid
 	}
 
-	org.ID = id
+	org.ID = &id
 
 	return s.repo.UpdateOrg(org)
 }

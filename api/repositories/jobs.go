@@ -320,7 +320,7 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		return models.Job{}, err
 	}
 
-	return r.GetJob(strconv.Itoa(job.ID))
+	return r.GetJob(strconv.Itoa(*job.ID))
 }
 
 func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {

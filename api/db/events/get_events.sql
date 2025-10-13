@@ -27,7 +27,6 @@ SELECT
     e.capacity,
     e.updated_at,
     e.created_at,
-
     e.parent_id,
 
     r.id AS "rules.id",
