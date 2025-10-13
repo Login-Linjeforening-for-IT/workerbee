@@ -25,7 +25,7 @@ type Job struct {
 	TimeExpire          time.Time      `db:"time_expire" json:"time_expire"`
 	ApplicationDeadline time.Time      `db:"application_deadline" json:"application_deadline"`
 	BannerImage         *string        `db:"banner_image" json:"banner_image,omitempty"`
-	OrganizationID      int            `db:"organization_id" json:"organization_id"`
+	Organization        *Organization  `db:"organization" json:"organization,omitempty"`
 	ApplicationURL      *string        `db:"application_url" json:"application_url,omitempty"`
 	CreatedAt           time.Time      `db:"created_at" json:"created_at"`
 	UpdatedAt           time.Time      `db:"updated_at" json:"updated_at"`
@@ -33,7 +33,7 @@ type Job struct {
 
 
 type Cities struct {
-	ID   int    `db:"id"`
+	ID   int    `db:"id" json:"id,omitempty"`
 	Name string `db:"name"`
 }
 

@@ -96,7 +96,7 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		job.TimeExpire,
 		job.ApplicationDeadline,
 		job.BannerImage,
-		job.OrganizationID,
+		job.Organization,
 		job.ApplicationURL,
 	)
 	// Example: scan the returned id (adjust as needed)
@@ -232,7 +232,7 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		job.TimeExpire,
 		job.ApplicationDeadline,
 		job.BannerImage,
-		job.OrganizationID,
+		job.Organization,
 		job.ApplicationURL,
 	); err != nil {
 		return models.Job{}, err

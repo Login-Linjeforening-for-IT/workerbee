@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Category struct {
-	ID            int       `json:"id" db:"id"`
+	ID            int       `json:"id" db:"id,omitempty"`
 	Color         string    `json:"color" db:"color" validate:"required"`
 	NameNo        string    `json:"name_no" db:"name_no" validate:"required"`
 	NameEn        string    `json:"name_en" db:"name_en" validate:"required"`

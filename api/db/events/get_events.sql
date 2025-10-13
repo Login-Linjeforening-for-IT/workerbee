@@ -1,23 +1,88 @@
 -- name: GetEvents :many
 SELECT
     e.id,
+    e.visible,
     e.name_en,
     e.name_no,
+    e.description_en,
+    e.description_no,
+    e.informational_en,
+    e.informational_no,
+    e.time_type,
     e.time_start,
     e.time_end,
+    e.time_publish,
+    e.time_signup_release,
+    e.time_signup_deadline,
+    e.canceled,
+    e.digital,
+    e.highlight,
+    e.image_small,
+    e.image_small,
+    e.image_banner,
+    e.link_facebook,
+    e.link_discord,
+    e.link_signup,
+    e.link_stream,
+    e.capacity,
+    e.updated_at,
+    e.created_at,
+
+    e.parent_id,
+
+    r.id AS "rules.id",
+    r.name_no AS "rules.name_no",
+    r.name_en AS "rules.name_en",
+    r.description_no AS "rules.description_no",
+    r.description_en AS "rules.description_en",
+    r.created_at AS "rules.created_at",
+    r.updated_at AS "rules.updated_at",
+
     c.id AS "category.id",
     c.name_no AS "category.name_no",
-    c.name_en AS "category.name_en",
+    c.name_en AS "category.name_en",  
+    c.description_en AS "category.description_en",
+    c.description_no AS "category.description_no",  
+    c.color AS "category.color",
+    c.created_at AS "category.created_at",
+    c.updated_at AS "category.updated_at",
+
     l.id AS "location.id",
     l.name_no AS "location.name_no",
     l.name_en AS "location.name_en",
+    l.type AS "location.type",
+    l.mazemap_campus_id AS "location.mazemap_campus_id",
+    l.mazemap_poi_id AS "location.mazemap_poi_id",
+    l.address_street AS "location.address_street",
+    l.address_postcode AS "location.address_postcode",
+    l.coordinate_lat AS "location.coordinate_lat",
+    l.coordinate_lon AS "location.coordinate_lon",
+    l.url AS "location.url",
+    l.created_at AS "location.created_at",
+    l.updated_at AS "location.updated_at",
+    
+    cities.id AS "location.cities.id",
+    cities.name AS "location.cities.name",
+
     o.id AS "organization.id",
     o.name_no AS "organization.name_no",
-    o.name_en AS "organization.name_en"
+    o.name_en AS "organization.name_en",
+    o.description_no AS "organization.description_no",
+    o.description_en AS "organization.description_en",
+    o.type AS "organization.type",
+    o.link_homepage AS "organization.link_homepage",
+    o.link_facebook AS "organization.link_facebook",
+    o.link_linkedin AS "organization.link_linkedin",
+    o.created_at AS "organization.created_at",
+    o.updated_at AS "organization.updated_at",
+    o.logo AS "organization.logo",
+    COUNT(*) OVER() AS total_count
 FROM events AS e
 LEFT JOIN categories AS c ON e.category_id = c.id
 LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
+LEFT JOIN cities ON l.city_id = cities.id
+LEFT JOIN rules AS r ON e.rule_id = r.id
 WHERE (
         $2::bool
         OR (

@@ -5,7 +5,7 @@ import (
 )
 
 type Event struct {
-	ID                 int           `db:"id" json:"id"`
+	ID                 int           `db:"id" json:"id,omitempty"`
 	Visible            bool          `db:"visible" json:"visible,omitempty" validate:"omitempty"`
 	NameNo             string        `db:"name_no" json:"name_no" validate:"required"`
 	NameEn             string        `db:"name_en" json:"name_en" validate:"required"`
@@ -32,8 +32,8 @@ type Event struct {
 	IsFull             bool          `db:"is_full" json:"is_full,omitempty" validate:"omitempty"`
 	Category           *Category     `db:"category" json:"category,omitempty" validate:"omitempty"`
 	Location           *Location     `db:"location" json:"location,omitempty" validate:"omitempty"`
-	Parent             *int          `db:"parent_id" json:"parent_id,omitempty" validate:"omitempty"`
-	Rule               *Rule         `db:"rule" json:"rule,omitempty" validate:"omitempty"`
+	ParentID           *int          `db:"parent_id" json:"parent_id,omitempty" validate:"omitempty"`
+	Rule               *Rule         `db:"rules" json:"rule,omitempty" validate:"omitempty"`
 	Audience           *int          `db:"audience_id" json:"audience_id,omitempty" validate:"omitempty"`
 	AudienceNameEn     *string       `db:"audience_name_en" json:"audience_name_en,omitempty" validate:"omitempty"`
 	AudienceNameNo     *string       `db:"audience_name_no" json:"audience_name_no,omitempty" validate:"omitempty"`
