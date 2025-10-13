@@ -33,8 +33,6 @@ SELECT
     org.logo AS "organization.logo",
     city_agg.cities,
     skill_agg.skills
-    cities,
-    skills
 FROM jobs ja
 JOIN organizations org ON ja.organization_id = org.id
 LEFT JOIN (

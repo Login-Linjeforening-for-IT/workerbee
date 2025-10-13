@@ -3,7 +3,6 @@ package repositories
 import (
 	"database/sql"
 	"os"
-	"strconv"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -13,13 +12,13 @@ import (
 )
 
 type Jobsrepositories interface {
-	CreateJob(job models.Job) error
+	CreateJob(job models.NewJob) (models.NewJob, error)
 	GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
 	GetJobsCities() ([]models.Cities, error)
 	GetJobTypes() ([]models.JobType, error)
 	GetJobSkills() ([]models.JobSkills, error)
-	UpdateJob(job models.Job) (models.Job, error)
+	UpdateJob(job models.NewJob) (models.NewJob, error)
 	DeleteJob(id string) (models.Job, error)
 	GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
@@ -32,10 +31,10 @@ func NewJobrepositories(db *sqlx.DB) Jobsrepositories {
 	return &jobsrepositories{db: db}
 }
 
-func (r *jobsrepositories) CreateJob(job models.Job) error {
+func (r *jobsrepositories) CreateJob(job models.NewJob) (models.NewJob, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		return err
+		return models.NewJob{}, err
 	}
 
 	defer tx.Rollback()
@@ -53,7 +52,7 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		}
 
 		if err != nil {
-			return err
+			return models.NewJob{}, err
 		}
 		skillIDs = append(skillIDs, skillID)
 	}
@@ -70,14 +69,14 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		}
 
 		if err != nil {
-			return err
+			return models.NewJob{}, err
 		}
 		cityIDs = append(cityIDs, cityID)
 	}
 
 	sqlFile, err := os.ReadFile("./db/jobs/post_job.sql")
 	if err != nil {
-		return err
+		return models.NewJob{}, err
 	}
 
 	row := tx.QueryRow(
@@ -96,23 +95,46 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		job.TimeExpire,
 		job.ApplicationDeadline,
 		job.BannerImage,
-		job.Organization,
+		job.OrganizationID,
 		job.ApplicationURL,
 	)
-	// Example: scan the returned id (adjust as needed)
-	var insertedID int
-	err = row.Scan(&insertedID)
+	var newJob models.NewJob
+	err = row.Scan(
+		&newJob.ID,
+		&newJob.Visible,
+		&newJob.Highlight,
+		&newJob.TitleNo,
+		&newJob.TitleEn,
+		&newJob.PositionTitleNo,
+		&newJob.PositionTitleEn,
+		&newJob.DescriptionShortNo,
+		&newJob.DescriptionShortEn,
+		&newJob.DescriptionLongNo,
+		&newJob.DescriptionLongEn,
+		&newJob.JobType,
+		&newJob.TimePublish,
+		&newJob.TimeExpire,
+		&newJob.ApplicationDeadline,
+		&newJob.BannerImage,
+		&newJob.OrganizationID,
+		&newJob.ApplicationURL,
+		&newJob.CreatedAt,
+		&newJob.UpdatedAt,
+		&newJob.Cities,
+		&newJob.Skills,
+	)
+
 	if err != nil {
-		return err
+		return models.NewJob{}, err
 	}
 
 	for _, skillID := range skillIDs {
 		_, err = tx.Exec(`
 			INSERT INTO ad_skill_relation (job_id, skill_id) 
 			VALUES ($1, $2)
-		`, insertedID, skillID)
+		`, newJob.ID, skillID)
 		if err != nil {
-			return err
+			return models.NewJob{}, err
 		}
 	}
 
@@ -120,13 +142,13 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 		_, err = tx.Exec(`
 			INSERT INTO ad_city_relation (job_id, city_id) 
 			VALUES ($1, $2)
-		`, insertedID, cityID)
+		`, newJob.ID, cityID)
 		if err != nil {
-			return err
+			return models.NewJob{}, err
 		}
 	}
 
-	return tx.Commit()
+	return newJob, tx.Commit()
 }
 
 func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error) {
@@ -201,20 +223,20 @@ func (r *jobsrepositories) GetJob(id string) (models.Job, error) {
 	return job, nil
 }
 
-func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
+func (r *jobsrepositories) UpdateJob(job models.NewJob) (models.NewJob, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		return models.Job{}, err
+		return models.NewJob{}, err
 	}
 
 	defer tx.Rollback()
 
 	sqlFile, err := os.ReadFile("./db/jobs/put_job.sql")
 	if err != nil {
-		return models.Job{}, err
+		return models.NewJob{}, err
 	}
 
-	if _, err := tx.Exec(
+	row := tx.QueryRow(
 		string(sqlFile),
 		job.ID,
 		job.Visible,
@@ -232,10 +254,36 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		job.TimeExpire,
 		job.ApplicationDeadline,
 		job.BannerImage,
-		job.Organization,
+		job.OrganizationID,
 		job.ApplicationURL,
-	); err != nil {
-		return models.Job{}, err
+	)
+	var newJob models.NewJob
+	err = row.Scan(
+		&newJob.ID,
+		&newJob.Visible,
+		&newJob.Highlight,
+		&newJob.TitleNo,
+		&newJob.TitleEn,
+		&newJob.PositionTitleNo,
+		&newJob.PositionTitleEn,
+		&newJob.DescriptionShortNo,
+		&newJob.DescriptionShortEn,
+		&newJob.DescriptionLongNo,
+		&newJob.DescriptionLongEn,
+		&newJob.JobType,
+		&newJob.TimePublish,
+		&newJob.TimeExpire,
+		&newJob.ApplicationDeadline,
+		&newJob.BannerImage,
+		&newJob.OrganizationID,
+		&newJob.ApplicationURL,
+		&newJob.CreatedAt,
+		&newJob.UpdatedAt,
+		&newJob.Cities,
+		&newJob.Skills,
+	)
+	if err != nil {
+		return models.NewJob{}, err
 	}
 
 	var skillIDs []int
@@ -250,13 +298,13 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		}
 
 		if err != nil {
-			return models.Job{}, err
+			return models.NewJob{}, err
 		}
 		skillIDs = append(skillIDs, skillID)
 	}
 
 	if _, err := tx.Exec(`DELETE FROM ad_skill_relation WHERE job_id = $1`, job.ID); err != nil {
-		return models.Job{}, err
+		return models.NewJob{}, err
 	}
 
 	for _, skillID := range skillIDs {
@@ -264,7 +312,7 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 			INSERT INTO ad_skill_relation (job_id, skill_id) 
 			VALUES ($1, $2)
 		`, job.ID, skillID); err != nil {
-			return models.Job{}, err
+			return models.NewJob{}, err
 		}
 	}
 
@@ -280,13 +328,13 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		}
 
 		if err != nil {
-			return models.Job{}, err
+			return models.NewJob{}, err
 		}
 		cityIDs = append(cityIDs, cityID)
 	}
 
 	if _, err := tx.Exec(`DELETE FROM ad_city_relation WHERE job_id = $1`, job.ID); err != nil {
-		return models.Job{}, err
+		return models.NewJob{}, err
 	}
 
 	for _, cityID := range cityIDs {
@@ -294,7 +342,7 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 			INSERT INTO ad_city_relation (job_id, city_id) 
 			VALUES ($1, $2)
 		`, job.ID, cityID); err != nil {
-			return models.Job{}, err
+			return models.NewJob{}, err
 		}
 	}
 
@@ -303,8 +351,9 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		DELETE FROM skills
 		WHERE id NOT IN (SELECT DISTINCT skill_id FROM ad_skill_relation)
 	`)
+
 	if err != nil {
-		return models.Job{}, err
+		return models.NewJob{}, err
 	}
 
 	_, err = tx.Exec(`
@@ -313,14 +362,10 @@ func (r *jobsrepositories) UpdateJob(job models.Job) (models.Job, error) {
 		AND id NOT IN (SELECT DISTINCT city_id FROM locations)
 	`)
 	if err != nil {
-		return models.Job{}, err
+		return models.NewJob{}, err
 	}
 
-	if err := tx.Commit(); err != nil {
-		return models.Job{}, err
-	}
-
-	return r.GetJob(strconv.Itoa(*job.ID))
+	return newJob, tx.Commit()
 }
 
 func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {

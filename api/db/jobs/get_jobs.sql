@@ -30,8 +30,8 @@ SELECT
     org.created_at AS "organization.created_at",
     org.updated_at AS "organization.updated_at",
     org.logo AS "organization.logo",
-    cities,
-    skills,
+    city_agg.cities,
+    skill_agg.skills,
     COUNT(*) OVER() AS total_count
 FROM jobs ja
 JOIN organizations org ON ja.organization_id = org.id

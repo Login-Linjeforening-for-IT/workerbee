@@ -18,8 +18,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			events.GET("/:id", h.GetEvent)
 			events.GET("/", h.GetEvents)
-			events.POST("/", /*middleware.AuthMiddleware(),*/ h.CreateEvent)
-			events.PUT("/:id", /*middleware.AuthMiddleware(),*/ h.UpdateEvent)
+			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
+			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
 			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
 			events.GET("/categories", h.GetEventCategories)
 		}
@@ -59,8 +59,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			jobs.GET("/:id", h.GetJob)
 			jobs.GET("/", h.GetJobs)
-			jobs.POST("/", middleware.AuthMiddleware(), h.CreateJob)
-			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
+			jobs.POST("/", /* middleware.AuthMiddleware(), */ h.CreateJob)
+			jobs.PUT("/:id", /* middleware.AuthMiddleware(), */ h.UpdateJob)
 			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)
 			jobs.GET("/types", h.GetJobTypes)

@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateJob(c *gin.Context) {
-	var job models.Job
+	var job models.NewJob
 
 	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -22,10 +22,12 @@ func (h *Handler) CreateJob(c *gin.Context) {
 		return
 	}
 
-	err := h.Services.Jobs.CreateJob(job)
+	jobResponse, err := h.Services.Jobs.CreateJob(job)
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	c.JSON(http.StatusCreated, jobResponse)
 }
 
 func (h *Handler) GetJobs(c *gin.Context) {
@@ -69,7 +71,7 @@ func (h *Handler) GetJob(c *gin.Context) {
 
 func (h *Handler) UpdateJob(c *gin.Context) {
 	id := c.Param("id")
-	var job models.Job
+	var job models.NewJob
 
 	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

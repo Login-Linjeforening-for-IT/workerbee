@@ -1,6 +1,7 @@
 package services
 
 import (
+	"log"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -34,8 +35,10 @@ func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 	return &JobsService{repo: repo}
 }
 
-func (s *JobsService) CreateJob(job models.Job) error {
-	return s.repo.CreateJob(job)
+func (s *JobsService) CreateJob(job models.NewJob) (models.NewJob, error) {
+	newJob, err := s.repo.CreateJob(job)
+	log.Println(err)
+	return newJob, err
 }
 
 func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
@@ -100,13 +103,14 @@ func (s *JobsService) GetJobSkills() ([]models.JobSkills, error) {
 	return s.repo.GetJobSkills()
 }
 
-func (s *JobsService) UpdateJob(id_str string, job models.Job) (models.Job, error) {
+func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
-		return models.Job{}, internal.ErrInvalid
+		return models.NewJob{}, internal.ErrInvalid
 	}
 
 	job.ID = &id
+
 
 	return s.repo.UpdateJob(job)
 }
