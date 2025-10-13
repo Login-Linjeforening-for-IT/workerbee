@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"workerbee/internal"
 
@@ -36,6 +37,7 @@ func FetchAllElements[T any](
 
 	err = db.Select(&result, query, args...)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 

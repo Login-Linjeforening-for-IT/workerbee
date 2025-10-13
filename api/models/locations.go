@@ -16,7 +16,7 @@ type Location struct {
 	CityID          *int      `db:"city_id" json:"city_id,omitempty"`
 	CityName        string    `db:"city_name" json:"city_name,omitempty"`
 	CoordinateLat   *float64  `db:"coordinate_lat" json:"coordinate_lat,omitempty"`
-	CoordinateLon  *float64  `db:"coordinate_lon" json:"coordinate_lon,omitempty"`
+	CoordinateLon   *float64  `db:"coordinate_lon" json:"coordinate_lon,omitempty"`
 	URL             *string   `db:"url" json:"url,omitempty" validate:"omitempty,url"`
 	CreatedAt       time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt       time.Time `db:"updated_at" json:"updated_at"`
