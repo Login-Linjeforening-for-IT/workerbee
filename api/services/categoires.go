@@ -30,6 +30,12 @@ func (s *CategorieService) GetCategories(search, limit, offset, orderBy, sort st
 	if ok != nil {
 		return nil, internal.ErrInvalid
 	}
+
+	offset, err := internal.CalculateOffset(offset, limit)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
 	return s.repo.GetCategories(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort))
 }
 

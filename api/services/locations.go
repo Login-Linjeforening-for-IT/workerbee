@@ -32,7 +32,7 @@ func (s *LocationService) CreateLocation(location models.Location) (models.Locat
 
 func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort, types string) ([]models.LocationWithTotalCount, error) {
 	var err error
-	
+
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsLocs)
 	if ok != nil {
 		return nil, internal.ErrInvalid
@@ -46,6 +46,11 @@ func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort, typ
 		}
 	} else {
 		typeSlice = make([]string, 0)
+	}
+
+	offset, err = internal.CalculateOffset(offset, limit)
+	if err != nil {
+		return nil, internal.ErrInvalid
 	}
 
 	return s.repo.GetLocations(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized), typeSlice)

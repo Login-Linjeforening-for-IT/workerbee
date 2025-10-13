@@ -35,3 +35,28 @@ func ParseCSVToSlice[T any](s string) ([]T, error) {
 
 	return result, nil
 }
+
+func CalculateOffset(page_str, limit_str string) (string, error) {
+	page, err := ParsePositiveInt(page_str)
+	if err != nil {
+		return "", ErrInvalid
+	}
+	limit, err := ParsePositiveInt(limit_str)
+	if err != nil {
+		return "", ErrInvalid
+	}
+	if page == 0 {
+		page = 1
+	}
+
+	return fmt.Sprintf("%d", (page-1)*limit), nil
+}
+
+func ParsePositiveInt(s string) (int, error) {
+	var i int
+	_, err := fmt.Sscan(s, &i)
+	if err != nil || i < 0 {
+		return 0, ErrInvalid
+	}
+	return i, nil
+}

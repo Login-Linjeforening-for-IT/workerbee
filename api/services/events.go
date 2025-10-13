@@ -62,6 +62,11 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 		numbers = make([]int, 0)
 	}
 
+	offset, err = internal.CalculateOffset(offset, limit)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
 	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, numbers)
 }
 

@@ -30,6 +30,11 @@ func (s *OrganizationService) GetOrgs(search, limit, offset, orderBy, sort strin
 		return nil, internal.ErrInvalid
 	}
 
+	offset, err = internal.CalculateOffset(offset, limit)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
 	return s.repo.GetOrgs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 

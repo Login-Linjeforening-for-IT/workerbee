@@ -54,10 +54,17 @@ func (h *Handler) GetForms(c *gin.Context) {
 
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"forms":       forms,
-		"total_count": forms[0].TotalCount,
-	})
+	if len(forms) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"forms":       forms,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"forms":       forms,
+			"total_count": forms[0].TotalCount,
+		})
+	}
 }
 
 // PostForm godoc

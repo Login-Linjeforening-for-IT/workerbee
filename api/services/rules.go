@@ -29,6 +29,12 @@ func (s *RuleService) GetRules(search, limit, offset, orderBy, sort string) ([]m
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
+
+	offset, err = internal.CalculateOffset(offset, limit)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
 	return s.repo.GetRules(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 

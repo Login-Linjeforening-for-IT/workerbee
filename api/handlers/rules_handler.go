@@ -65,10 +65,17 @@ func (h *Handler) GetRules(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"rules":       rules,
-		"total_count": rules[0].TotalCount,
-	})
+	if len(rules) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"rules":       rules,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"rules":       rules,
+			"total_count": rules[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetRule(c *gin.Context) {

@@ -65,10 +65,17 @@ func (h *Handler) GetOrganizations(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"organizations": orgs,
-		"count":         orgs[0].TotalCount,
-	})
+	if len(orgs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"organizations": orgs,
+			"count":         0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"organizations": orgs,
+			"count":         orgs[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetOrganization(c *gin.Context) {

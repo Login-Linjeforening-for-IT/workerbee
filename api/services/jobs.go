@@ -76,6 +76,11 @@ func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort, jobTypes, sk
 		citiesSlice = make([]string, 0)
 	}
 
+	offset, err = internal.CalculateOffset(offset, limit)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
 	return s.repo.GetJobs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
 }
 

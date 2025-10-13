@@ -20,10 +20,17 @@ func (h *Handler) GetCategories(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"categories":  categories,
-		"total_count": categories[0].TotalCount,
-	})
+	if len(categories) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"categories":  categories,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"categories":  categories,
+			"total_count": categories[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetCategory(c *gin.Context) {

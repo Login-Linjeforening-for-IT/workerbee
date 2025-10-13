@@ -78,10 +78,17 @@ func (h *Handler) GetEvents(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"events":      events,
-		"total_count": events[0].TotalCount,
-	})
+	if len(events) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"events":      events,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"events":      events,
+			"total_count": events[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetEvent(c *gin.Context) {
