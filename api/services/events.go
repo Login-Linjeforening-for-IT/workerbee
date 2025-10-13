@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -56,18 +54,9 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 
 	var numbers []int
 	if categories_str != "" {
-		decoded, err := url.QueryUnescape(categories_str)
+		numbers, err = internal.ParseCSVToSlice[int](categories_str)
 		if err != nil {
 			return nil, internal.ErrInvalid
-		}
-
-		parts := strings.Split(decoded, ",")
-
-		numbers = make([]int, 0, len(parts))
-		for _, p := range parts {
-			var n int
-			fmt.Sscanf(p, "%d", &n)
-			numbers = append(numbers, n)
 		}
 	} else {
 		numbers = make([]int, 0)
