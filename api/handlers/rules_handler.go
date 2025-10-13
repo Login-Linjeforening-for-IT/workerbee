@@ -57,8 +57,8 @@ func (h *Handler) GetRules(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
-	sort := c.DefaultQuery("direction", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "asc")
 
 	rules, err := h.Services.Rules.GetRules(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
