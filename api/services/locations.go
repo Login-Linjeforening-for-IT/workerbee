@@ -30,13 +30,25 @@ func (s *LocationService) CreateLocation(location models.Location) (models.Locat
 	return s.repo.CreateLocation(location)
 }
 
-func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort string) ([]models.LocationWithTotalCount, error) {
+func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort, types string) ([]models.LocationWithTotalCount, error) {
+	var err error
+	
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsLocs)
 	if ok != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetLocations(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
+	var typeSlice []string
+	if types != "" {
+		typeSlice, err = internal.ParseCSVToSlice[string](types)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		typeSlice = make([]string, 0)
+	}
+
+	return s.repo.GetLocations(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized), typeSlice)
 }
 
 func (s *LocationService) GetLocation(id string) (models.Location, error) {

@@ -31,21 +31,30 @@ func (h *Handler) CreateLocation(c *gin.Context) {
 }
 
 func (h *Handler) GetLocations(c *gin.Context) {
+	types := c.DefaultQuery("type", "")
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	sort := c.DefaultQuery("sort", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
 
-	locs, err := h.Services.Locations.GetLocations(search, limit, offset, orderBy, sort)
+
+	locs, err := h.Services.Locations.GetLocations(search, limit, offset, orderBy, sort, types)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"locations": locs,
-		"count":     locs[0].TotalCount,
-	})
+	if len(locs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"locations": locs,
+			"count":     0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"locations": locs,
+			"count":     locs[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetLocation(c *gin.Context) {

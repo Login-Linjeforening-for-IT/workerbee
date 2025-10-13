@@ -13,7 +13,7 @@ func (h *Handler) GetCategories(c *gin.Context) {
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
-	sort := c.DefaultQuery("sort", "desc")
+	sort := c.DefaultQuery("sort", "asc")
 
 	categories, err := h.Services.Categories.GetCategories(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {

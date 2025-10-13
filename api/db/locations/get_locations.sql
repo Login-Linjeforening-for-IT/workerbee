@@ -22,3 +22,7 @@ WHERE
         $1 = '' OR
         to_json(l)::text ILIKE '%' || $1 || '%'
     )
+    AND (
+        cardinality($2::text[]) = 0
+        OR l.type::text = ANY($2::text[])
+    )

@@ -47,7 +47,7 @@ func (h *Handler) GetForms(c *gin.Context) {
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "created_at")
-	sort := c.DefaultQuery("sort", "desc")
+	sort := c.DefaultQuery("sort", "asc")
 
 	forms, err := h.Services.Forms.GetForms(search, limit, offset, orderBy, sort)
 	if err != nil {
