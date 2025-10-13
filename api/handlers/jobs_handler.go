@@ -29,21 +29,29 @@ func (h *Handler) CreateJob(c *gin.Context) {
 }
 
 func (h *Handler) GetJobs(c *gin.Context) {
+	jobTypes := c.DefaultQuery("jobtypes", "")
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "desc")
 
-	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort)
+	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort, jobTypes)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"jobs":        jobs,
-		"total_count": jobs[0].TotalCount,
-	})
+	if len(jobs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"jobs":        jobs,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"jobs":        jobs,
+			"total_count": jobs[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetJob(c *gin.Context) {

@@ -18,5 +18,10 @@ LEFT JOIN (
     LEFT JOIN skills s ON asr.skill_id = s.id
     GROUP BY asr.job_id
 ) skill_agg ON skill_agg.job_id = ja.id
-WHERE ($1 = '' OR to_json(ja)::text ILIKE '%' || $1 || '%')
-
+WHERE (
+    $1 = '' OR to_json(ja)::text ILIKE '%' || $1 || '%'
+    )
+    AND (
+        cardinality($2::text[]) = 0
+        OR ja.job_type = ANY($2::job_type[])
+    )

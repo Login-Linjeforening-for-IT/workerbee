@@ -9,11 +9,12 @@ import (
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type Jobsrepositories interface {
 	CreateJob(job models.Job) error
-	GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error)
+	GetJobs(search, limit, offset, orderBy, sort string, jobTypes []string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
 	GetJobsCities() ([]models.Cities, error)
 	GetJobTypes() ([]models.JobType, error)
@@ -128,7 +129,7 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 	return tx.Commit()
 }
 
-func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
+func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string, jobTypes []string) ([]models.JobWithTotalCount, error) {
 	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
 		r.db,
 		"./db/jobs/get_jobs.sql",
@@ -136,6 +137,7 @@ func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string) 
 		limit,
 		offset,
 		search,
+		pq.Array(jobTypes),
 	)
 	if err != nil {
 		return nil, err

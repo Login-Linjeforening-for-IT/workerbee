@@ -38,13 +38,25 @@ func (s *JobsService) CreateJob(job models.Job) error {
 	return s.repo.CreateJob(job)
 }
 
-func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort string) ([]models.JobWithTotalCount, error) {
+func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort, jobTypes string) ([]models.JobWithTotalCount, error) {
+	var err error
+
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
 	if ok != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetJobs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
+	var jobTypesSlice []string
+	if jobTypes != "" {
+		jobTypesSlice, err = internal.ParseCSVToSlice[string](jobTypes)
+		if err != nil {
+			return nil, internal.ErrInvalid
+		}
+	} else {
+		jobTypesSlice = make([]string, 0)
+	}
+
+	return s.repo.GetJobs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice)
 }
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {
