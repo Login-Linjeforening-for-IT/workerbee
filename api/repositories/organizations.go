@@ -10,7 +10,7 @@ import (
 
 type OrganizationRepository interface {
 	CreateOrg(org models.Organization) (models.Organization, error)
-	GetOrgs(search, limit, offset, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
+	GetOrgs(limit, offset int, search, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
 	GetOrg(id string) (models.Organization, error)
 	UpdateOrg(org models.Organization) (models.Organization, error)
 	DeleteOrg(id string) (models.Organization, error)
@@ -24,7 +24,7 @@ func NewOrganizationRepository(db *sqlx.DB) OrganizationRepository {
 	return &organizationRepository{db: db}
 }
 
-func (r *organizationRepository) GetOrgs(search, limit, offset, orderBy, sort string) ([]models.OrganizationWithTotalCount, error) {
+func (r *organizationRepository) GetOrgs(limit, offset int, search, orderBy, sort string) ([]models.OrganizationWithTotalCount, error) {
 	orgs, err := db.FetchAllElements[models.OrganizationWithTotalCount](
 		r.db, "./db/organizations/get_organizations.sql",
 		orderBy, sort, limit, offset, search,

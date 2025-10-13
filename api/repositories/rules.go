@@ -10,7 +10,7 @@ import (
 
 type Rulerepositories interface {
 	CreateRule(rule models.Rule) (models.Rule, error)
-	GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error)
+	GetRules(limit, offset int, search, orderBy, sort string) ([]models.RuleWithTotalCount, error)
 	GetRule(id string) (models.Rule, error)
 	UpdateRule(rule models.Rule) (models.Rule, error)
 	DeleteRule(id string) (models.Rule, error)
@@ -40,7 +40,7 @@ func (r *ruleRepositories) UpdateRule(rule models.Rule) (models.Rule, error) {
 	)
 }
 
-func (r *ruleRepositories) GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
+func (r *ruleRepositories) GetRules(limit, offset int, search, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
 	rules, err := db.FetchAllElements[models.RuleWithTotalCount](
 		r.db,
 		"./db/rules/get_rules.sql",

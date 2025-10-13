@@ -38,7 +38,7 @@ func (s *JobsService) CreateJob(job models.Job) error {
 	return s.repo.CreateJob(job)
 }
 
-func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
+func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
 	var err error
 
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
@@ -76,12 +76,12 @@ func (s *JobsService) GetJobs(search, limit, offset, orderBy, sort, jobTypes, sk
 		citiesSlice = make([]string, 0)
 	}
 
-	offset, err = internal.CalculateOffset(offset, limit)
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetJobs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
+	return s.repo.GetJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
 }
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {
@@ -115,10 +115,14 @@ func (s *JobsService) DeleteJob(id string) (models.Job, error) {
 	return s.repo.DeleteJob(id)
 }
 
-func (s *JobsService) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
+func (s *JobsService) GetCities(search, limit_str, offset_str, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
 	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsCities)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
-	return s.repo.GetCities(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+	return s.repo.GetCities(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
 }

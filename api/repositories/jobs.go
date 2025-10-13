@@ -14,14 +14,14 @@ import (
 
 type Jobsrepositories interface {
 	CreateJob(job models.Job) error
-	GetJobs(search, limit, offset, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
+	GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
 	GetJobsCities() ([]models.Cities, error)
 	GetJobTypes() ([]models.JobType, error)
 	GetJobSkills() ([]models.JobSkills, error)
 	UpdateJob(job models.Job) (models.Job, error)
 	DeleteJob(id string) (models.Job, error)
-	GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
+	GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
 
 type jobsrepositories struct {
@@ -129,7 +129,7 @@ func (r *jobsrepositories) CreateJob(job models.Job) error {
 	return tx.Commit()
 }
 
-func (r *jobsrepositories) GetJobs(search, limit, offset, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error) {
+func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error) {
 	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
 		r.db,
 		"./db/jobs/get_jobs.sql",
@@ -332,7 +332,7 @@ func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {
 	return job, nil
 }
 
-func (r *jobsrepositories) GetCities(search, limit, offset, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
+func (r *jobsrepositories) GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {
 	cities, err := db.FetchAllElements[models.CitiesWithTotalCount](
 		r.db,
 		"./db/jobs/get_cities.sql",

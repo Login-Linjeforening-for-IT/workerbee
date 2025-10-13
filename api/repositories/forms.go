@@ -10,7 +10,7 @@ import (
 )
 
 type Formrepositories interface {
-	GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error)
+	GetForms(limit, offset int, search, orderBy, sort string) ([]models.FormWithTotalCount, error)
 	GetForm(id string) (*models.FormWithQuestion, error)
 	PostForm(form models.Form) (models.Form, error)
 	PutForm(id string, form models.Form) (models.Form, error)
@@ -25,7 +25,7 @@ func NewFormrepositories(db *sqlx.DB) Formrepositories {
 	return &formrepositories{db: db}
 }
 
-func (r *formrepositories) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
+func (r *formrepositories) GetForms(limit, offset int, search, orderBy, sort string) ([]models.FormWithTotalCount, error) {
 	forms, err := db.FetchAllElements[models.FormWithTotalCount](
 		r.db,
 		"./db/forms/get_forms.sql",

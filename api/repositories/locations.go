@@ -11,7 +11,7 @@ import (
 
 type LocationRepository interface {
 	CreateLocation(location models.Location) (models.Location, error)
-	GetLocations(search, limit, offset, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error)
+	GetLocations(limit, offset int, search, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error)
 	GetLocation(id string) (models.Location, error)
 	UpdateLocation(location models.Location) (models.Location, error)
 	DeleteLocation(id string) (models.Location, error)
@@ -41,7 +41,7 @@ func (r *locationRepository) UpdateLocation(location models.Location) (models.Lo
 	)
 }
 
-func (r *locationRepository) GetLocations(search, limit, offset, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error) {
+func (r *locationRepository) GetLocations(limit, offset int, search, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error) {
 	locations, err := db.FetchAllElements[models.LocationWithTotalCount](
 		r.db,
 		"./db/locations/get_locations.sql",

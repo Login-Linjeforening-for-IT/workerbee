@@ -25,18 +25,18 @@ func NewCategorieService(repo repositories.CategoireRepository) *CategorieServic
 	return &CategorieService{repo: repo}
 }
 
-func (s *CategorieService) GetCategories(search, limit, offset, orderBy, sort string) ([]models.CategoryWithTotalCount, error) {
+func (s *CategorieService) GetCategories(search, limit_str, offset_str, orderBy, sort string) ([]models.CategoryWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsCategories)
 	if ok != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	offset, err := internal.CalculateOffset(offset, limit)
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetCategories(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort))
+	return s.repo.GetCategories(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort))
 }
 
 func (s *CategorieService) GetCategory(id string) (models.Category, error) {

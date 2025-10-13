@@ -41,7 +41,7 @@ func (s *EventService) UpdateEvent(body models.Event, id_str string) (models.Eve
 	return s.repo.UpdateOneEvent(id, body)
 }
 
-func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
+func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
 		return nil, internal.ErrInvalid
@@ -62,12 +62,12 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 		numbers = make([]int, 0)
 	}
 
-	offset, err = internal.CalculateOffset(offset, limit)
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, numbers)
+	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, numbers)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {

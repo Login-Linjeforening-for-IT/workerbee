@@ -9,7 +9,7 @@ import (
 )
 
 type CategoireRepository interface {
-	GetCategories(search, limit, offset, orderBy, sort string) ([]models.CategoryWithTotalCount, error)
+	GetCategories(limit, offset int, search, orderBy, sort string) ([]models.CategoryWithTotalCount, error)
 	GetCategory(id string) (models.Category, error)
 	DeleteCategory(id string) (models.Category, error)
 	CreateCateory(category models.Category) (models.Category, error)
@@ -24,7 +24,7 @@ func NewCategoireRepository(db *sqlx.DB) CategoireRepository {
 	return &categoireRepository{db: db}
 }
 
-func (r *categoireRepository) GetCategories(search, limit, offset, orderBy, sort string) ([]models.CategoryWithTotalCount, error) {
+func (r *categoireRepository) GetCategories(limit, offset int, search, orderBy, sort string) ([]models.CategoryWithTotalCount, error) {
 	categories, err := db.FetchAllElements[models.CategoryWithTotalCount](
 		r.db,
 		"./db/categories/get_categories.sql",
@@ -58,15 +58,15 @@ func (r *categoireRepository) DeleteCategory(id string) (models.Category, error)
 func (r *categoireRepository) UpdateCateory(category models.Category, id int) (models.Category, error) {
 	return db.AddOneRow(
 		r.db,
-		"./db/categories/put_category.sql", 
+		"./db/categories/put_category.sql",
 		category,
 	)
 }
 
 func (r *categoireRepository) CreateCateory(category models.Category) (models.Category, error) {
 	return db.AddOneRow(
-		r.db, 
-		"./db/categories/post_category.sql", 
+		r.db,
+		"./db/categories/post_category.sql",
 		category,
 	)
 }

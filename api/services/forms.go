@@ -1,6 +1,7 @@
 package services
 
 import (
+	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
 )
@@ -13,8 +14,13 @@ func NewFormService(repo repositories.Formrepositories) *FormService {
 	return &FormService{repo: repo}
 }
 
-func (s *FormService) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
-	return s.repo.GetForms(search, limit, offset, orderBy, sort)
+func (s *FormService) GetForms(search, limit_str, offset_str, orderBy, sort string) ([]models.FormWithTotalCount, error) {
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetForms(limit, offset, search, orderBy, sort)
 }
 
 func (s *FormService) GetForm(id string) (*models.FormWithQuestion, error) {

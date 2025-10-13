@@ -14,7 +14,7 @@ func FetchAllElements[T any](
 	db *sqlx.DB,
 	sqlPath string,
 	orderBy, sort string,
-	limit, offset string,
+	limit, offset int,
 	args ...any,
 ) ([]T, error) {
 	var result []T
