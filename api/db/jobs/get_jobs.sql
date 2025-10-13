@@ -25,3 +25,11 @@ WHERE (
         cardinality($2::text[]) = 0
         OR ja.job_type = ANY($2::job_type[])
     )
+    AND (
+        cardinality($3::text[]) = 0
+        OR skill_agg.skills::text[] && $3::text[]
+    )
+    AND (
+        cardinality($4::text[]) = 0
+        OR city_agg.cities::text[] && $4::text[]
+    )

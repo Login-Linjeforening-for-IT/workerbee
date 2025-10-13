@@ -30,13 +30,15 @@ func (h *Handler) CreateJob(c *gin.Context) {
 
 func (h *Handler) GetJobs(c *gin.Context) {
 	jobTypes := c.DefaultQuery("jobtypes", "")
+	skills := c.DefaultQuery("skills", "")
+	cities := c.DefaultQuery("cities", "")
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "desc")
 
-	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort, jobTypes)
+	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities)
 	if internal.HandleError(c, err) {
 		return
 	}
