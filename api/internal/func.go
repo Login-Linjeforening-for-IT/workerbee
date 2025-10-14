@@ -41,15 +41,21 @@ func CalculateOffset(page_str, limit_str string) (int, int, error) {
 	if err != nil {
 		return 0, 0, ErrInvalid
 	}
+
 	limit, err := ParsePositiveInt(limit_str)
 	if err != nil {
 		return 0, 0, ErrInvalid
 	}
-	if page == 0 {
-		page = 1
+
+	if limit <= 0 || limit > 50 {
+		limit = 20
 	}
 
-	return (page-1)*limit, limit, nil
+	if page < 0 {
+		page = 0
+	}
+
+	return page*limit, limit, nil
 }
 
 func ParsePositiveInt(s string) (int, error) {
