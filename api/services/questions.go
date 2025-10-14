@@ -21,7 +21,7 @@ func (s *QuestionService) PutQuestions(formID string, questions []models.Questio
 	return s.repo.PutQuestions(formID, questions)
 }
 
-func (s *QuestionService) DeleteQuestion(id string) (models.Question, error) {
+func (s *QuestionService) DeleteQuestion(id string) (int, error) {
 	return s.repo.DeleteQuestion(id)
 }
 
@@ -33,6 +33,6 @@ func (s *QuestionService) PutQuestionOption(options models.QuestionOption) (mode
 	return s.repo.PutQuestionOption(options)
 }
 
-func (s *QuestionService) DeleteQuestionOption(id string) (models.QuestionOption, error) {
+func (s *QuestionService) DeleteQuestionOption(id string) (int, error) {
 	return s.repo.DeleteQuestionOption(id)
 }

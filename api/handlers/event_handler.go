@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateEvent(c *gin.Context) {
-	var event models.Event
+	var event models.NewEvent
 
 	if err := c.ShouldBindBodyWithJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -31,7 +31,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 }
 
 func (h *Handler) UpdateEvent(c *gin.Context) {
-	var event models.Event
+	var event models.NewEvent
 	id := c.Param("id")
 
 	if err := c.ShouldBindBodyWithJSON(&event); err != nil {
@@ -53,6 +53,33 @@ func (h *Handler) UpdateEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+func (h *Handler) GetEvents(c *gin.Context) {
+	search := c.DefaultQuery("search", "")
+	categories := c.DefaultQuery("categories", "")
+	limit := c.DefaultQuery("limit", "20")
+	offset := c.DefaultQuery("offset", "0")
+	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "asc")
+	historical := c.DefaultQuery("historical", "false")
+
+	events, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, historical, categories)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	if len(events) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"events":      events,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"events":      events,
+			"total_count": events[0].TotalCount,
+		})
+	}
+}
+
 // GetEvents godoc
 // @Summary      Get events
 // @Description  Returns a list of events with details, including category, location, audience, and organizer info. Supports historical filtering, limit, and offset.
@@ -64,24 +91,31 @@ func (h *Handler) UpdateEvent(c *gin.Context) {
 // @Success      200  {array}  models.Event
 // @Failure      500  {object}  error
 // @Router       /api/v2/events [get]
-func (h *Handler) GetEvents(c *gin.Context) {
+func (h *Handler) GetProtectedEvents(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	categories := c.DefaultQuery("categories", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
-	sort := c.DefaultQuery("sort", "desc")
+	sort := c.DefaultQuery("sort", "asc")
 	historical := c.DefaultQuery("historical", "false")
 
-	events, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, historical, categories)
+	events, err := h.Services.Events.GetProtectedEvents(search, limit, offset, orderBy, sort, historical, categories)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"events":      events,
-		"total_count": events[0].TotalCount,
-	})
+	if len(events) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"events":      events,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"events":      events,
+			"total_count": events[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetEvent(c *gin.Context) {
@@ -95,23 +129,59 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+func (h *Handler) GetProtectedEvent(c *gin.Context) {
+	id := c.Param("id")
+
+	event, err := h.Services.Events.GetProtectedEvent(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, event)
+}
+
+func (h *Handler) GetAllEventCategories(c *gin.Context) {
+	categories, err := h.Services.Events.GetAllEventCategories()
+	if internal.HandleError(c, err) {
+		return
+	}
+	
+	c.JSON(http.StatusOK, categories)
+}
+
+func (h *Handler) GetEventAudiences(c *gin.Context) {
+	audiences, err := h.Services.Events.GetEventAudiences()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, audiences)
+}
+
+func (h *Handler) GetAllTimeTypes(c *gin.Context) {
+	timeTypes, err := h.Services.Events.GetAllTimeTypes()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, timeTypes)
+}
+
 func (h *Handler) GetEventCategories(c *gin.Context) {
 	categories, err := h.Services.Events.GetEventCategories()
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"categories": categories,
-	})
+	c.JSON(http.StatusOK, categories)
 }
 
 func (h *Handler) DeleteEvent(c *gin.Context) {
 	id := c.Param("id")
 
-	event, err := h.Services.Events.DeleteEvent(id)
+	eventId, err := h.Services.Events.DeleteEvent(id)
 	if internal.HandleError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, event)
+	c.JSON(http.StatusOK, gin.H{"id": eventId})
 }

@@ -24,20 +24,25 @@ func NewOrganizationService(repo repositories.OrganizationRepository) *Organizat
 	return &OrganizationService{repo: repo}
 }
 
-func (s *OrganizationService) GetOrgs(search, limit, offset, orderBy, sort string) ([]models.OrganizationWithTotalCount, error) {
+func (s *OrganizationService) GetOrgs(search, limit_str, offset_str, orderBy, sort string) ([]models.OrganizationWithTotalCount, error) {
 	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsOrgs)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetOrgs(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetOrgs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 
 func (s *OrganizationService) GetOrg(id string) (models.Organization, error) {
 	return s.repo.GetOrg(id)
 }
 
-func (s *OrganizationService) DeleteOrg(id string) (models.Organization, error) {
+func (s *OrganizationService) DeleteOrg(id string) (int, error) {
 	return s.repo.DeleteOrg(id)
 }
 
@@ -47,7 +52,7 @@ func (s *OrganizationService) UpdateOrg(id_str string, org models.Organization) 
 		return models.Organization{}, internal.ErrInvalid
 	}
 
-	org.ID = id
+	org.ID = &id
 
 	return s.repo.UpdateOrg(org)
 }

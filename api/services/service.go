@@ -8,7 +8,6 @@ import (
 
 type Services struct {
 	Events        *EventService
-	Categories    *CategorieService
 	Locations     *LocationService
 	Organizations *OrganizationService
 	Forms         *FormService
@@ -29,7 +28,6 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Rules:         NewRuleService(repos.Rules),
 		Stats:         NewStatsService(repos.Stats),
 		Submissions:   NewSubmissionService(repos.Submissions),
-		Categories:    NewCategorieService(repos.Categories),
 		Locations:     NewLocationService(repos.Locations),
 		Organizations: NewOrganizationService(repos.Organizations),
 		Validate:      validator.New(),

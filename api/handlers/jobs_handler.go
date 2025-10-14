@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateJob(c *gin.Context) {
-	var job models.Job
+	var job models.NewJob
 
 	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -22,28 +22,68 @@ func (h *Handler) CreateJob(c *gin.Context) {
 		return
 	}
 
-	err := h.Services.Jobs.CreateJob(job)
+	jobResponse, err := h.Services.Jobs.CreateJob(job)
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	c.JSON(http.StatusCreated, jobResponse)
 }
 
 func (h *Handler) GetJobs(c *gin.Context) {
+	jobTypes := c.DefaultQuery("jobtypes", "")
+	skills := c.DefaultQuery("skills", "")
+	cities := c.DefaultQuery("cities", "")
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
-	sort := c.DefaultQuery("sort", "desc")
+	sort := c.DefaultQuery("sort", "asc")
 
-	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort)
+	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"jobs":        jobs,
-		"total_count": jobs[0].TotalCount,
-	})
+	if len(jobs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"jobs":        jobs,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"jobs":        jobs,
+			"total_count": jobs[0].TotalCount,
+		})
+	}
+}
+
+func (h *Handler) GetProtectedJobs(c *gin.Context) {
+	jobTypes := c.DefaultQuery("jobtypes", "")
+	skills := c.DefaultQuery("skills", "")
+	cities := c.DefaultQuery("cities", "")
+	search := c.DefaultQuery("search", "")
+	limit := c.DefaultQuery("limit", "20")
+	offset := c.DefaultQuery("offset", "0")
+	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "asc")
+
+	jobs, err := h.Services.Jobs.GetProtectedJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	if len(jobs) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"jobs":        jobs,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"jobs":        jobs,
+			"total_count": jobs[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetJob(c *gin.Context) {
@@ -57,9 +97,20 @@ func (h *Handler) GetJob(c *gin.Context) {
 	c.JSON(http.StatusOK, job)
 }
 
+func (h *Handler) GetProtectedJob(c *gin.Context) {
+	id := c.Param("id")
+
+	job, err := h.Services.Jobs.GetJobProtected(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, job)
+}
+
 func (h *Handler) UpdateJob(c *gin.Context) {
 	id := c.Param("id")
-	var job models.Job
+	var job models.NewJob
 
 	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -83,12 +134,12 @@ func (h *Handler) UpdateJob(c *gin.Context) {
 func (h *Handler) DeleteJob(c *gin.Context) {
 	id := c.Param("id")
 
-	job, err := h.Services.Jobs.DeleteJob(id)
+	jobId, err := h.Services.Jobs.DeleteJob(id)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, job)
+	c.JSON(http.StatusOK, gin.H{"id": jobId})
 }
 
 func (h *Handler) GetCities(c *gin.Context) {
@@ -122,4 +173,13 @@ func (h *Handler) GetJobSkills(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"job_skills": jobSkills,
 	})
+}
+
+func (h *Handler) GetAllJobTypes(c *gin.Context) {
+	jobTypes, err := h.Services.Jobs.GetAllJobTypes()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, jobTypes)
 }

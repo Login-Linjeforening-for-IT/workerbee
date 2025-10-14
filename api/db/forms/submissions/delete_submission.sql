@@ -1,1 +1,1 @@
-DELETE FROM submissions WHERE id = $1 RETURNING *;
+DELETE FROM submissions WHERE id = $1 RETURNING id;

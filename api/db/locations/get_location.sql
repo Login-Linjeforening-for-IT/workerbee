@@ -8,12 +8,14 @@ SELECT
     l.mazemap_poi_id,
     l.address_street,
     l.address_postcode,
-    c.name AS city_name,
     l.coordinate_lat,
     l.coordinate_lon,
     l.url,
     l.created_at,
-    l.updated_at
+    l.updated_at,
+
+    c.id AS "cities.id",
+    c.name AS "cities.name"
 FROM locations AS l
 INNER JOIN cities c ON c.id = l.city_id
 WHERE l.id = $1;

@@ -6,7 +6,6 @@ import (
 
 type Repositories struct {
 	Forms         Formrepositories
-	Categories    CategoireRepository
 	Locations     LocationRepository
 	Organizations OrganizationRepository
 	Events        Eventrepositories
@@ -26,7 +25,6 @@ func NewRepositories(db *sqlx.DB) *Repositories {
 		Rules:       NewRulerepositories(db),
 		Stats:       NewStatsrepositories(db),
 		Submissions: NewSubmissionrepositories(db),
-		Categories: NewCategoireRepository(db),
 		Locations: NewLocationRepository(db),
 		Organizations: NewOrganizationRepository(db),
 	}

@@ -1,1 +1,1 @@
-DELETE FROM questions WHERE id = $1 RETURNING *;
+DELETE FROM questions WHERE id = $1 RETURNING id;

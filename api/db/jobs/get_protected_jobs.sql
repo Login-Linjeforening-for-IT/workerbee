@@ -64,5 +64,3 @@ WHERE (
         cardinality($4::text[]) = 0
         OR city_agg.cities::text[] && $4::text[]
     )
-    AND ja.visible = true
-    AND ja.time_publish <= now()

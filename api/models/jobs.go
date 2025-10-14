@@ -6,8 +6,8 @@ import (
 	"github.com/lib/pq"
 )
 
-type Job struct {
-	ID                  int            `db:"id" json:"id"`
+type BaseJob struct {
+	ID                  *int           `db:"id" json:"id"`
 	Visible             bool           `db:"visible" json:"visible"`
 	Highlight           bool           `db:"highlight" json:"highlight"`
 	TitleNo             string         `db:"title_no" json:"title_no"`
@@ -25,15 +25,24 @@ type Job struct {
 	TimeExpire          time.Time      `db:"time_expire" json:"time_expire"`
 	ApplicationDeadline time.Time      `db:"application_deadline" json:"application_deadline"`
 	BannerImage         *string        `db:"banner_image" json:"banner_image,omitempty"`
-	OrganizationID      int            `db:"organization_id" json:"organization_id"`
 	ApplicationURL      *string        `db:"application_url" json:"application_url,omitempty"`
 	CreatedAt           time.Time      `db:"created_at" json:"created_at"`
 	UpdatedAt           time.Time      `db:"updated_at" json:"updated_at"`
 }
 
+type Job struct {
+	ID           *int          `db:"id" json:"id"`
+	Organization *Organization `db:"organization" json:"organization,omitempty"`
+	BaseJob
+}
+
+type NewJob struct {
+	OrganizationID int `db:"organization_id" json:"organization_id"` // mandatory
+	BaseJob
+}
 
 type Cities struct {
-	ID   int    `db:"id"`
+	ID   int    `db:"id" json:"id,omitempty"`
 	Name string `db:"name"`
 }
 

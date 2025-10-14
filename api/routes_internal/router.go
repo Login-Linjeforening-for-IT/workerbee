@@ -16,12 +16,17 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		v2.GET("/status", handlers.GetStatus)
 		events := v2.Group("/events")
 		{
+			events.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedEvent)
 			events.GET("/:id", h.GetEvent)
+			events.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedEvents)
 			events.GET("/", h.GetEvents)
 			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
 			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
 			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
 			events.GET("/categories", h.GetEventCategories)
+			events.GET("/categories/all", h.GetAllEventCategories)
+			events.GET("/audiences", h.GetEventAudiences)
+			events.GET("/time", h.GetAllTimeTypes)
 		}
 		rules := v2.Group("/rules")
 		{
@@ -38,6 +43,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
 			locations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateLocation)
 			locations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteLocation)
+			locations.GET("/types", h.GetAllLocationTypes)
 		}
 		organizations := v2.Group("/organizations")
 		{
@@ -47,24 +53,19 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			organizations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateOrganization)
 			organizations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteOrganization)
 		}
-		categories := v2.Group("/categories")
-		{
-			categories.GET("/:id", h.GetCategory)
-			categories.GET("/", h.GetCategories)
-			categories.POST("/", middleware.AuthMiddleware(), h.CreateCategory)
-			categories.PUT("/:id", middleware.AuthMiddleware(), h.UpdateCategory)
-			categories.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteCategory)
-		}
 		jobs := v2.Group("/jobs")
 		{
 			jobs.GET("/:id", h.GetJob)
+			jobs.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedJob)
 			jobs.GET("/", h.GetJobs)
+			jobs.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedJobs)
 			jobs.POST("/", middleware.AuthMiddleware(), h.CreateJob)
 			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
 			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)
 			jobs.GET("/types", h.GetJobTypes)
 			jobs.GET("/skills", h.GetJobSkills)
+			jobs.GET("/types/all", h.GetAllJobTypes)
 		}
 
 		stats := v2.Group("/stats")

@@ -10,10 +10,10 @@ import (
 type Questionrepositories interface {
 	PostQuestions(formID string, questions []models.Question) ([]models.Question, error)
 	PutQuestions(formID string, questions []models.Question) ([]models.Question, error)
-	DeleteQuestion(id string) (models.Question, error)
+	DeleteQuestion(id string) (int, error)
 	PostQuestionOption(questionID string, options models.QuestionOption) (models.QuestionOption, error)
 	PutQuestionOption(options models.QuestionOption) (models.QuestionOption, error)
-	DeleteQuestionOption(id string) (models.QuestionOption, error)
+	DeleteQuestionOption(id string) (int, error)
 }
 
 type questionrepositories struct {
@@ -66,21 +66,21 @@ func (r *questionrepositories) PutQuestions(formID string, questions []models.Qu
 	return updated, nil
 }
 
-func (r *questionrepositories) DeleteQuestion(id string) (models.Question, error) {
-	question := models.Question{}
+func (r *questionrepositories) DeleteQuestion(id string) (int, error) {
+	var questionId int
 
-	sqlBytes, err := os.ReadFile("./db/forms/questions/delete_question.sql")
+		sqlBytes, err := os.ReadFile("./db/forms/questions/delete_option.sql")
 	if err != nil {
-		return question, err
+		return 0, err
 	}
 
 	query := string(sqlBytes)
-	err = r.db.Get(&question, query, id)
+	err = r.db.Get(&questionId, query, id)
 	if err != nil {
-		return question, err
+		return 0, err
 	}
 
-	return question, nil
+	return questionId, nil
 }
 
 func (r *questionrepositories) PostQuestionOption(questionID string, options models.QuestionOption) (models.QuestionOption, error) {
@@ -117,19 +117,19 @@ func (r *questionrepositories) PutQuestionOption(options models.QuestionOption) 
 	return option, nil
 }
 
-func (r *questionrepositories) DeleteQuestionOption(id string) (models.QuestionOption, error) {
-	option := models.QuestionOption{}
+func (r *questionrepositories) DeleteQuestionOption(id string) (int, error) {
+	var optionId int
 
-	sqlBytes, err := os.ReadFile("./db/forms/questions/delete_question_option.sql")
+	sqlBytes, err := os.ReadFile("./db/forms/questions/delete_option.sql")
 	if err != nil {
-		return option, err
+		return 0, err
 	}
 
 	query := string(sqlBytes)
-	err = r.db.Get(&option, query, id)
+	err = r.db.Get(&optionId, query, id)
 	if err != nil {
-		return option, err
+		return 0, err
 	}
 
-	return option, nil
+	return optionId, nil
 }

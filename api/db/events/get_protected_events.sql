@@ -1,4 +1,4 @@
--- name: GetEvent :one
+-- name: GetEvents :many
 SELECT
     e.id,
     e.visible,
@@ -73,6 +73,21 @@ LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id
 LEFT JOIN rules AS r ON e.rule_id = r.id
-WHERE e.id = $1
-  AND e.visible = true
-  AND e.time_publish <= now();
+WHERE (
+        $2::bool
+        OR (
+            (
+                e.time_end IS NOT NULL
+                AND e.time_end > now()
+            )
+            OR (e.time_start > now() - interval '1 day')
+        )
+    )
+    AND (
+        $1 = ''
+        OR to_json(e)::text ILIKE '%' || $1 || '%'
+    )
+    AND (
+        cardinality($3::text[]) = 0
+        OR e.category = ANY($3::categories[])
+    )

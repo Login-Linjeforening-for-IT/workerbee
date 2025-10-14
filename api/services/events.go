@@ -1,8 +1,7 @@
 package services
 
 import (
-	"fmt"
-	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -30,20 +29,102 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 	return &EventService{repo: repo}
 }
 
-func (s *EventService) CreateEvent(body models.Event) (models.Event, error) {
+func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error) {
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedCategories, strings.ToLower(body.Category)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	allowedAudiences, err := s.GetEventAudiences()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	allowedTimeTypes, err := s.GetAllTimeTypes()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedTimeTypes, strings.ToLower(body.TimeType)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	if body.Audience != nil {
+		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
+			return models.NewEvent{}, internal.ErrInvalid
+		}
+	}
+
 	return s.repo.CreateEvent(body)
 }
 
-func (s *EventService) UpdateEvent(body models.Event, id_str string) (models.Event, error) {
+func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.NewEvent, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
-		return models.Event{}, internal.ErrInvalid
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedCategories, strings.ToLower(body.Category)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	allowedTimeTypes, err := s.GetAllTimeTypes()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedTimeTypes, strings.ToLower(body.TimeType)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	if body.Audience != nil {
+		allowedAudiences, err := s.GetEventAudiences()
+		if err != nil {
+			return models.NewEvent{}, err
+		}
+
+		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
+			return models.NewEvent{}, internal.ErrInvalid
+		}
 	}
 
 	return s.repo.UpdateOneEvent(id, body)
 }
 
-func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
+func (s *EventService) GetAllEventCategories() ([]string, error) {
+	rawString, err := s.repo.GetAllCategories()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(rawString), nil
+}
+
+func (s *EventService) GetAllTimeTypes() ([]string, error) {
+	rawString, err := s.repo.GetAllTimeTypes()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(rawString), nil
+}
+
+func (s *EventService) GetEventAudiences() ([]string, error) {
+	audiences, err := s.repo.GetEventAudiences()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(audiences), nil
+}
+
+func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
 		return nil, internal.ErrInvalid
@@ -54,36 +135,92 @@ func (s *EventService) GetEvents(search, limit, offset, orderBy, sort, historica
 		return nil, internal.ErrInvalid
 	}
 
-	var numbers []int
-	if categories_str != "" {
-		decoded, err := url.QueryUnescape(categories_str)
-		if err != nil {
-			return nil, internal.ErrInvalid
-		}
-
-		parts := strings.Split(decoded, ",")
-
-		numbers = make([]int, 0, len(parts))
-		for _, p := range parts {
-			var n int
-			fmt.Sscanf(p, "%d", &n)
-			numbers = append(numbers, n)
-		}
-	} else {
-		numbers = make([]int, 0)
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return nil, err
 	}
 
-	return s.repo.GetEvents(search, limit, offset, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, numbers)
+	categories, err := parseCategories(categories_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	for _, category := range categories {
+		if !slices.Contains(allowedCategories, category) {
+			return nil, internal.ErrInvalid
+		}
+	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
+}
+
+func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
+	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
+	if ok != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	historicalBool, err := strconv.ParseBool(historical)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return nil, err
+	}
+
+	categories, err := parseCategories(categories_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	for _, category := range categories {
+		if !slices.Contains(allowedCategories, category) {
+			return nil, internal.ErrInvalid
+		}
+	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetProtectedEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
 	return s.repo.GetEvent(id)
 }
 
+func (s *EventService) GetProtectedEvent(id string) (models.Event, error) {
+	return s.repo.GetProtectedEvent(id)
+}
+
 func (s *EventService) GetEventCategories() ([]models.EventCategory, error) {
 	return s.repo.GetEventCategories()
 }
 
-func (s *EventService) DeleteEvent(id string) (models.Event, error) {
+func (s *EventService) DeleteEvent(id string) (int, error) {
 	return s.repo.DeleteEvent(id)
+}
+
+func parseCategories(categories_str string) ([]string, error) {
+	if categories_str != "" {
+		categories, err := internal.ParseCSVToSlice[string](categories_str)
+		if err != nil {
+			return nil, internal.ErrInvalid
+		}
+		for i := range categories {
+			categories[i] = strings.ToLower(categories[i])
+		}
+		return categories, nil
+	} else {
+		return make([]string, 0), nil
+	}
 }

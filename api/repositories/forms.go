@@ -10,11 +10,11 @@ import (
 )
 
 type Formrepositories interface {
-	GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error)
+	GetForms(limit, offset int, search, orderBy, sort string) ([]models.FormWithTotalCount, error)
 	GetForm(id string) (*models.FormWithQuestion, error)
 	PostForm(form models.Form) (models.Form, error)
 	PutForm(id string, form models.Form) (models.Form, error)
-	DeleteForm(id string) (models.Form, error)
+	DeleteForm(id string) (int, error)
 }
 
 type formrepositories struct {
@@ -25,7 +25,7 @@ func NewFormrepositories(db *sqlx.DB) Formrepositories {
 	return &formrepositories{db: db}
 }
 
-func (r *formrepositories) GetForms(search, limit, offset, orderBy, sort string) ([]models.FormWithTotalCount, error) {
+func (r *formrepositories) GetForms(limit, offset int, search, orderBy, sort string) ([]models.FormWithTotalCount, error) {
 	forms, err := db.FetchAllElements[models.FormWithTotalCount](
 		r.db,
 		"./db/forms/get_forms.sql",
@@ -105,19 +105,19 @@ func (r *formrepositories) PutForm(id string, form models.Form) (models.Form, er
 	return updatedForm, nil
 }
 
-func (r *formrepositories) DeleteForm(id string) (models.Form, error) {
-	deletedForm := models.Form{}
+func (r *formrepositories) DeleteForm(id string) (int, error) {
+	var formId int
 
 	sqlBytes, err := os.ReadFile("./db/forms/delete_form.sql")
 	if err != nil {
-		return models.Form{}, err
+		return 0, err
 	}
 	query := string(sqlBytes)
 
-	err = r.db.Get(&deletedForm, query, id)
+	err = r.db.Get(&formId, query, id)
 	if err != nil {
-		return models.Form{}, err
+		return 0, err
 	}
 
-	return deletedForm, nil
+	return formId, nil
 }

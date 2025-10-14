@@ -24,19 +24,25 @@ func NewRuleService(repo repositories.Rulerepositories) *RuleService {
 	return &RuleService{repo: repo}
 }
 
-func (s *RuleService) GetRules(search, limit, offset, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
+func (s *RuleService) GetRules(search, limit_str, offset_str, orderBy, sort string) ([]models.RuleWithTotalCount, error) {
 	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsRules)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
-	return s.repo.GetRules(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetRules(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 
 func (s *RuleService) GetRule(id string) (models.Rule, error) {
 	return s.repo.GetRule(id)
 }
 
-func (s *RuleService) DeleteRule(id string) (models.Rule, error) {
+func (s *RuleService) DeleteRule(id string) (int, error) {
 	return s.repo.DeleteRule(id)
 }
 
@@ -50,7 +56,7 @@ func (s *RuleService) UpdateRule(id_str string, rule models.Rule) (models.Rule, 
 		return models.Rule{}, internal.ErrInvalid
 	}
 
-	rule.ID = id
+	rule.ID = &id
 
 	return s.repo.UpdateRule(rule)
 }

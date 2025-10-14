@@ -1,6 +1,7 @@
 package services
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -27,23 +28,57 @@ func NewLocationService(repo repositories.LocationRepository) *LocationService {
 }
 
 func (s *LocationService) CreateLocation(location models.Location) (models.Location, error) {
+	allowedTypes, err := s.GetAllLocationTypes()
+	if err != nil {
+		return models.Location{}, err
+	}
+
+	if !slices.Contains(allowedTypes, strings.ToLower(*location.Type)) {
+		return models.Location{}, internal.ErrInvalid
+	}
+
 	return s.repo.CreateLocation(location)
 }
 
-func (s *LocationService) GetLocations(search, limit, offset, orderBy, sort string) ([]models.LocationWithTotalCount, error) {
+func (s *LocationService) GetLocations(search, limit_str, offset_str, orderBy, sort, types string) ([]models.LocationWithTotalCount, error) {
+	var err error
+
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsLocs)
 	if ok != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetLocations(search, limit, offset, orderBySanitized, strings.ToUpper(sortSanitized))
+	var typeSlice []string
+	if types != "" {
+		typeSlice, err = internal.ParseCSVToSlice[string](types)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		typeSlice = make([]string, 0)
+	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetLocations(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), typeSlice)
 }
 
 func (s *LocationService) GetLocation(id string) (models.Location, error) {
 	return s.repo.GetLocation(id)
 }
 
-func (s *LocationService) DeleteLocation(id string) (models.Location, error) {
+func (s *LocationService) GetAllLocationTypes() ([]string, error) {
+	rawString, err := s.repo.GetAllLocationTypes()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(rawString), nil
+}
+
+func (s *LocationService) DeleteLocation(id string) (int, error) {
 	return s.repo.DeleteLocation(id)
 }
 
@@ -53,7 +88,18 @@ func (s *LocationService) UpdateLocation(id_str string, location models.Location
 		return models.Location{}, err
 	}
 
-	location.ID = id
+	location.ID = &id
+
+	if location.Type != nil {
+		allowedTypes, err := s.GetAllLocationTypes()
+		if err != nil {
+			return models.Location{}, err
+		}
+
+		if !slices.Contains(allowedTypes, strings.ToLower(*location.Type)) {
+			return models.Location{}, internal.ErrInvalid
+		}
+	}
 
 	return s.repo.UpdateLocation(location)
 }

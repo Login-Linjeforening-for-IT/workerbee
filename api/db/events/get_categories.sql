@@ -1,7 +1,6 @@
 -- name: get_categories :many
-SELECT DISTINCT c.name_no, c.name_en
-FROM categories c
-JOIN events e ON e.category_id = c.id
+SELECT DISTINCT e.category
+FROM events as e
 WHERE 
     e.time_end > NOW() AND
     e.time_publish < NOW() AND

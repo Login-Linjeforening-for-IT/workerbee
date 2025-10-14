@@ -24,12 +24,12 @@ SET
     link_stream = :link_stream,
     capacity = :capacity,
     is_full = :is_full,
-    category_id = :category_id,
+    category = :category,
     organization_id = :organization_id,
     location_id = :location_id,
     parent_id = :parent_id,
     rule_id = :rule_id,
-    audience_id = :audience_id,
+    audience = :audience,
     updated_at = NOW()
 WHERE id = :id
 RETURNING *;

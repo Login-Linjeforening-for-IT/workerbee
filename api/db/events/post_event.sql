@@ -23,11 +23,11 @@ INSERT INTO events (
     link_stream,
     capacity, 
     is_full,
-    category_id, 
+    category, 
     location_id, 
     parent_id, 
     rule_id, 
-    audience_id, 
+    audience, 
     organization_id
 ) VALUES (
     :visible, 
@@ -54,11 +54,11 @@ INSERT INTO events (
     :link_stream, 
     :capacity, 
     :is_full,
-    :category_id, 
+    :category, 
     :location_id,
     :parent_id, 
     :rule_id, 
-    :audience_id, 
+    :audience, 
     :organization_id
 )
 RETURNING *;

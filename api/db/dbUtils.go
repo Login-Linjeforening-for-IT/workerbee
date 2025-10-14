@@ -10,11 +10,27 @@ import (
 	"github.com/lib/pq"
 )
 
+func FetchAllEnumTypes(db *sqlx.DB, sqlPath string) (string, error) {
+	var result string
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return "", err
+	}
+
+	err = db.Get(&result, string(sqlBytes))
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
+
 func FetchAllElements[T any](
 	db *sqlx.DB,
 	sqlPath string,
 	orderBy, sort string,
-	limit, offset string,
+	limit, offset int,
 	args ...any,
 ) ([]T, error) {
 	var result []T

@@ -11,12 +11,17 @@ import (
 )
 
 type Eventrepositories interface {
-	GetEvents(search, limit, offset, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
+	GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
+	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
+	GetProtectedEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
-	DeleteEvent(id string) (models.Event, error)
-	UpdateOneEvent(id int, event models.Event) (models.Event, error)
-	CreateEvent(event models.Event) (models.Event, error)
+	DeleteEvent(id string) (int, error)
+	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
+	CreateEvent(event models.NewEvent) (models.NewEvent, error)
+	GetAllCategories() (string, error)
+	GetEventAudiences() (string, error)
+	GetAllTimeTypes() (string, error)
 }
 
 type eventRepositories struct {
@@ -27,7 +32,7 @@ func NewEventrepositories(db *sqlx.DB) Eventrepositories {
 	return &eventRepositories{db: db}
 }
 
-func (r *eventRepositories) CreateEvent(event models.Event) (models.Event, error) {
+func (r *eventRepositories) CreateEvent(event models.NewEvent) (models.NewEvent, error) {
 	return db.AddOneRow(
 		r.db,
 		"./db/events/post_event.sql",
@@ -35,7 +40,25 @@ func (r *eventRepositories) CreateEvent(event models.Event) (models.Event, error
 	)
 }
 
-func (r *eventRepositories) GetEvents(search, limit, offset, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error) {
+	events, err := db.FetchAllElements[models.EventWithTotalCount](
+		r.db,
+		"./db/events/get_protected_events.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+		historical,
+		pq.Array(categories),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
+}
+
+func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_events.sql",
@@ -65,6 +88,7 @@ func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
+
 	return categories, nil
 }
 
@@ -76,16 +100,57 @@ func (r *eventRepositories) GetEvent(id string) (models.Event, error) {
 	return event, nil
 }
 
-func (r *eventRepositories) UpdateOneEvent(id int, event models.Event) (models.Event, error) {
+func (r *eventRepositories) GetProtectedEvent(id string) (models.Event, error) {
+	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/get_protected_event.sql", id)
+	if err != nil {
+		return models.Event{}, internal.ErrInvalid
+	}
+	return event, nil
+}
+
+func (r *eventRepositories) UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error) {
 	event.ID = id
 
 	return db.AddOneRow(r.db, "./db/events/put_event.sql", event)
 }
 
-func (r *eventRepositories) DeleteEvent(id string) (models.Event, error) {
-	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/delete_event.sql", id)
+func (r *eventRepositories) DeleteEvent(id string) (int, error) {
+	eventId, err := db.ExecuteOneRow[int](r.db, "./db/events/delete_event.sql", id)
 	if err != nil {
-		return models.Event{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
-	return event, nil
+	return eventId, nil
+}
+
+func (r *eventRepositories) GetAllCategories() (string, error) {
+	categories, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_categories.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return categories, nil
+}
+
+func (r *eventRepositories) GetEventAudiences() (string, error) {
+	audiences, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_audiences.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return audiences, nil
+}
+
+func (r *eventRepositories) GetAllTimeTypes() (string, error) {
+	timeTypes, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_time_types.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return timeTypes, nil
 }

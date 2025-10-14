@@ -57,18 +57,25 @@ func (h *Handler) GetRules(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
-	sort := c.DefaultQuery("direction", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "asc")
 
 	rules, err := h.Services.Rules.GetRules(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"rules":       rules,
-		"total_count": rules[0].TotalCount,
-	})
+	if len(rules) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"rules":       rules,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"rules":       rules,
+			"total_count": rules[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetRule(c *gin.Context) {
@@ -85,10 +92,10 @@ func (h *Handler) GetRule(c *gin.Context) {
 func (h *Handler) DeleteRule(c *gin.Context) {
 	id := c.Param("id")
 
-	rule, err := h.Services.Rules.DeleteRule(id)
+	ruleId, err := h.Services.Rules.DeleteRule(id)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, rule)
+	c.JSON(http.StatusOK, gin.H{"id": ruleId})
 }

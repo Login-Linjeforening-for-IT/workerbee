@@ -8,17 +8,24 @@ SELECT
     l.mazemap_poi_id,
     l.address_street,
     l.address_postcode,
-    c.name AS city_name,
     l.coordinate_lat,
     l.coordinate_lon,
     l.url,
     l.created_at,
     l.updated_at,
-    COUNT(*) OVER() AS total_count
+
+    c.id AS "cities.id",
+    c.name AS "cities.name",
+
+    COUNT (*) OVER() AS total_count
 FROM locations AS l
 INNER JOIN cities c ON c.id = l.city_id
 WHERE
     (
         $1 = '' OR
         to_json(l)::text ILIKE '%' || $1 || '%'
+    )
+    AND (
+        cardinality($2::text[]) = 0
+        OR l.type::text = ANY($2::text[])
     )

@@ -10,10 +10,10 @@ import (
 
 type OrganizationRepository interface {
 	CreateOrg(org models.Organization) (models.Organization, error)
-	GetOrgs(search, limit, offset, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
+	GetOrgs(limit, offset int, search, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
 	GetOrg(id string) (models.Organization, error)
 	UpdateOrg(org models.Organization) (models.Organization, error)
-	DeleteOrg(id string) (models.Organization, error)
+	DeleteOrg(id string) (int, error)
 }
 
 type organizationRepository struct {
@@ -24,7 +24,7 @@ func NewOrganizationRepository(db *sqlx.DB) OrganizationRepository {
 	return &organizationRepository{db: db}
 }
 
-func (r *organizationRepository) GetOrgs(search, limit, offset, orderBy, sort string) ([]models.OrganizationWithTotalCount, error) {
+func (r *organizationRepository) GetOrgs(limit, offset int, search, orderBy, sort string) ([]models.OrganizationWithTotalCount, error) {
 	orgs, err := db.FetchAllElements[models.OrganizationWithTotalCount](
 		r.db, "./db/organizations/get_organizations.sql",
 		orderBy, sort, limit, offset, search,
@@ -47,15 +47,15 @@ func (r *organizationRepository) GetOrg(id string) (models.Organization, error) 
 	return org, nil
 }
 
-func (r *organizationRepository) DeleteOrg(id string) (models.Organization, error) {
-	org, err := db.ExecuteOneRow[models.Organization](
+func (r *organizationRepository) DeleteOrg(id string) (int, error) {
+	orgId, err := db.ExecuteOneRow[int](
 		r.db, "./db/organizations/delete_organization.sql", id,
 	)
 	if err != nil {
-		return models.Organization{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
 
-	return org, nil
+	return orgId, nil
 }
 
 func (r *organizationRepository) UpdateOrg(org models.Organization) (models.Organization, error) {
