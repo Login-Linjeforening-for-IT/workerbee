@@ -42,7 +42,10 @@ CREATE TYPE audience AS ENUM (
   'sixth_semester',
   'seventh_semester',
   'login',
-  'open'
+  'open',
+  'bachelor',
+  'master',
+  'phd'
 );
 
 CREATE TABLE "events" (

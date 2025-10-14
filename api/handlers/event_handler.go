@@ -102,6 +102,18 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+func (h *Handler) GetAllEventCategories(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"categories": h.Services.Events.GetAllEventCategories(),
+	})
+}
+
+func (h *Handler) GetEventAudiences(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"audiences": h.Services.Events.GetEventAudiences(),
+	})
+}
+
 func (h *Handler) GetEventCategories(c *gin.Context) {
 	categories, err := h.Services.Events.GetEventCategories()
 	if internal.HandleError(c, err) {

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -18,6 +19,35 @@ var allowedSortColumnsEvents = map[string]string{
 	"canceled":     "e.canceled",
 	"capacity":     "e.capacity",
 	"full":         "e.full",
+}
+
+var allowedCategories = []string{
+	"tekkom",
+	"ctfkom",
+	"eventkom",
+	"pr",
+	"sosialt",
+	"login",
+	"buddyweek",
+	"bedkom",
+	"carreerday",
+	"other",
+}
+
+var audiences = []string{
+	"students",
+	"first_semester",
+	"second_semester",
+	"third_semester",
+	"fourth_semester",
+	"fifth_semester",
+	"sixth_semester",
+	"seventh_semester",
+	"login",
+	"open",
+	"bachelor",
+	"master",
+	"phd",
 }
 
 type EventService struct {
@@ -41,6 +71,15 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 	return s.repo.UpdateOneEvent(id, body)
 }
 
+func (s *EventService) GetAllEventCategories() []string {
+	return allowedCategories
+}
+
+func (s *EventService) GetEventAudiences() []string {
+	return audiences
+}
+
+
 func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
@@ -60,6 +99,9 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		}
 		for i := range categories {
 			categories[i] = strings.ToLower(categories[i])
+			if !slices.Contains(allowedCategories, categories[i]) {
+				return nil, internal.ErrInvalid
+			}
 		}
 
 	} else {
