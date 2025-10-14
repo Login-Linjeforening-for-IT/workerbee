@@ -1,6 +1,7 @@
 package services
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -27,6 +28,15 @@ func NewLocationService(repo repositories.LocationRepository) *LocationService {
 }
 
 func (s *LocationService) CreateLocation(location models.Location) (models.Location, error) {
+	allowedTypes, err := s.GetAllLocationTypes()
+	if err != nil {
+		return models.Location{}, err
+	}
+
+	if !slices.Contains(allowedTypes, strings.ToLower(*location.Type)) {
+		return models.Location{}, internal.ErrInvalid
+	}
+
 	return s.repo.CreateLocation(location)
 }
 
@@ -79,6 +89,17 @@ func (s *LocationService) UpdateLocation(id_str string, location models.Location
 	}
 
 	location.ID = &id
+
+	if location.Type != nil {
+		allowedTypes, err := s.GetAllLocationTypes()
+		if err != nil {
+			return models.Location{}, err
+		}
+
+		if !slices.Contains(allowedTypes, strings.ToLower(*location.Type)) {
+			return models.Location{}, internal.ErrInvalid
+		}
+	}
 
 	return s.repo.UpdateLocation(location)
 }

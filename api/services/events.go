@@ -44,6 +44,15 @@ func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error
 		return models.NewEvent{}, err
 	}
 
+	allowedTimeTypes, err := s.GetAllTimeTypes()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedTimeTypes, strings.ToLower(body.TimeType)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
 	if body.Audience != nil {
 		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
 			return models.NewEvent{}, internal.ErrInvalid
@@ -68,12 +77,21 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
-	allowedAudiences, err := s.GetEventAudiences()
+	allowedTimeTypes, err := s.GetAllTimeTypes()
 	if err != nil {
 		return models.NewEvent{}, err
 	}
 
+	if !slices.Contains(allowedTimeTypes, strings.ToLower(body.TimeType)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
 	if body.Audience != nil {
+		allowedAudiences, err := s.GetEventAudiences()
+		if err != nil {
+			return models.NewEvent{}, err
+		}
+
 		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
 			return models.NewEvent{}, internal.ErrInvalid
 		}
