@@ -91,3 +91,4 @@ WHERE (
         cardinality($3::text[]) = 0
         OR e.category = ANY($3::categories[])
     )
+    AND e.visible = true

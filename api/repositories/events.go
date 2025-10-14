@@ -11,6 +11,7 @@ import (
 )
 
 type Eventrepositories interface {
+	GetAllEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
 	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
@@ -33,6 +34,24 @@ func (r *eventRepositories) CreateEvent(event models.NewEvent) (models.NewEvent,
 		"./db/events/post_event.sql",
 		event,
 	)
+}
+
+func (r *eventRepositories) GetAllEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error) {
+	events, err := db.FetchAllElements[models.EventWithTotalCount](
+		r.db,
+		"./db/events/get_all_events.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+		historical,
+		pq.Array(categories),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
 }
 
 func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error) {

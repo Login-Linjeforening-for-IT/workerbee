@@ -79,7 +79,6 @@ func (s *EventService) GetEventAudiences() []string {
 	return audiences
 }
 
-
 func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
@@ -91,21 +90,9 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	var categories []string
-	if categories_str != "" {
-		categories, err = internal.ParseCSVToSlice[string](categories_str)
-		if err != nil {
-			return nil, internal.ErrInvalid
-		}
-		for i := range categories {
-			categories[i] = strings.ToLower(categories[i])
-			if !slices.Contains(allowedCategories, categories[i]) {
-				return nil, internal.ErrInvalid
-			}
-		}
-
-	} else {
-		categories = make([]string, 0)
+	categories, err := parseCategories(categories_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
@@ -114,6 +101,30 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 	}
 
 	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
+}
+
+func (s *EventService) GetAllEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
+	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
+	if ok != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	historicalBool, err := strconv.ParseBool(historical)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	categories, err := parseCategories(categories_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetAllEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
@@ -126,4 +137,22 @@ func (s *EventService) GetEventCategories() ([]models.EventCategory, error) {
 
 func (s *EventService) DeleteEvent(id string) (int, error) {
 	return s.repo.DeleteEvent(id)
+}
+
+func parseCategories(categories_str string) ([]string, error) {
+	if categories_str != "" {
+		categories, err := internal.ParseCSVToSlice[string](categories_str)
+		if err != nil {
+			return nil, internal.ErrInvalid
+		}
+		for i := range categories {
+			categories[i] = strings.ToLower(categories[i])
+			if !slices.Contains(allowedCategories, categories[i]) {
+				return nil, internal.ErrInvalid
+			}
+		}
+		return categories, nil
+	} else {
+		return make([]string, 0), nil
+	}
 }

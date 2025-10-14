@@ -17,13 +17,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		events := v2.Group("/events")
 		{
 			events.GET("/:id", h.GetEvent)
+			events.GET("/all", middleware.AuthMiddleware(), h.GetAllEvents)
 			events.GET("/", h.GetEvents)
 			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
 			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
 			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
-			events.GET("/categories/active", h.GetEventCategories)
-			events.GET("/categories", h.GetAllEventCategories)
-			events.GET("/audience", h.GetEventAudiences)
+			events.GET("/categories", h.GetEventCategories)
+			events.GET("/categories/all", h.GetAllEventCategories)
+			events.GET("/audiences", h.GetEventAudiences)
 		}
 		rules := v2.Group("/rules")
 		{
