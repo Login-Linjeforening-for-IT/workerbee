@@ -19,6 +19,32 @@ CREATE TYPE "job_type" AS ENUM (
     'verv'
 );
 
+CREATE TYPE categories AS ENUM (
+  'tekkom',
+  'ctfkom',
+  'eventkom',
+  'pr',
+  'sosialt',
+  'login',
+  'buddyweek',
+  'bedkom',
+  'carreerday',
+  'other'
+);
+
+CREATE TYPE audience AS ENUM (
+  'students',
+  'first_semester',
+  'second_semester',
+  'third_semester',
+  'fourth_semester',
+  'fifth_semester',
+  'sixth_semester',
+  'seventh_semester',
+  'login',
+  'open'
+);
+
 CREATE TABLE "events" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
@@ -35,6 +61,7 @@ CREATE TABLE "events" (
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
     "canceled" bool NOT NULL DEFAULT false,
+    "category" categories NOT NULL,
     "digital" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
     "image_small" varchar,
@@ -45,33 +72,11 @@ CREATE TABLE "events" (
     "link_stream" varchar,
     "capacity" int,
     "is_full" bool NOT NULL DEFAULT false,
-    "category_id" int NOT NULL,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,
     "rule_id" int,
-    "audience_id" int,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "categories" (
-    "id" SERIAL PRIMARY KEY,
-    "color" varchar NOT NULL,
-    "name_no" varchar NOT NULL,
-    "name_en" varchar NOT NULL,
-    "description_no" text NOT NULL,
-    "description_en" text NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "audiences" (
-    "id" SERIAL PRIMARY KEY,
-    "name_no" varchar NOT NULL,
-    "name_en" varchar NOT NULL,
-    "description_no" varchar NOT NULL,
-    "description_en" varchar NOT NULL,
+    "audience" audience,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -166,17 +171,11 @@ CREATE TABLE "skills" (
 
 CREATE INDEX ON "events" ("visible");
 CREATE INDEX ON "events" ("highlight");
-CREATE INDEX ON "events" ("category_id");
 CREATE INDEX ON "events" ("time_start");
 CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
 
-CREATE INDEX ON "categories" ("updated_at");
-CREATE INDEX ON "categories" ("created_at");
-
-CREATE INDEX ON "audiences" ("updated_at");
-CREATE INDEX ON "audiences" ("created_at");
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
@@ -195,12 +194,10 @@ CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -221,8 +218,8 @@ CREATE TYPE question_type_enum AS ENUM (
 
 CREATE TABLE users (
     "id" SERIAL PRIMARY KEY,
-    "full_name" text UNIQUE NOT NULL,
-    "email" text UNIQUE NOT NULL,
+    "full_name" varchar UNIQUE NOT NULL,
+    "email" varchar UNIQUE NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
@@ -230,8 +227,8 @@ CREATE TABLE users (
 CREATE TABLE forms (
     "id" SERIAL PRIMARY KEY,
     "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
-    "title" text NOT NULL,
-    "description" text NOT NULL,
+    "title" varchar NOT NULL,
+    "description" varchar NOT NULL,
     "capacity" int,
     "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "close_at" timestamp NOT NULL,
@@ -242,8 +239,8 @@ CREATE TABLE forms (
 CREATE TABLE questions (
   "id" SERIAL PRIMARY KEY,
   "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
-    "question_title" text NOT NULL,
-    "question_description" text NOT NULL,
+    "question_title" varchar NOT NULL,
+    "question_description" varchar NOT NULL,
     "question_type" question_type_enum NOT NULL,
     "required" boolean DEFAULT false,
     "position" int NOT NULL,
@@ -255,7 +252,7 @@ CREATE TABLE questions (
 CREATE TABLE question_options (
     "id" SERIAL PRIMARY KEY,
     "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
-    "option_text" text NOT NULL,
+    "option_text" varchar NOT NULL,
     "position" int NOT NULL,
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
