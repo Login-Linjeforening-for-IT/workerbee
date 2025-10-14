@@ -16,6 +16,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		v2.GET("/status", handlers.GetStatus)
 		events := v2.Group("/events")
 		{
+			events.GET("/all/:id", middleware.AuthMiddleware(), h.GetEventProtected)
 			events.GET("/:id", h.GetEvent)
 			events.GET("/all", middleware.AuthMiddleware(), h.GetAllEvents)
 			events.GET("/", h.GetEvents)

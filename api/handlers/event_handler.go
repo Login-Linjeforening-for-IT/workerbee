@@ -129,6 +129,17 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+func (h *Handler) GetEventProtected(c *gin.Context) {
+	id := c.Param("id")
+
+	event, err := h.Services.Events.GetEventProtected(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, event)
+}
+
 func (h *Handler) GetAllEventCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"categories": h.Services.Events.GetAllEventCategories(),

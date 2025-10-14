@@ -14,6 +14,7 @@ type Eventrepositories interface {
 	GetAllEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
 	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
+	GetEventProtected(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
 	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
@@ -90,6 +91,14 @@ func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error)
 
 func (r *eventRepositories) GetEvent(id string) (models.Event, error) {
 	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/get_event.sql", id)
+	if err != nil {
+		return models.Event{}, internal.ErrInvalid
+	}
+	return event, nil
+}
+
+func (r *eventRepositories) GetEventProtected(id string) (models.Event, error) {
+	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/get_event_protected.sql", id)
 	if err != nil {
 		return models.Event{}, internal.ErrInvalid
 	}

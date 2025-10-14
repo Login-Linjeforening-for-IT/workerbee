@@ -131,6 +131,10 @@ func (s *EventService) GetEvent(id string) (models.Event, error) {
 	return s.repo.GetEvent(id)
 }
 
+func (s *EventService) GetEventProtected(id string) (models.Event, error) {
+	return s.repo.GetEventProtected(id)
+}
+
 func (s *EventService) GetEventCategories() ([]models.EventCategory, error) {
 	return s.repo.GetEventCategories()
 }
