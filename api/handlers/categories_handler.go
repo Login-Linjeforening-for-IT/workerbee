@@ -92,9 +92,9 @@ func (h *Handler) UpdateCategory(c *gin.Context) {
 func (h *Handler) DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
 
-	category, err := h.Services.Categories.DeleteCategory(id)
+	categoryId, err := h.Services.Categories.DeleteCategory(id)
 	if internal.HandleError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, category)
+	c.JSON(http.StatusOK, gin.H{"id": categoryId})
 }

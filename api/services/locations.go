@@ -60,7 +60,7 @@ func (s *LocationService) GetLocation(id string) (models.Location, error) {
 	return s.repo.GetLocation(id)
 }
 
-func (s *LocationService) DeleteLocation(id string) (models.Location, error) {
+func (s *LocationService) DeleteLocation(id string) (int, error) {
 	return s.repo.DeleteLocation(id)
 }
 

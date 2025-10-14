@@ -42,7 +42,7 @@ func (s *OrganizationService) GetOrg(id string) (models.Organization, error) {
 	return s.repo.GetOrg(id)
 }
 
-func (s *OrganizationService) DeleteOrg(id string) (models.Organization, error) {
+func (s *OrganizationService) DeleteOrg(id string) (int, error) {
 	return s.repo.DeleteOrg(id)
 }
 

@@ -42,7 +42,7 @@ func (s *RuleService) GetRule(id string) (models.Rule, error) {
 	return s.repo.GetRule(id)
 }
 
-func (s *RuleService) DeleteRule(id string) (models.Rule, error) {
+func (s *RuleService) DeleteRule(id string) (int, error) {
 	return s.repo.DeleteRule(id)
 }
 

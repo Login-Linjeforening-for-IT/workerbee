@@ -92,10 +92,10 @@ func (h *Handler) GetRule(c *gin.Context) {
 func (h *Handler) DeleteRule(c *gin.Context) {
 	id := c.Param("id")
 
-	rule, err := h.Services.Rules.DeleteRule(id)
+	ruleId, err := h.Services.Rules.DeleteRule(id)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, rule)
+	c.JSON(http.StatusOK, gin.H{"id": ruleId})
 }

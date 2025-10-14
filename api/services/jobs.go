@@ -115,7 +115,7 @@ func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob
 	return s.repo.UpdateJob(job)
 }
 
-func (s *JobsService) DeleteJob(id string) (models.Job, error) {
+func (s *JobsService) DeleteJob(id string) (int, error) {
 	return s.repo.DeleteJob(id)
 }
 

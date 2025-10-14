@@ -19,7 +19,7 @@ type Jobsrepositories interface {
 	GetJobTypes() ([]models.JobType, error)
 	GetJobSkills() ([]models.JobSkills, error)
 	UpdateJob(job models.NewJob) (models.NewJob, error)
-	DeleteJob(id string) (models.Job, error)
+	DeleteJob(id string) (int, error)
 	GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
 }
 
@@ -368,13 +368,13 @@ func (r *jobsrepositories) UpdateJob(job models.NewJob) (models.NewJob, error) {
 	return newJob, tx.Commit()
 }
 
-func (r *jobsrepositories) DeleteJob(id string) (models.Job, error) {
-	job, err := db.ExecuteOneRow[models.Job](r.db, "./db/jobs/delete_job.sql", id)
+func (r *jobsrepositories) DeleteJob(id string) (int, error) {
+	jobId, err := db.ExecuteOneRow[int](r.db, "./db/jobs/delete_job.sql", id)
 	if err != nil {
-		return models.Job{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
 
-	return job, nil
+	return jobId, nil
 }
 
 func (r *jobsrepositories) GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error) {

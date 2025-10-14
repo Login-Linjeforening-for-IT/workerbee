@@ -78,6 +78,6 @@ func (s *EventService) GetEventCategories() ([]models.EventCategory, error) {
 	return s.repo.GetEventCategories()
 }
 
-func (s *EventService) DeleteEvent(id string) (models.Event, error) {
+func (s *EventService) DeleteEvent(id string) (int, error) {
 	return s.repo.DeleteEvent(id)
 }

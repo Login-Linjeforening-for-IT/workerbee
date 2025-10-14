@@ -94,10 +94,10 @@ func (h *Handler) UpdateLocation(c *gin.Context) {
 func (h *Handler) DeleteLocation(c *gin.Context) {
 	id := c.Param("id")
 
-	loc, err := h.Services.Locations.DeleteLocation(id)
+	locId, err := h.Services.Locations.DeleteLocation(id)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, loc)
+	c.JSON(http.StatusOK, gin.H{"id": locId})
 }

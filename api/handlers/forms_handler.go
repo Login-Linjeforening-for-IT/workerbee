@@ -122,15 +122,15 @@ func (h *Handler) PutForm(c *gin.Context) {
 // @Description  Deletes a form by ID
 // @Tags         forms
 // @Param        id   path  string  true  "Form ID"
-// @Success      200  {object}  models.Form
+// @Success      200  {object}  gin.H
 // @Failure      404  {object}  error
 // @Router       /api/v2/forms/{id} [delete]
 func (h *Handler) DeleteForm(c *gin.Context) {
 	id := c.Param("id")
-	deletedForm, err := h.Services.Forms.DeleteForm(id)
+	formId, err := h.Services.Forms.DeleteForm(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, deletedForm)
+	c.JSON(http.StatusOK, gin.H{"id": formId})
 }

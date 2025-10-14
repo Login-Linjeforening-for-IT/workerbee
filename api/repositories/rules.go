@@ -13,7 +13,7 @@ type Rulerepositories interface {
 	GetRules(limit, offset int, search, orderBy, sort string) ([]models.RuleWithTotalCount, error)
 	GetRule(id string) (models.Rule, error)
 	UpdateRule(rule models.Rule) (models.Rule, error)
-	DeleteRule(id string) (models.Rule, error)
+	DeleteRule(id string) (int, error)
 }
 
 type ruleRepositories struct {
@@ -63,10 +63,10 @@ func (r *ruleRepositories) GetRule(id string) (models.Rule, error) {
 	return rule, nil
 }
 
-func (r *ruleRepositories) DeleteRule(id string) (models.Rule, error) {
-	rule, err := db.ExecuteOneRow[models.Rule](r.db, "./db/rules/delete_rule.sql", id)
+func (r *ruleRepositories) DeleteRule(id string) (int, error) {
+	ruleId, err := db.ExecuteOneRow[int](r.db, "./db/rules/delete_rule.sql", id)
 	if err != nil {
-		return rule, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
-	return rule, nil
+	return ruleId, nil
 }

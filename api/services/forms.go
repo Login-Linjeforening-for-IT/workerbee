@@ -35,6 +35,6 @@ func (s *FormService) PutForm(id string, form models.Form) (models.Form, error) 
 	return s.repo.PutForm(id, form)
 }
 
-func (s *FormService) DeleteForm(id string) (models.Form, error) {
+func (s *FormService) DeleteForm(id string) (int, error) {
 	return s.repo.DeleteForm(id)
 }

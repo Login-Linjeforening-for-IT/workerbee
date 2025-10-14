@@ -43,7 +43,7 @@ func (s *CategorieService) GetCategory(id string) (models.Category, error) {
 	return s.repo.GetCategory(id)
 }
 
-func (s *CategorieService) DeleteCategory(id string) (models.Category, error) {
+func (s *CategorieService) DeleteCategory(id string) (int, error) {
 	return s.repo.DeleteCategory(id)
 }
 

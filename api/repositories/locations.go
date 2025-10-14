@@ -14,7 +14,7 @@ type LocationRepository interface {
 	GetLocations(limit, offset int, search, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error)
 	GetLocation(id string) (models.Location, error)
 	UpdateLocation(location models.Location) (models.Location, error)
-	DeleteLocation(id string) (models.Location, error)
+	DeleteLocation(id string) (int, error)
 }
 
 type locationRepository struct {
@@ -67,12 +67,12 @@ func (r *locationRepository) GetLocation(id string) (models.Location, error) {
 	return location, nil
 }
 
-func (r *locationRepository) DeleteLocation(id string) (models.Location, error) {
-	location, err := db.ExecuteOneRow[models.Location](
+func (r *locationRepository) DeleteLocation(id string) (int, error) {
+	locationId, err := db.ExecuteOneRow[int](
 		r.db, "./db/locations/delete_location.sql", id,
 	)
 	if err != nil {
-		return models.Location{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
-	return location, nil
+	return locationId, nil
 }

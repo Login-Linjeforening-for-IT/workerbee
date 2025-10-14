@@ -92,10 +92,10 @@ func (h *Handler) GetOrganization(c *gin.Context) {
 func (h *Handler) DeleteOrganization(c *gin.Context) {
 	id := c.Param("id")
 
-	org, err := h.Services.Organizations.DeleteOrg(id)
+	orgId, err := h.Services.Organizations.DeleteOrg(id)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, org)
+	c.JSON(http.StatusOK, gin.H{"id": orgId})
 }

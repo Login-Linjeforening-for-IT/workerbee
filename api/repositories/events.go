@@ -14,7 +14,7 @@ type Eventrepositories interface {
 	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
-	DeleteEvent(id string) (models.Event, error)
+	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
 }
@@ -82,10 +82,10 @@ func (r *eventRepositories) UpdateOneEvent(id int, event models.NewEvent) (model
 	return db.AddOneRow(r.db, "./db/events/put_event.sql", event)
 }
 
-func (r *eventRepositories) DeleteEvent(id string) (models.Event, error) {
-	event, err := db.ExecuteOneRow[models.Event](r.db, "./db/events/delete_event.sql", id)
+func (r *eventRepositories) DeleteEvent(id string) (int, error) {
+	eventId, err := db.ExecuteOneRow[int](r.db, "./db/events/delete_event.sql", id)
 	if err != nil {
-		return models.Event{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
-	return event, nil
+	return eventId, nil
 }

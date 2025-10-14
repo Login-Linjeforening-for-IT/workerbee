@@ -116,9 +116,9 @@ func (h *Handler) GetEventCategories(c *gin.Context) {
 func (h *Handler) DeleteEvent(c *gin.Context) {
 	id := c.Param("id")
 
-	event, err := h.Services.Events.DeleteEvent(id)
+	eventId, err := h.Services.Events.DeleteEvent(id)
 	if internal.HandleError(c, err) {
 		return
 	}
-	c.JSON(http.StatusOK, event)
+	c.JSON(http.StatusOK, gin.H{"id": eventId})
 }

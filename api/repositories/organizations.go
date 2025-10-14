@@ -13,7 +13,7 @@ type OrganizationRepository interface {
 	GetOrgs(limit, offset int, search, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
 	GetOrg(id string) (models.Organization, error)
 	UpdateOrg(org models.Organization) (models.Organization, error)
-	DeleteOrg(id string) (models.Organization, error)
+	DeleteOrg(id string) (int, error)
 }
 
 type organizationRepository struct {
@@ -47,15 +47,15 @@ func (r *organizationRepository) GetOrg(id string) (models.Organization, error) 
 	return org, nil
 }
 
-func (r *organizationRepository) DeleteOrg(id string) (models.Organization, error) {
-	org, err := db.ExecuteOneRow[models.Organization](
+func (r *organizationRepository) DeleteOrg(id string) (int, error) {
+	orgId, err := db.ExecuteOneRow[int](
 		r.db, "./db/organizations/delete_organization.sql", id,
 	)
 	if err != nil {
-		return models.Organization{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
 
-	return org, nil
+	return orgId, nil
 }
 
 func (r *organizationRepository) UpdateOrg(org models.Organization) (models.Organization, error) {

@@ -11,7 +11,7 @@ import (
 type CategoireRepository interface {
 	GetCategories(limit, offset int, search, orderBy, sort string) ([]models.CategoryWithTotalCount, error)
 	GetCategory(id string) (models.Category, error)
-	DeleteCategory(id string) (models.Category, error)
+	DeleteCategory(id string) (int, error)
 	CreateCateory(category models.Category) (models.Category, error)
 	UpdateCateory(category models.Category, id int) (models.Category, error)
 }
@@ -47,12 +47,12 @@ func (r *categoireRepository) GetCategory(id string) (models.Category, error) {
 	return category, nil
 }
 
-func (r *categoireRepository) DeleteCategory(id string) (models.Category, error) {
-	category, err := db.ExecuteOneRow[models.Category](r.db, "./db/categories/delete_category.sql", id)
+func (r *categoireRepository) DeleteCategory(id string) (int, error) {
+	categoryId, err := db.ExecuteOneRow[int](r.db, "./db/categories/delete_category.sql", id)
 	if err != nil {
-		return models.Category{}, internal.ErrInvalid
+		return 0, internal.ErrInvalid
 	}
-	return category, nil
+	return categoryId, nil
 }
 
 func (r *categoireRepository) UpdateCateory(category models.Category, id int) (models.Category, error) {

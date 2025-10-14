@@ -47,11 +47,11 @@ func (h *Handler) PutQuestions(c *gin.Context) {
 func (h *Handler) DeleteQuestion(c *gin.Context) {
 	id := c.Param("id")
 	
-	deletedQuestion, err := h.Services.Questions.DeleteQuestion(id)
+	questionId, err := h.Services.Questions.DeleteQuestion(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	
-	c.JSON(http.StatusOK, deletedQuestion)
+	c.JSON(http.StatusOK, gin.H{"id": questionId})
 }

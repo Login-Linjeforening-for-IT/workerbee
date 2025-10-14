@@ -95,12 +95,12 @@ func (h *Handler) UpdateJob(c *gin.Context) {
 func (h *Handler) DeleteJob(c *gin.Context) {
 	id := c.Param("id")
 
-	job, err := h.Services.Jobs.DeleteJob(id)
+	jobId, err := h.Services.Jobs.DeleteJob(id)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, job)
+	c.JSON(http.StatusOK, gin.H{"id": jobId})
 }
 
 func (h *Handler) GetCities(c *gin.Context) {
