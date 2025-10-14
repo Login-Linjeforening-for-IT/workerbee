@@ -47,12 +47,12 @@ func (h *Handler) GetLocations(c *gin.Context) {
 	if len(locs) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"locations": locs,
-			"count":     0,
+			"total_count":     0,
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
 			"locations": locs,
-			"count":     locs[0].TotalCount,
+			"total_count":     locs[0].TotalCount,
 		})
 	}
 }
