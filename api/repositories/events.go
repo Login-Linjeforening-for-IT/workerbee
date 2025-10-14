@@ -19,6 +19,9 @@ type Eventrepositories interface {
 	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
+	GetAllCategories() (string, error)
+	GetEventAudiences() (string, error)
+	GetAllTimeTypes() (string, error)
 }
 
 type eventRepositories struct {
@@ -117,4 +120,37 @@ func (r *eventRepositories) DeleteEvent(id string) (int, error) {
 		return 0, internal.ErrInvalid
 	}
 	return eventId, nil
+}
+
+func (r *eventRepositories) GetAllCategories() (string, error) {
+	categories, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_categories.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return categories, nil
+}
+
+func (r *eventRepositories) GetEventAudiences() (string, error) {
+	audiences, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_audiences.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return audiences, nil
+}
+
+func (r *eventRepositories) GetAllTimeTypes() (string, error) {
+	timeTypes, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_time_types.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return timeTypes, nil
 }

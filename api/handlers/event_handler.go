@@ -141,15 +141,30 @@ func (h *Handler) GetProtectedEvent(c *gin.Context) {
 }
 
 func (h *Handler) GetAllEventCategories(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"categories": h.Services.Events.GetAllEventCategories(),
-	})
+	categories, err := h.Services.Events.GetAllEventCategories()
+	if internal.HandleError(c, err) {
+		return
+	}
+	
+	c.JSON(http.StatusOK, categories)
 }
 
 func (h *Handler) GetEventAudiences(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"audiences": h.Services.Events.GetEventAudiences(),
-	})
+	audiences, err := h.Services.Events.GetEventAudiences()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, audiences)
+}
+
+func (h *Handler) GetAllTimeTypes(c *gin.Context) {
+	timeTypes, err := h.Services.Events.GetAllTimeTypes()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, timeTypes)
 }
 
 func (h *Handler) GetEventCategories(c *gin.Context) {
@@ -158,9 +173,7 @@ func (h *Handler) GetEventCategories(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"categories": categories,
-	})
+	c.JSON(http.StatusOK, categories)
 }
 
 func (h *Handler) DeleteEvent(c *gin.Context) {

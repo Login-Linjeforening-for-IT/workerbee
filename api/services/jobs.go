@@ -123,6 +123,14 @@ func (s *JobsService) GetJobSkills() ([]models.JobSkills, error) {
 	return s.repo.GetJobSkills()
 }
 
+func (s *JobsService) GetAllJobTypes() ([]string, error) {
+	jobTypes, err := s.repo.GetAllJobTypes()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(jobTypes), nil
+}
+
 func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {

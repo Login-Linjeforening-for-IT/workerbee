@@ -68,6 +68,15 @@ func (h *Handler) GetLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, loc)
 }
 
+func (h *Handler) GetAllLocationTypes(c *gin.Context) {
+	locationTypes, err := h.Services.Locations.GetAllLocationTypes()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, locationTypes)
+}
+
 func (h *Handler) UpdateLocation(c *gin.Context) {
 	var location models.Location
 	id := c.Param("id")

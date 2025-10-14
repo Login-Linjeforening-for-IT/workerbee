@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+func ParsePgArray(s string) []string {
+	s = strings.Trim(s, "{}")
+	if s == "" {
+		return []string{}
+	}
+	return strings.Split(s, ",")
+}
+
 func SanitizeSort(col, dir string, allowed map[string]string) (string, string, error) {
 	c, ok := allowed[col]
 	if !ok {
@@ -55,7 +63,7 @@ func CalculateOffset(page_str, limit_str string) (int, int, error) {
 		page = 0
 	}
 
-	return page*limit, limit, nil
+	return page * limit, limit, nil
 }
 
 func ParsePositiveInt(s string) (int, error) {

@@ -21,35 +21,6 @@ var allowedSortColumnsEvents = map[string]string{
 	"full":         "e.full",
 }
 
-var allowedCategories = []string{
-	"tekkom",
-	"ctfkom",
-	"eventkom",
-	"pr",
-	"sosialt",
-	"login",
-	"buddyweek",
-	"bedkom",
-	"carreerday",
-	"other",
-}
-
-var audiences = []string{
-	"students",
-	"first_semester",
-	"second_semester",
-	"third_semester",
-	"fourth_semester",
-	"fifth_semester",
-	"sixth_semester",
-	"seventh_semester",
-	"login",
-	"open",
-	"bachelor",
-	"master",
-	"phd",
-}
-
 type EventService struct {
 	repo repositories.Eventrepositories
 }
@@ -59,6 +30,26 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 }
 
 func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error) {
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedCategories, strings.ToLower(body.Category)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	allowedAudiences, err := s.GetEventAudiences()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if body.Audience != nil {
+		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
+			return models.NewEvent{}, internal.ErrInvalid
+		}
+	}
+
 	return s.repo.CreateEvent(body)
 }
 
@@ -68,15 +59,51 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if !slices.Contains(allowedCategories, strings.ToLower(body.Category)) {
+		return models.NewEvent{}, internal.ErrInvalid
+	}
+
+	allowedAudiences, err := s.GetEventAudiences()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+
+	if body.Audience != nil {
+		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
+			return models.NewEvent{}, internal.ErrInvalid
+		}
+	}
+
 	return s.repo.UpdateOneEvent(id, body)
 }
 
-func (s *EventService) GetAllEventCategories() []string {
-	return allowedCategories
+func (s *EventService) GetAllEventCategories() ([]string, error) {
+	rawString, err := s.repo.GetAllCategories()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(rawString), nil
 }
 
-func (s *EventService) GetEventAudiences() []string {
-	return audiences
+func (s *EventService) GetAllTimeTypes() ([]string, error) {
+	rawString, err := s.repo.GetAllTimeTypes()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(rawString), nil
+}
+
+func (s *EventService) GetEventAudiences() ([]string, error) {
+	audiences, err := s.repo.GetEventAudiences()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(audiences), nil
 }
 
 func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
@@ -90,9 +117,20 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return nil, err
+	}
+
 	categories, err := parseCategories(categories_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
+	}
+
+	for _, category := range categories {
+		if !slices.Contains(allowedCategories, category) {
+			return nil, internal.ErrInvalid
+		}
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
@@ -114,9 +152,20 @@ func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy
 		return nil, internal.ErrInvalid
 	}
 
+	allowedCategories, err := s.GetAllEventCategories()
+	if err != nil {
+		return nil, err
+	}
+
 	categories, err := parseCategories(categories_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
+	}
+
+	for _, category := range categories {
+		if !slices.Contains(allowedCategories, category) {
+			return nil, internal.ErrInvalid
+		}
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
@@ -151,9 +200,6 @@ func parseCategories(categories_str string) ([]string, error) {
 		}
 		for i := range categories {
 			categories[i] = strings.ToLower(categories[i])
-			if !slices.Contains(allowedCategories, categories[i]) {
-				return nil, internal.ErrInvalid
-			}
 		}
 		return categories, nil
 	} else {

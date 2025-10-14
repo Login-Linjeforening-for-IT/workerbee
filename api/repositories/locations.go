@@ -15,6 +15,7 @@ type LocationRepository interface {
 	GetLocation(id string) (models.Location, error)
 	UpdateLocation(location models.Location) (models.Location, error)
 	DeleteLocation(id string) (int, error)
+	GetAllLocationTypes() (string, error)
 }
 
 type locationRepository struct {
@@ -65,6 +66,17 @@ func (r *locationRepository) GetLocation(id string) (models.Location, error) {
 		return models.Location{}, internal.ErrInvalid
 	}
 	return location, nil
+}
+
+func (r *locationRepository) GetAllLocationTypes() (string, error) {
+	locationTypes, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/locations/get_all_location_types.sql",
+	)
+	if err != nil {
+		return "", err
+	}
+	return locationTypes, nil
 }
 
 func (r *locationRepository) DeleteLocation(id string) (int, error) {

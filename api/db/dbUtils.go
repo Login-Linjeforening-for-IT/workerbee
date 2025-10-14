@@ -3,13 +3,28 @@ package db
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"workerbee/internal"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
+
+func FetchAllEnumTypes(db *sqlx.DB, sqlPath string) (string, error) {
+	var result string
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return "", err
+	}
+
+	err = db.Get(&result, string(sqlBytes))
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
 
 func FetchAllElements[T any](
 	db *sqlx.DB,
@@ -37,7 +52,6 @@ func FetchAllElements[T any](
 
 	err = db.Select(&result, query, args...)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 

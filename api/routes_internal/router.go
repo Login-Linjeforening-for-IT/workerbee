@@ -26,6 +26,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.GET("/categories", h.GetEventCategories)
 			events.GET("/categories/all", h.GetAllEventCategories)
 			events.GET("/audiences", h.GetEventAudiences)
+			events.GET("/time", h.GetAllTimeTypes)
 		}
 		rules := v2.Group("/rules")
 		{
@@ -42,6 +43,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
 			locations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateLocation)
 			locations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteLocation)
+			locations.GET("/types", h.GetAllLocationTypes)
 		}
 		organizations := v2.Group("/organizations")
 		{
@@ -63,6 +65,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/cities", h.GetCities)
 			jobs.GET("/types", h.GetJobTypes)
 			jobs.GET("/skills", h.GetJobSkills)
+			jobs.GET("/types/all", h.GetAllJobTypes)
 		}
 
 		stats := v2.Group("/stats")

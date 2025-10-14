@@ -60,6 +60,14 @@ func (s *LocationService) GetLocation(id string) (models.Location, error) {
 	return s.repo.GetLocation(id)
 }
 
+func (s *LocationService) GetAllLocationTypes() ([]string, error) {
+	rawString, err := s.repo.GetAllLocationTypes()
+	if err != nil {
+		return nil, err
+	}
+	return internal.ParsePgArray(rawString), nil
+}
+
 func (s *LocationService) DeleteLocation(id string) (int, error) {
 	return s.repo.DeleteLocation(id)
 }
