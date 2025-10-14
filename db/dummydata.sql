@@ -19,6 +19,32 @@ CREATE TYPE "job_type" AS ENUM (
     'verv'
 );
 
+CREATE TYPE category AS ENUM (
+  'tekkom',
+  'ctfkom',
+  'eventkom',
+  'pr',
+  'sosialt',
+  'login',
+  'buddyweek',
+  'bedkom',
+  'carreerday',
+  'other'
+);
+
+CREATE TYPE audience AS ENUM (
+  'students',
+  'first_semester',
+  'second_semester',
+  'third_semester',
+  'fourth_semester',
+  'fifth_semester',
+  'sixth_semester',
+  'seventh_semester',
+  'login',
+  'open'
+);
+
 CREATE TABLE "events" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
@@ -45,33 +71,12 @@ CREATE TABLE "events" (
     "link_stream" varchar,
     "capacity" int,
     "is_full" bool NOT NULL DEFAULT false,
-    "category_id" int NOT NULL,
+    "category" category NOT NULL,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,
     "rule_id" int,
-    "audience_id" int,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "categories" (
-    "id" SERIAL PRIMARY KEY,
-    "color" varchar NOT NULL,
-    "name_no" varchar NOT NULL,
-    "name_en" varchar NOT NULL,
-    "description_no" text NOT NULL,
-    "description_en" text NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "audiences" (
-    "id" SERIAL PRIMARY KEY,
-    "name_no" varchar NOT NULL,
-    "name_en" varchar NOT NULL,
-    "description_no" varchar NOT NULL,
-    "description_en" varchar NOT NULL,
+    "audience" audience,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -166,17 +171,11 @@ CREATE TABLE "skills" (
 
 CREATE INDEX ON "events" ("visible");
 CREATE INDEX ON "events" ("highlight");
-CREATE INDEX ON "events" ("category_id");
 CREATE INDEX ON "events" ("time_start");
 CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
 
-CREATE INDEX ON "categories" ("updated_at");
-CREATE INDEX ON "categories" ("created_at");
-
-CREATE INDEX ON "audiences" ("updated_at");
-CREATE INDEX ON "audiences" ("created_at");
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
@@ -195,12 +194,10 @@ CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -341,23 +338,6 @@ INSERT INTO "cities" ("name") VALUES
 ('Stavanger'),
 ('Tromsø');
 
-
-INSERT INTO "categories" (
-  "color", 
-  "name_no", 
-  "name_en", 
-  "description_no", 
-  "description_en", 
-  "updated_at", 
-  "created_at"
-)
-VALUES
-('#FF5733', 'Kultur', 'Culture', 'Kulturelle arrangementer og aktiviteter.', 'Cultural events and activities.', now(), now()),
-('#33FF57', 'Teknologi', 'Technology', 'Arrangementer relatert til teknologi og innovasjon.', 'Events related to technology and innovation.', now(), now()),
-('#3357FF', 'Sport', 'Sports', 'Sportslige aktiviteter og konkurranser.', 'Sports activities and competitions.', now(), now()),
-('#FF33A8', 'Musikk', 'Music', 'Konserter og musikalske arrangementer.', 'Concerts and musical events.', now(), now()),
-('#FFD700', 'Mat', 'Food', 'Arrangementer med fokus på mat og drikke.', 'Events focused on food and beverages.', now(), now());
-
 INSERT INTO "locations" (
   "name_no", 
   "name_en", 
@@ -447,23 +427,6 @@ VALUES
 ('Gyldig billett kreves', 'Valid Ticket Required', 
   'Alle deltakere må ha en gyldig billett for å delta på arrangementet.', 
   'All attendees must present a valid ticket to participate in the event.', 
-  now(), now());
-
-INSERT INTO "audiences" (
-  "name_no", "name_en", "description_no", "description_en", "updated_at", "created_at"
-)
-VALUES
-('Studenter', 'Students', 
-  'Arrangementet er rettet mot studenter fra alle studieretninger.', 
-  'The event is targeted at students from all fields of study.', 
-  now(), now()),
-('Familier', 'Families', 
-  'Arrangementet er familievennlig og åpent for alle aldersgrupper.', 
-  'The event is family-friendly and open to all age groups.', 
-  now(), now()),
-('Profesjonelle', 'Professionals', 
-  'Arrangementet er rettet mot fagpersoner innenfor relevante bransjer.', 
-  'The event is aimed at professionals in relevant industries.', 
   now(), now());
 
 INSERT INTO "organizations" (
@@ -586,52 +549,55 @@ VALUES
 (4, 27),  -- Customer Support Agent (SINTEF) - Trondheim
 (5, 27);  -- Data Analyst (NTNU) - Trondheim
 
-INSERT INTO "events" (
-  "visible", "name_no", "name_en", "description_no", "description_en", 
-  "informational_no", "informational_en", "time_type", "time_start", "time_end", 
-  "time_publish", "time_signup_release", "time_signup_deadline", "canceled", 
-  "digital", "highlight", "image_small", "image_banner", "link_facebook", 
-  "link_discord", "link_signup", "link_stream", "capacity", "is_full", "category_id", 
-  "organization_id", "location_id", "parent_id", "rule_id", "audience_id", "created_at", "updated_at"
+INSERT INTO events (
+  visible, name_no, name_en, description_no, description_en, 
+  informational_no, informational_en, time_type, time_start, time_end, 
+  time_publish, time_signup_release, time_signup_deadline, canceled, 
+  digital, highlight, image_small, image_banner, link_facebook, 
+  link_discord, link_signup, link_stream, capacity, is_full, 
+  organization_id, location_id, parent_id, rule_id, audience, category, created_at, updated_at
 )
 VALUES
-(true, 'Hackathon Oslo', 'Hackathon Oslo', 'Bli med på en spennende hackathon i Oslo!',
-  'Join an exciting hackathon in Oslo!', 'Mer informasjon kommer snart.', 'More information coming soon.',
-  'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', '2025-02-01 09:00:00', 
-  '2025-01-15 08:00:00', '2025-01-30 23:59:00', false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 1, 1, 1, NULL, 1, 1, '2025-02-01 09:00:00', '2025-02-01 09:00:00'),
-(true, 'Tech Conference Bergen', 'Tech Conference Bergen', 'Lær om de nyeste teknologiene på Tech Conference i Bergen.',
-  'Learn about the latest technologies at Tech Conference in Bergen.', 'Påmelding nødvendig.', 'Registration required.',
-  'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', now(), 
-  '2025-02-15 08:00:00', '2025-03-01 23:59:00', false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 2, 2, 2, NULL, 1, 2, now(), now()),
-(true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
-  'Utforsk kunstig intelligens i Trondheim!', 
-  'Explore artificial intelligence in Trondheim!', 
+ (true, 'Hackathon Oslo', 'Hackathon Oslo', 
+  'Bli med på en spennende hackathon i Oslo!', 'Join an exciting hackathon in Oslo!', 
+  'Mer informasjon kommer snart.', 'More information coming soon.',
+  'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
+  '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
+  false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
+  NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 'login', 'tekkom', '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+
+ (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
+  'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
+  'Learn about the latest technologies at Tech Conference in Bergen.', 
+  'Påmelding nødvendig.', 'Registration required.',
+  'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', 
+  '2025-02-01 09:00:00', '2025-02-15 08:00:00', '2025-03-01 23:59:00', 
+  false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
+  NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 'open', 'eventkom', '2025-02-01 09:00:00', '2025-02-01 09:00:00'),
+
+ (true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
+  'Utforsk kunstig intelligens i Trondheim!', 'Explore artificial intelligence in Trondheim!', 
   'Gratis workshop for alle interesserte.', 'Free workshop for all interested.',
-  'whole_day', NOW() + (INTERVAL '1 day' * trunc(random() * 30)), 
-  NOW() + (INTERVAL '1 day' * trunc(random() * 30)) + (INTERVAL '1 hour' * trunc(random() * 10)), 
-  NOW(), NOW() - INTERVAL '10 days', NOW() + INTERVAL '15 days', 
+  'whole_day', '2025-04-05 10:00:00', '2025-04-05 16:00:00', 
+  '2025-03-20 08:00:00', '2025-03-20 08:00:00', '2025-04-01 23:59:00', 
   false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 3, 3, 3, NULL, 1, 1, NOW(), NOW()),
-(true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
-  'Lær om cybersikkerhet i Stavanger!', 
-  'Learn about cybersecurity in Stavanger!', 
+  NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 'login', 'tekkom', '2025-03-01 09:00:00', '2025-03-01 09:00:00'),
+
+ (true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
+  'Lær om cybersikkerhet i Stavanger!', 'Learn about cybersecurity in Stavanger!', 
   'Fokus på praktiske løsninger.', 'Focus on practical solutions.',
-  'whole_day', NOW() + (INTERVAL '1 day' * trunc(random() * 30)), 
-  NOW() + (INTERVAL '1 day' * trunc(random() * 30)) + (INTERVAL '1 hour' * trunc(random() * 10)), 
-  NOW(), NOW() - INTERVAL '5 days', NOW() + INTERVAL '20 days', 
+  'whole_day', '2025-05-12 09:00:00', '2025-05-12 17:00:00', 
+  '2025-04-01 09:00:00', '2025-04-10 08:00:00', '2025-05-01 23:59:00', 
   true, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 4, 3, 4, NULL, 3, 3, NOW(), NOW()),
-(true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
-  'Møt eksperter innen skyteknologi i Tromsø.', 
-  'Meet cloud technology experts in Tromsø.', 
+  NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 'login', 'ctfkom', '2025-04-01 09:00:00', '2025-04-01 09:00:00'),
+
+ (true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
+  'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
   'Networking muligheter.', 'Networking opportunities.',
-  'whole_day', NOW() - INTERVAL '5 days', 
-  NOW() - INTERVAL '5 days' + (INTERVAL '1 hour' * trunc(random() * 10)), 
-  NOW(), NOW() - INTERVAL '30 days', NOW() - INTERVAL '10 days', 
+  'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
+  '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
   false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
-  NULL, NULL, NULL, NULL, NULL, false, 5, 1, 5, NULL, 2, 2, NOW(), NOW());
+  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 'open', 'eventkom', '2025-05-01 09:00:00', '2025-05-01 09:00:00');
 
 -- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
 -- 10 submissions per form (one per user), and 10 answers per question.
