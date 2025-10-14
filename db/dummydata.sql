@@ -19,7 +19,7 @@ CREATE TYPE "job_type" AS ENUM (
     'verv'
 );
 
-CREATE TYPE category AS ENUM (
+CREATE TYPE categories AS ENUM (
   'tekkom',
   'ctfkom',
   'eventkom',
@@ -61,6 +61,7 @@ CREATE TABLE "events" (
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
     "canceled" bool NOT NULL DEFAULT false,
+    "category" categories NOT NULL,
     "digital" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
     "image_small" varchar,
@@ -71,7 +72,6 @@ CREATE TABLE "events" (
     "link_stream" varchar,
     "capacity" int,
     "is_full" bool NOT NULL DEFAULT false,
-    "category" category NOT NULL,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,

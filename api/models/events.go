@@ -32,6 +32,7 @@ type EventBase struct {
 	Capacity           *int       `db:"capacity" json:"capacity,omitempty"`
 	IsFull             bool       `db:"is_full" json:"is_full,omitempty"`
 	ParentID           *int       `db:"parent_id" json:"parent_id,omitempty"`
+	Audience           *string    `db:"audience" json:"audience,omitempty"`
 	UpdatedAt          time.Time  `db:"updated_at" json:"updated_at,omitempty"`
 	CreatedAt          time.Time  `db:"created_at" json:"created_at,omitempty"`
 }
@@ -50,7 +51,6 @@ type NewEvent struct {
 	EventBase
 	LocationID     *int `db:"location_id" json:"location_id"`
 	RuleID         *int `db:"rule_id" json:"rule_id,omitempty"`
-	AudienceID     *int `db:"audience_id" json:"audience_id,omitempty"`
 	OrganizationID *int `db:"organization_id" json:"organization_id"`
 }
 

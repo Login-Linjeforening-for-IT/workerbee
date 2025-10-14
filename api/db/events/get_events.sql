@@ -28,6 +28,8 @@ SELECT
     e.updated_at,
     e.created_at,
     e.parent_id,
+    e.category,
+    e.audience,
 
     r.id AS "rules.id",
     r.name_no AS "rules.name_no",
@@ -36,15 +38,6 @@ SELECT
     r.description_en AS "rules.description_en",
     r.created_at AS "rules.created_at",
     r.updated_at AS "rules.updated_at",
-
-    c.id AS "category.id",
-    c.name_no AS "category.name_no",
-    c.name_en AS "category.name_en",  
-    c.description_en AS "category.description_en",
-    c.description_no AS "category.description_no",  
-    c.color AS "category.color",
-    c.created_at AS "category.created_at",
-    c.updated_at AS "category.updated_at",
 
     l.id AS "location.id",
     l.name_no AS "location.name_no",
@@ -74,10 +67,8 @@ SELECT
     o.link_linkedin AS "organization.link_linkedin",
     o.created_at AS "organization.created_at",
     o.updated_at AS "organization.updated_at",
-    o.logo AS "organization.logo",
-    COUNT(*) OVER() AS total_count
+    o.logo AS "organization.logo"
 FROM events AS e
-LEFT JOIN categories AS c ON e.category_id = c.id
 LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id
@@ -97,6 +88,6 @@ WHERE (
         OR to_json(e)::text ILIKE '%' || $1 || '%'
     )
     AND (
-        cardinality($3::int[]) = 0
-        OR e.category_id = ANY($3)
+        cardinality($3::text[]) = 0
+        OR e.category = ANY($3::categories[])
     )

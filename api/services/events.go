@@ -37,7 +37,7 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 	if err != nil {
 		return models.NewEvent{}, internal.ErrInvalid
 	}
-	
+
 	return s.repo.UpdateOneEvent(id, body)
 }
 
@@ -52,14 +52,18 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	var numbers []int
+	var categories []string
 	if categories_str != "" {
-		numbers, err = internal.ParseCSVToSlice[int](categories_str)
+		categories, err = internal.ParseCSVToSlice[string](categories_str)
 		if err != nil {
 			return nil, internal.ErrInvalid
 		}
+		for i := range categories {
+			categories[i] = strings.ToLower(categories[i])
+		}
+
 	} else {
-		numbers = make([]int, 0)
+		categories = make([]string, 0)
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
@@ -67,7 +71,7 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, numbers)
+	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
