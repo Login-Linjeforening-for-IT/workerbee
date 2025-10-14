@@ -91,7 +91,7 @@ func (h *Handler) GetEvents(c *gin.Context) {
 // @Success      200  {array}  models.Event
 // @Failure      500  {object}  error
 // @Router       /api/v2/events [get]
-func (h *Handler) GetAllEvents(c *gin.Context) {
+func (h *Handler) GetProtectedEvents(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	categories := c.DefaultQuery("categories", "")
 	limit := c.DefaultQuery("limit", "20")
@@ -100,7 +100,7 @@ func (h *Handler) GetAllEvents(c *gin.Context) {
 	sort := c.DefaultQuery("sort", "asc")
 	historical := c.DefaultQuery("historical", "false")
 
-	events, err := h.Services.Events.GetAllEvents(search, limit, offset, orderBy, sort, historical, categories)
+	events, err := h.Services.Events.GetProtectedEvents(search, limit, offset, orderBy, sort, historical, categories)
 	if internal.HandleError(c, err) {
 		return
 	}
@@ -129,10 +129,10 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
-func (h *Handler) GetEventProtected(c *gin.Context) {
+func (h *Handler) GetProtectedEvent(c *gin.Context) {
 	id := c.Param("id")
 
-	event, err := h.Services.Events.GetEventProtected(id)
+	event, err := h.Services.Events.GetProtectedEvent(id)
 	if internal.HandleError(c, err) {
 		return
 	}

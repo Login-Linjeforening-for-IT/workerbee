@@ -41,42 +41,58 @@ func (s *JobsService) CreateJob(job models.NewJob) (models.NewJob, error) {
 	return newJob, err
 }
 
+func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
+	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
+	if ok != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	jobTypesSlice, err := parseFromStringToSlice(jobTypes)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+
+	skillsSlice, err := parseFromStringToSlice(skills)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	citiesSlice, err := parseFromStringToSlice(cities)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetProtectedJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
+}
+
+
 func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
-	var err error
 
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
 	if ok != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	var jobTypesSlice []string
-	if jobTypes != "" {
-		jobTypesSlice, err = internal.ParseCSVToSlice[string](jobTypes)
-		if err != nil {
-			return nil, internal.ErrInvalid
-		}
-	} else {
-		jobTypesSlice = make([]string, 0)
+	jobTypesSlice, err := parseFromStringToSlice(jobTypes)
+	if err != nil {
+		return nil, internal.ErrInvalid
 	}
 
-	var skillsSlice []string
-	if skills != "" {
-		skillsSlice, err = internal.ParseCSVToSlice[string](skills)
-		if err != nil {
-			return nil, internal.ErrInvalid
-		}
-	} else {
-		skillsSlice = make([]string, 0)
+
+	skillsSlice, err := parseFromStringToSlice(skills)
+	if err != nil {
+		return nil, internal.ErrInvalid
 	}
 
-	var citiesSlice []string
-	if cities != "" {
-		citiesSlice, err = internal.ParseCSVToSlice[string](cities)
-		if err != nil {
-			return nil, internal.ErrInvalid
-		}
-	} else {
-		citiesSlice = make([]string, 0)
+	citiesSlice, err := parseFromStringToSlice(cities)
+	if err != nil {
+		return nil, internal.ErrInvalid
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
@@ -89,6 +105,10 @@ func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobT
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {
 	return s.repo.GetJob(id)
+}
+
+func (s *JobsService) GetJobProtected(id string) (models.Job, error) {
+	return s.repo.GetJobProtected(id)
 }
 
 func (s *JobsService) GetJobsCities() ([]models.Cities, error) {
@@ -129,4 +149,19 @@ func (s *JobsService) GetCities(search, limit_str, offset_str, orderBy, sort str
 		return nil, internal.ErrInvalid
 	}
 	return s.repo.GetCities(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
+}
+
+func parseFromStringToSlice(input string) ([]string, error) {
+	if input != "" {
+		slice, err := internal.ParseCSVToSlice[string](input)
+		if err != nil {
+			return nil, internal.ErrInvalid
+		}
+		for i := range slice {
+			slice[i] = strings.ToLower(slice[i])
+		}
+		return slice, nil
+	} else {
+		return make([]string, 0), nil
+	}
 }

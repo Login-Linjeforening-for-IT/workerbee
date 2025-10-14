@@ -103,7 +103,7 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
 }
 
-func (s *EventService) GetAllEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
+func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
 		return nil, internal.ErrInvalid
@@ -124,15 +124,15 @@ func (s *EventService) GetAllEvents(search, limit_str, offset_str, orderBy, sort
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetAllEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
+	return s.repo.GetProtectedEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
 	return s.repo.GetEvent(id)
 }
 
-func (s *EventService) GetEventProtected(id string) (models.Event, error) {
-	return s.repo.GetEventProtected(id)
+func (s *EventService) GetProtectedEvent(id string) (models.Event, error) {
+	return s.repo.GetProtectedEvent(id)
 }
 
 func (s *EventService) GetEventCategories() ([]models.EventCategory, error) {

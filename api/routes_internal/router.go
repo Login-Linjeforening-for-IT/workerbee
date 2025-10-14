@@ -16,9 +16,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		v2.GET("/status", handlers.GetStatus)
 		events := v2.Group("/events")
 		{
-			events.GET("/all/:id", middleware.AuthMiddleware(), h.GetEventProtected)
+			events.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedEvent)
 			events.GET("/:id", h.GetEvent)
-			events.GET("/all", middleware.AuthMiddleware(), h.GetAllEvents)
+			events.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedEvents)
 			events.GET("/", h.GetEvents)
 			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
 			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
@@ -54,7 +54,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		jobs := v2.Group("/jobs")
 		{
 			jobs.GET("/:id", h.GetJob)
+			jobs.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedJob)
 			jobs.GET("/", h.GetJobs)
+			jobs.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedJobs)
 			jobs.POST("/", middleware.AuthMiddleware(), h.CreateJob)
 			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
 			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)

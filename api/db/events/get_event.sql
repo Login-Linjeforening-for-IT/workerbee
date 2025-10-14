@@ -74,4 +74,5 @@ LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id
 LEFT JOIN rules AS r ON e.rule_id = r.id
 WHERE e.id = $1
-  AND e.visible = true;
+  AND e.visible = true
+  AND e.time_publish <= now();

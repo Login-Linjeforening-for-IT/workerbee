@@ -14,7 +14,9 @@ import (
 type Jobsrepositories interface {
 	CreateJob(job models.NewJob) (models.NewJob, error)
 	GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
+	GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
+	GetJobProtected(id string) (models.Job, error)
 	GetJobsCities() ([]models.Cities, error)
 	GetJobTypes() ([]models.JobType, error)
 	GetJobSkills() ([]models.JobSkills, error)
@@ -169,6 +171,24 @@ func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort stri
 	return jobs, nil
 }
 
+func (r *jobsrepositories) GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error) {
+	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
+		r.db,
+		"./db/jobs/get_protected_jobs.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
+		pq.Array(jobTypes),
+		pq.Array(skills),
+		pq.Array(cities),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return jobs, nil
+}
+
 func (r *jobsrepositories) GetJobsCities() ([]models.Cities, error) {
 	var cities []models.Cities
 
@@ -216,6 +236,15 @@ func (r *jobsrepositories) GetJobSkills() ([]models.JobSkills, error) {
 
 func (r *jobsrepositories) GetJob(id string) (models.Job, error) {
 	job, err := db.ExecuteOneRow[models.Job](r.db, "./db/jobs/get_job.sql", id)
+	if err != nil {
+		return models.Job{}, internal.ErrInvalid
+	}
+
+	return job, nil
+}
+
+func (r *jobsrepositories) GetJobProtected(id string) (models.Job, error) {
+	job, err := db.ExecuteOneRow[models.Job](r.db, "./db/jobs/get_protected_job.sql", id)
 	if err != nil {
 		return models.Job{}, internal.ErrInvalid
 	}
