@@ -65,6 +65,7 @@ func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
+
 	return categories, nil
 }
 
