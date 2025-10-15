@@ -106,7 +106,7 @@ CREATE TABLE "events" (
     "digital" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
     "image_small" varchar,
-    "image_banner" varchar NOT NULL,
+    "image_banner" varchar,
     "link_facebook" varchar,
     "link_discord" varchar,
     "link_signup" varchar,

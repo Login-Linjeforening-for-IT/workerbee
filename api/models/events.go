@@ -24,7 +24,7 @@ type EventBase struct {
 	Digital            bool       `db:"digital" json:"digital,omitempty"`
 	Highlight          bool       `db:"highlight" json:"highlight,omitempty"`
 	ImageSmall         *string    `db:"image_small" json:"image_small,omitempty"`
-	ImageBanner        string     `db:"image_banner" json:"image_banner" validate:"required"`
+	ImageBanner        string     `db:"image_banner" json:"image_banner,omitempty"`
 	LinkFacebook       *string    `db:"link_facebook" json:"link_facebook,omitempty"`
 	LinkDiscord        *string    `db:"link_discord" json:"link_discord,omitempty"`
 	LinkSignup         *string    `db:"link_signup" json:"link_signup,omitempty"`
