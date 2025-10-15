@@ -3,6 +3,7 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -35,11 +36,13 @@ func HandleError(c *gin.Context, err error) bool {
 	for k, v := range ErrorMap {
 		if errors.Is(err, k) {
 			c.JSON(v.Status, gin.H{"error": v.Message})
+			log.Println("Got error: ", err)
 			return true
 		}
 	}
 
 	c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+	log.Println("Got error: ", err)
 	return true
 }
 
