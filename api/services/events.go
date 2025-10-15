@@ -35,8 +35,8 @@ func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error
 		return models.NewEvent{}, err
 	}
 
-	if !slices.Contains(allowedCategories, strings.ToLower(body.Category)) {
-		return models.NewEvent{}, internal.ErrInvalid
+	if !slices.Contains(allowedCategories, body.Category) {
+		return models.NewEvent{}, internal.ErrInvalidCategory
 	}
 
 	allowedAudiences, _, err := s.GetEventAudiences()
@@ -49,13 +49,13 @@ func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error
 		return models.NewEvent{}, err
 	}
 
-	if !slices.Contains(allowedTimeTypes, strings.ToLower(body.TimeType)) {
-		return models.NewEvent{}, internal.ErrInvalid
+	if !slices.Contains(allowedTimeTypes, body.TimeType) {
+		return models.NewEvent{}, internal.ErrInvalidTimeType
 	}
 
 	if body.Audience != nil {
-		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
-			return models.NewEvent{}, internal.ErrInvalid
+		if !slices.Contains(allowedAudiences, *body.Audience) {
+			return models.NewEvent{}, internal.ErrInvalidAudience
 		}
 	}
 
@@ -74,7 +74,7 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 	}
 
 	if !slices.Contains(allowedCategories, body.Category) {
-		return models.NewEvent{}, internal.ErrInvalid
+		return models.NewEvent{}, internal.ErrInvalidCategory
 	}
 
 	allowedTimeTypes, err := s.GetAllTimeTypes()
@@ -83,7 +83,7 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 	}
 
 	if !slices.Contains(allowedTimeTypes, body.TimeType) {
-		return models.NewEvent{}, internal.ErrInvalid
+		return models.NewEvent{}, internal.ErrInvalidTimeType
 	}
 
 	if body.Audience != nil {
@@ -93,7 +93,7 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 		}
 
 		if !slices.Contains(allowedAudiences, *body.Audience) {
-			return models.NewEvent{}, internal.ErrInvalid
+			return models.NewEvent{}, internal.ErrInvalidAudience
 		}
 	}
 

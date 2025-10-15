@@ -13,11 +13,16 @@ import (
 )
 
 var (
-	ErrNotFound          = errors.New("could not find id")
-	ErrInvalid           = errors.New("invalid user data")
-	ErrUnauthorized      = errors.New("unauthorized opperation")
-	ErrInvalidForeignKey = errors.New("error foreign key does not exist")
-	ErrorMap             = map[error]struct {
+	ErrNotFound            = errors.New("could not find id")
+	ErrInvalid             = errors.New("invalid user data")
+	ErrUnauthorized        = errors.New("unauthorized opperation")
+	ErrInvalidForeignKey   = errors.New("error foreign key does not exist")
+	ErrInvalidAudience     = errors.New("invalid audience does not exist in enum")
+	ErrInvalidTimeType     = errors.New("invalid time type does not exist in enum")
+	ErrInvalidCategory     = errors.New("invalid category does not exist in enum")
+	ErrInvalidLocationType = errors.New("invalid location type does not exist in enum")
+	ErrInvalidJobType      = errors.New("invalid job type does not exist in enum")
+	ErrorMap               = map[error]struct {
 		Status  int
 		Message string
 	}{
@@ -25,6 +30,14 @@ var (
 		ErrInvalid:           {Status: http.StatusBadRequest, Message: "invalid user data"},
 		ErrUnauthorized:      {Status: http.StatusUnauthorized, Message: "unauthorized operation"},
 		ErrInvalidForeignKey: {Status: http.StatusBadRequest, Message: "error foreign key does not exist"},
+		ErrInvalidAudience:   {Status: http.StatusBadRequest, Message: "invalid audience does not exist in enum"},
+		ErrInvalidTimeType:   {Status: http.StatusBadRequest, Message: "invalid time type does not exist in enum"},
+		ErrInvalidCategory:   {Status: http.StatusBadRequest, Message: "invalid category does not exist in enum"},
+		ErrInvalidLocationType: {
+			Status:  http.StatusBadRequest,
+			Message: "invalid location type does not exist in enum",
+		},
+		ErrInvalidJobType: {Status: http.StatusBadRequest, Message: "invalid job type does not exist in enum"},
 	}
 )
 

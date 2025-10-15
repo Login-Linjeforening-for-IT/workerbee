@@ -1,6 +1,7 @@
 package services
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -35,6 +36,15 @@ func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 }
 
 func (s *JobsService) CreateJob(job models.NewJob) (models.NewJob, error) {
+	jobTypes, _, err := s.GetAllJobTypes()
+	if err != nil {
+		return models.NewJob{}, err
+	}
+
+	if !slices.Contains(jobTypes, job.JobType) {
+		return models.NewJob{}, internal.ErrInvalidJobType
+	}
+
 	newJob, err := s.repo.CreateJob(job)
 	return newJob, err
 }
@@ -133,6 +143,15 @@ func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob
 	}
 
 	job.ID = &id
+
+	jobTypes, _, err := s.GetAllJobTypes()
+	if err != nil {
+		return models.NewJob{}, err
+	}
+
+	if !slices.Contains(jobTypes, job.JobType) {
+		return models.NewJob{}, internal.ErrInvalidJobType
+	}
 
 	return s.repo.UpdateJob(job)
 }
