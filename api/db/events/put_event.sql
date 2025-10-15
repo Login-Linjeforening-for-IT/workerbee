@@ -23,7 +23,7 @@ SET
     link_signup = :link_signup,
     link_stream = :link_stream,
     capacity = :capacity,
-    is_full = :is_full,
+    full_time = :full_time,
     category = :category,
     organization_id = :organization_id,
     location_id = :location_id,

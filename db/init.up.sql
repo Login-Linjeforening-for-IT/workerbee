@@ -2,7 +2,7 @@ CREATE TYPE "time_type_enum" AS ENUM (
     'default',
     'no_end',
     'whole_day',
-    'tbd'
+    'to_be_determined'
 );
 
 CREATE TYPE "location_type" AS ENUM (
@@ -13,26 +13,41 @@ CREATE TYPE "location_type" AS ENUM (
 );
 
 CREATE TYPE "job_type" AS ENUM (
-    'is_full',
-    'part',
+    'full_time',
+    'part_time',
     'summer',
     'verv'
 );
 
 CREATE TYPE categories AS ENUM (
-  'tekkom',
+  'TekKom',
   'ctfkom',
-  'eventkom',
+  'EvntKom',
   'pr',
-  'sosialt',
-  'login',
-  'buddyweek',
-  'bedkom',
-  'carreerday',
-  'other'
+  'social',
+  'Login',
+  'Buddyweek',
+  'BedKom',
+  'careerday',
+  'Cyberdays',
+  'Other'
 );
 
-CREATE TYPE audience AS ENUM (
+CREATE TYPE categories_no AS ENUM (
+  'TekKom',
+  'ctfkom',
+  'EvntKom',
+  'pr',
+  'sosialt',
+  'Login',
+  'fadderuka',
+  'BedKom',
+  'karrieredag',
+  'Cyberdagene',
+  'Other'
+);
+
+CREATE TYPE audience_en AS ENUM (
   'students',
   'first_semester',
   'second_semester',
@@ -41,8 +56,27 @@ CREATE TYPE audience AS ENUM (
   'fifth_semester',
   'sixth_semester',
   'seventh_semester',
-  'login',
-  'open'
+  'Login',
+  'open',
+  'bachelor',
+  'master',
+  'phd'
+);
+
+CREATE TYPE audience_no AS ENUM (
+  'students',
+  'første_semester',
+  'andre_semester',
+  'tredje_semester',
+  'fjerde_semester',
+  'femte_semester',
+  'sjette_semester',
+  'sjuende_semester',
+  'Login',
+  'åpen',
+  'bachelor',
+  'master',
+  'phd'
 );
 
 CREATE TABLE "events" (
@@ -71,7 +105,7 @@ CREATE TABLE "events" (
     "link_signup" varchar,
     "link_stream" varchar,
     "capacity" int,
-    "is_full" bool NOT NULL DEFAULT false,
+    "full_time" bool NOT NULL DEFAULT false,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,
@@ -136,7 +170,7 @@ CREATE TABLE "jobs" (
     "description_short_en" varchar NOT NULL,
     "description_long_no" varchar NOT NULL,
     "description_long_en" varchar NOT NULL,
-    "job_type" job_type NOT NULL DEFAULT 'is_full',
+    "job_type" job_type NOT NULL DEFAULT 'full_time',
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
     "application_deadline" timestamp NOT NULL,

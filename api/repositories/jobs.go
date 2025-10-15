@@ -23,7 +23,7 @@ type Jobsrepositories interface {
 	UpdateJob(job models.NewJob) (models.NewJob, error)
 	DeleteJob(id string) (int, error)
 	GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
-	GetAllJobTypes() (string, error)
+	GetAllJobTypes() (string, string, error)
 }
 
 type jobsrepositories struct {
@@ -422,13 +422,22 @@ func (r *jobsrepositories) GetCities(limit, offset int, search, orderBy, sort st
 	return cities, nil
 }
 
-func (r *jobsrepositories) GetAllJobTypes() (string, error) {
-	jobTypes, err := db.FetchAllEnumTypes(
+func (r *jobsrepositories) GetAllJobTypes() (string, string, error) {
+	jobTypesEN, err := db.FetchAllEnumTypes(
 		r.db,
-		"./db/jobs/get_all_job_types.sql",
+		"./db/jobs/get_all_job_types_en.sql",
 	)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return jobTypes, nil
+
+	jobTypesNO, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/jobs/get_all_job_types_no.sql",
+	)
+	if err != nil {
+		return "", "", err
+	}
+
+	return jobTypesEN, jobTypesNO, nil
 }

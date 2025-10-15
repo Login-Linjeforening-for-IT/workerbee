@@ -30,7 +30,7 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 }
 
 func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error) {
-	allowedCategories, err := s.GetAllEventCategories()
+	allowedCategories, _, err := s.GetAllEventCategories()
 	if err != nil {
 		return models.NewEvent{}, err
 	}
@@ -39,7 +39,7 @@ func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
-	allowedAudiences, err := s.GetEventAudiences()
+	allowedAudiences, _, err := s.GetEventAudiences()
 	if err != nil {
 		return models.NewEvent{}, err
 	}
@@ -68,12 +68,12 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
-	allowedCategories, err := s.GetAllEventCategories()
+	allowedCategories, _, err := s.GetAllEventCategories()
 	if err != nil {
 		return models.NewEvent{}, err
 	}
 
-	if !slices.Contains(allowedCategories, strings.ToLower(body.Category)) {
+	if !slices.Contains(allowedCategories, body.Category) {
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
@@ -82,17 +82,17 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 		return models.NewEvent{}, err
 	}
 
-	if !slices.Contains(allowedTimeTypes, strings.ToLower(body.TimeType)) {
+	if !slices.Contains(allowedTimeTypes, body.TimeType) {
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
 	if body.Audience != nil {
-		allowedAudiences, err := s.GetEventAudiences()
+		allowedAudiences, _, err := s.GetEventAudiences()
 		if err != nil {
 			return models.NewEvent{}, err
 		}
 
-		if !slices.Contains(allowedAudiences, strings.ToLower(*body.Audience)) {
+		if !slices.Contains(allowedAudiences, *body.Audience) {
 			return models.NewEvent{}, internal.ErrInvalid
 		}
 	}
@@ -100,12 +100,13 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 	return s.repo.UpdateOneEvent(id, body)
 }
 
-func (s *EventService) GetAllEventCategories() ([]string, error) {
-	rawString, err := s.repo.GetAllCategories()
+func (s *EventService) GetAllEventCategories() ([]string, []string, error) {
+	rawEventsEn, rawEventsNo, err := s.repo.GetAllCategories()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return internal.ParsePgArray(rawString), nil
+
+	return internal.ParsePgArray(rawEventsEn), internal.ParsePgArray(rawEventsNo), nil
 }
 
 func (s *EventService) GetAllTimeTypes() ([]string, error) {
@@ -116,12 +117,12 @@ func (s *EventService) GetAllTimeTypes() ([]string, error) {
 	return internal.ParsePgArray(rawString), nil
 }
 
-func (s *EventService) GetEventAudiences() ([]string, error) {
-	audiences, err := s.repo.GetEventAudiences()
+func (s *EventService) GetEventAudiences() ([]string, []string, error) {
+	audiencesEN, audiencesNO, err := s.repo.GetEventAudiences()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return internal.ParsePgArray(audiences), nil
+	return internal.ParsePgArray(audiencesEN), internal.ParsePgArray(audiencesNO), nil
 }
 
 func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str string) ([]models.EventWithTotalCount, error) {
@@ -135,7 +136,7 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	allowedCategories, err := s.GetAllEventCategories()
+	allowedCategories, _, err := s.GetAllEventCategories()
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy
 		return nil, internal.ErrInvalid
 	}
 
-	allowedCategories, err := s.GetAllEventCategories()
+	allowedCategories, _, err := s.GetAllEventCategories()
 	if err != nil {
 		return nil, err
 	}

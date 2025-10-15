@@ -141,19 +141,22 @@ func (h *Handler) GetProtectedEvent(c *gin.Context) {
 }
 
 func (h *Handler) GetAllEventCategories(c *gin.Context) {
-	categories, err := h.Services.Events.GetAllEventCategories()
+	categories_en, categories_no, err := h.Services.Events.GetAllEventCategories()
 	if internal.HandleError(c, err) {
 		return
 	}
-	
+
+	categories := internal.ParseENAndNOArray(categories_en, categories_no)
 	c.JSON(http.StatusOK, categories)
 }
 
 func (h *Handler) GetEventAudiences(c *gin.Context) {
-	audiences, err := h.Services.Events.GetEventAudiences()
+	audiencesEN, audiencesNO, err := h.Services.Events.GetEventAudiences()
 	if internal.HandleError(c, err) {
 		return
 	}
+	
+	audiences := internal.ParseENAndNOArray(audiencesEN, audiencesNO)
 
 	c.JSON(http.StatusOK, audiences)
 }

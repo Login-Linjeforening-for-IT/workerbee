@@ -159,9 +159,7 @@ func (h *Handler) GetJobTypes(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"job_types": jobTypes,
-	})
+	c.JSON(http.StatusOK, jobTypes)
 }
 
 func (h *Handler) GetJobSkills(c *gin.Context) {
@@ -176,10 +174,12 @@ func (h *Handler) GetJobSkills(c *gin.Context) {
 }
 
 func (h *Handler) GetAllJobTypes(c *gin.Context) {
-	jobTypes, err := h.Services.Jobs.GetAllJobTypes()
+	jobTypesEN, jobTypesNO, err := h.Services.Jobs.GetAllJobTypes()
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	jobTypes := internal.ParseENAndNOArray(jobTypesEN, jobTypesNO)
 
 	c.JSON(http.StatusOK, jobTypes)
 }

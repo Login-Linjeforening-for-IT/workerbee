@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+func ParseENAndNOArray(en, no []string) []map[string]string {
+	var categories []map[string]string
+	for i := range en {
+		categories = append(categories, map[string]string{
+			"en": en[i],
+			"no": no[i],
+		})
+	}
+	return categories
+}
+
 func ParsePgArray(s string) []string {
 	s = strings.Trim(s, "{}")
 	if s == "" {

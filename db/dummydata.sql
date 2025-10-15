@@ -2,7 +2,7 @@ CREATE TYPE "time_type_enum" AS ENUM (
     'default',
     'no_end',
     'whole_day',
-    'tbd'
+    'to_be_determined'
 );
 
 CREATE TYPE "location_type" AS ENUM (
@@ -13,23 +13,45 @@ CREATE TYPE "location_type" AS ENUM (
 );
 
 CREATE TYPE "job_type" AS ENUM (
-    'is_full',
-    'part',
+    'full_time',
+    'part_time',
     'summer',
     'verv'
 );
 
+CREATE TYPE "job_type_no" AS ENUM (
+    'full_tid',
+    'del_tid',
+    'sommer',
+    'verv'
+);
+
 CREATE TYPE categories AS ENUM (
-  'tekkom',
-  'ctfkom',
-  'eventkom',
-  'pr',
-  'sosialt',
-  'login',
-  'buddyweek',
-  'bedkom',
-  'carreerday',
-  'other'
+  'TekKom',
+  'CTFKom',
+  'EvntKom',
+  'PR',
+  'Social',
+  'Login',
+  'Buddyweek',
+  'BedKom',
+  'Careerdays',
+  'Cyberdays',
+  'Other'
+);
+
+CREATE TYPE categories_no AS ENUM (
+  'TekKom',
+  'CTFKom',
+  'Evntkom',
+  'PR',
+  'Sosialt',
+  'Login',
+  'Fadderuka',
+  'BedKom',
+  'Karrieredagene',
+  'Cyberdagene',
+  'Other'
 );
 
 CREATE TYPE audience AS ENUM (
@@ -41,8 +63,24 @@ CREATE TYPE audience AS ENUM (
   'fifth_semester',
   'sixth_semester',
   'seventh_semester',
-  'login',
+  'Login',
   'open',
+  'bachelor',
+  'master',
+  'phd'
+);
+
+CREATE TYPE audience_no AS ENUM (
+  'students',
+  'første_semester',
+  'andre_semester',
+  'tredje_semester',
+  'fjerde_semester',
+  'femte_semester',
+  'sjette_semester',
+  'sjuende_semester',
+  'Login',
+  'åpen',
   'bachelor',
   'master',
   'phd'
@@ -74,7 +112,7 @@ CREATE TABLE "events" (
     "link_signup" varchar,
     "link_stream" varchar,
     "capacity" int,
-    "is_full" bool NOT NULL DEFAULT false,
+    "full_time" bool NOT NULL DEFAULT false,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,
@@ -139,7 +177,7 @@ CREATE TABLE "jobs" (
     "description_short_en" varchar NOT NULL,
     "description_long_no" varchar NOT NULL,
     "description_long_en" varchar NOT NULL,
-    "job_type" job_type NOT NULL DEFAULT 'is_full',
+    "job_type" job_type NOT NULL DEFAULT 'full_time',
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
     "application_deadline" timestamp NOT NULL,
@@ -417,7 +455,7 @@ VALUES
   now(), now()),
 ('Påmelding er obligatorisk', 'Registration Required', 
   'Alle deltakere må registrere seg på forhånd for å delta.', 
-  'All participants must register in advance to attend.', 
+  'All part_timeicipants must register in advance to attend.', 
   now(), now()),
 ('Stille mobiltelefoner', 'Silence Mobile Phones', 
   'Alle mobiltelefoner må settes på lydløs under arrangementet.', 
@@ -429,7 +467,7 @@ VALUES
   now(), now()),
 ('Gyldig billett kreves', 'Valid Ticket Required', 
   'Alle deltakere må ha en gyldig billett for å delta på arrangementet.', 
-  'All attendees must present a valid ticket to participate in the event.', 
+  'All attendees must present a valid ticket to part_timeicipate in the event.', 
   now(), now());
 
 INSERT INTO "organizations" (
@@ -505,35 +543,35 @@ VALUES
   'An exciting opportunity for recent graduates to develop software.', 
   'Som Junior Software Developer vil du være med på utvikling av applikasjoner og programvare.', 
   'As a Junior Software Developer, you will be involved in the development of applications and software.', 
-  'is_full', now(), '2025-03-31', '2025-03-01', 'https://www.example.com/banner.jpg', 
+  'full_time', now(), '2025-03-31', '2025-03-01', 'https://www.example.com/banner.jpg', 
   1, 'https://www.uio.no/job-apply', now(), now()),
 (true, true, 'Markedsføringskoordinator', 'Marketing Coordinator', 'Markedsføringsspesialist', 
   'Marketing Specialist', 'Bli en del av vårt markedsføringsteam og jobb med spennende prosjekter.', 
   'Join our marketing team and work on exciting projects.', 
   'Som markedsføringskoordinator vil du ha ansvar for markedsføring og kommunikasjon på tvers av kanaler.', 
   'As a Marketing Coordinator, you will be responsible for marketing and communication across channels.', 
-  'part', now(), '2025-05-31', '2025-04-15', 'https://www.example.com/banner2.jpg', 
+  'part_time', now(), '2025-05-31', '2025-04-15', 'https://www.example.com/banner2.jpg', 
   3, 'https://www.dnb.no/job-apply', now(), now()),
 (false, false, 'Prosjektleder', 'Project Manager', 'Senior prosjektleder', 
   'Senior Project Manager', 'Vi søker en erfaren prosjektleder til å lede store prosjekter.', 
   'We are looking for an experienced project manager to lead large projects.', 
   'Som prosjektleder vil du ha ansvar for å lede prosjekter fra start til slutt, inkludert budsjett og tidsplanlegging.', 
   'As a Project Manager, you will be responsible for leading projects from start to finish, including budgeting and scheduling.', 
-  'is_full', now(), '2027-06-30', '2027-05-01', 'https://www.example.com/banner3.jpg', 
+  'full_time', now(), '2027-06-30', '2027-05-01', 'https://www.example.com/banner3.jpg', 
   4, 'https://www.telenor.no/job-apply', now(), now()),
 (true, false, 'Kundestøtteagent', 'Customer Support Agent', 'Kundestøtteansvarlig', 
   'Customer Support Manager', 'Bli en del av vårt kundeserviceteam og hjelp kunder med deres henvendelser.', 
   'Join our customer service team and assist customers with their inquiries.', 
   'Som kundestøtteansvarlig vil du hjelpe kunder via telefon, e-post og chat, samt sikre god kundetilfredshet.', 
   'As a Customer Support Manager, you will assist customers via phone, email, and chat, ensuring high customer satisfaction.', 
-  'part', now(), '2027-04-15', '2027-03-15', 'https://www.example.com/banner4.jpg', 
+  'part_time', now(), '2027-04-15', '2027-03-15', 'https://www.example.com/banner4.jpg', 
   5, 'https://www.sintef.no/job-apply', now(), now()),
 (true, true, 'Dataanalytiker', 'Data Analyst', 'Dataanalytiker', 
   'Data Analyst', 'Er du en dataanalytiker som elsker å finne innsikt fra store datamengder?', 
   'Are you a data analyst who loves to derive insights from large datasets?', 
   'Som dataanalytiker vil du analysere data for å identifisere trender og lage rapporter som støtter beslutningstaking.', 
   'As a Data Analyst, you will analyze data to identify trends and create reports that support decision-making.', 
-  'is_full', now(), '2025-07-31', '2025-06-01', 'https://www.example.com/banner5.jpg', 
+  'full_time', now(), '2025-07-31', '2025-06-01', 'https://www.example.com/banner5.jpg', 
   2, 'https://www.ntnu.no/job-apply', now(), now());
 
 INSERT INTO "ad_skill_relation" ("job_id", "skill_id")
@@ -557,7 +595,7 @@ INSERT INTO events (
   informational_no, informational_en, time_type, time_start, time_end, 
   time_publish, time_signup_release, time_signup_deadline, canceled, 
   digital, highlight, image_small, image_banner, link_facebook, 
-  link_discord, link_signup, link_stream, capacity, is_full, 
+  link_discord, link_signup, link_stream, capacity, full_time, 
   organization_id, location_id, parent_id, rule_id, audience, category, created_at, updated_at
 )
 VALUES
@@ -567,7 +605,7 @@ VALUES
   'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
   '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
   false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
-  NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 'login', 'tekkom', '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+  NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 'Login', 'TekKom', '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
 
  (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
   'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
@@ -576,7 +614,7 @@ VALUES
   'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', 
   '2025-02-01 09:00:00', '2025-02-15 08:00:00', '2025-03-01 23:59:00', 
   false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
-  NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 'open', 'eventkom', '2025-02-01 09:00:00', '2025-02-01 09:00:00'),
+  NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 'open', 'EvntKom', '2025-02-01 09:00:00', '2025-02-01 09:00:00'),
 
  (true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
   'Utforsk kunstig intelligens i Trondheim!', 'Explore artificial intelligence in Trondheim!', 
@@ -584,7 +622,7 @@ VALUES
   'whole_day', '2025-04-05 10:00:00', '2025-04-05 16:00:00', 
   '2025-03-20 08:00:00', '2025-03-20 08:00:00', '2025-04-01 23:59:00', 
   false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
-  NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 'login', 'tekkom', '2025-03-01 09:00:00', '2025-03-01 09:00:00'),
+  NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 'Login', 'TekKom', '2025-03-01 09:00:00', '2025-03-01 09:00:00'),
 
  (true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
   'Lær om cybersikkerhet i Stavanger!', 'Learn about cybersecurity in Stavanger!', 
@@ -592,7 +630,7 @@ VALUES
   'whole_day', '2025-05-12 09:00:00', '2025-05-12 17:00:00', 
   '2025-04-01 09:00:00', '2025-04-10 08:00:00', '2025-05-01 23:59:00', 
   true, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
-  NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 'login', 'ctfkom', '2025-04-01 09:00:00', '2025-04-01 09:00:00'),
+  NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 'Login', 'CTFKom', '2025-04-01 09:00:00', '2025-04-01 09:00:00'),
 
  (true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
   'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
@@ -600,7 +638,7 @@ VALUES
   'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
   '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
   false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
-  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 'open', 'eventkom', '2025-05-01 09:00:00', '2025-05-01 09:00:00');
+  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 'open', 'EvntKom', '2025-05-01 09:00:00', '2025-05-01 09:00:00');
 
 -- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
 -- 10 submissions per form (one per user), and 10 answers per question.

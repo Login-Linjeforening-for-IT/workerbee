@@ -19,8 +19,8 @@ type Eventrepositories interface {
 	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
-	GetAllCategories() (string, error)
-	GetEventAudiences() (string, error)
+	GetAllCategories() (string, string, error)
+	GetEventAudiences() (string, string, error)
 	GetAllTimeTypes() (string, error)
 }
 
@@ -122,26 +122,44 @@ func (r *eventRepositories) DeleteEvent(id string) (int, error) {
 	return eventId, nil
 }
 
-func (r *eventRepositories) GetAllCategories() (string, error) {
-	categories, err := db.FetchAllEnumTypes(
+func (r *eventRepositories) GetAllCategories() (string, string, error) {
+	categoriesEN, err := db.FetchAllEnumTypes(
 		r.db,
-		"./db/events/get_all_categories.sql",
+		"./db/events/get_all_categories_en.sql",
 	)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return categories, nil
+
+	categoriesNO, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_categories_no.sql",
+	)
+
+	if err != nil {
+		return "", "", err
+	}
+	return categoriesEN, categoriesNO, nil
 }
 
-func (r *eventRepositories) GetEventAudiences() (string, error) {
-	audiences, err := db.FetchAllEnumTypes(
+func (r *eventRepositories) GetEventAudiences() (string, string, error) {
+	audiencesEN, err := db.FetchAllEnumTypes(
 		r.db,
-		"./db/events/get_all_audiences.sql",
+		"./db/events/get_all_audiences_en.sql",
 	)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return audiences, nil
+
+	audiencesNO, err := db.FetchAllEnumTypes(
+		r.db,
+		"./db/events/get_all_audiences_no.sql",
+	)
+
+	if err != nil {
+		return "", "", err
+	}
+	return audiencesEN, audiencesNO, nil
 }
 
 func (r *eventRepositories) GetAllTimeTypes() (string, error) {

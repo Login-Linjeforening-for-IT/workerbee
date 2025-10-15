@@ -1,7 +1,6 @@
 package services
 
 import (
-	"log"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -37,7 +36,6 @@ func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 
 func (s *JobsService) CreateJob(job models.NewJob) (models.NewJob, error) {
 	newJob, err := s.repo.CreateJob(job)
-	log.Println(err)
 	return newJob, err
 }
 
@@ -51,7 +49,6 @@ func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, s
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
-
 
 	skillsSlice, err := parseFromStringToSlice(skills)
 	if err != nil {
@@ -71,7 +68,6 @@ func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, s
 	return s.repo.GetProtectedJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
 }
 
-
 func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
 
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
@@ -83,7 +79,6 @@ func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobT
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
-
 
 	skillsSlice, err := parseFromStringToSlice(skills)
 	if err != nil {
@@ -123,12 +118,12 @@ func (s *JobsService) GetJobSkills() ([]models.JobSkills, error) {
 	return s.repo.GetJobSkills()
 }
 
-func (s *JobsService) GetAllJobTypes() ([]string, error) {
-	jobTypes, err := s.repo.GetAllJobTypes()
+func (s *JobsService) GetAllJobTypes() ([]string, []string, error) {
+	jobTypesEN, jobTypesNO, err := s.repo.GetAllJobTypes()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return internal.ParsePgArray(jobTypes), nil
+	return internal.ParsePgArray(jobTypesEN), internal.ParsePgArray(jobTypesNO), nil
 }
 
 func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob, error) {
@@ -138,7 +133,6 @@ func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob
 	}
 
 	job.ID = &id
-
 
 	return s.repo.UpdateJob(job)
 }
