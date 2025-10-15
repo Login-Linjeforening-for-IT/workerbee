@@ -19,35 +19,42 @@ CREATE TYPE "job_type" AS ENUM (
     'verv'
 );
 
+CREATE TYPE "job_type_no" AS ENUM (
+    'full_tid',
+    'del_tid',
+    'sommer',
+    'verv'
+);
+
 CREATE TYPE categories AS ENUM (
   'TekKom',
-  'ctfkom',
+  'CTFKom',
   'EvntKom',
-  'pr',
-  'social',
+  'PR',
+  'Social',
   'Login',
   'Buddyweek',
   'BedKom',
-  'careerday',
+  'Careerdays',
   'Cyberdays',
   'Other'
 );
 
 CREATE TYPE categories_no AS ENUM (
   'TekKom',
-  'ctfkom',
-  'EvntKom',
-  'pr',
-  'sosialt',
+  'CTFKom',
+  'Evntkom',
+  'PR',
+  'Sosialt',
   'Login',
-  'fadderuka',
+  'Fadderuka',
   'BedKom',
-  'karrieredag',
+  'Karrieredagene',
   'Cyberdagene',
   'Other'
 );
 
-CREATE TYPE audience_en AS ENUM (
+CREATE TYPE audience AS ENUM (
   'students',
   'first_semester',
   'second_semester',
