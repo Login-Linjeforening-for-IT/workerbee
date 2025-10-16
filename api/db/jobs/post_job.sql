@@ -12,13 +12,12 @@ INSERT INTO jobs
     description_long_en,
     job_type,
     time_expire,
-    application_deadline,
     banner_image,
     organization_id,
     application_url
 )
 VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
 )
 RETURNING *,
 (

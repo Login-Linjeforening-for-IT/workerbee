@@ -23,7 +23,6 @@ type BaseJob struct {
 	JobType             string             `db:"job_type" json:"job_type"`
 	TimePublish         internal.LocalTime `db:"time_publish" json:"time_publish"`
 	TimeExpire          internal.LocalTime `db:"time_expire" json:"time_expire"`
-	ApplicationDeadline internal.LocalTime `db:"application_deadline" json:"application_deadline"`
 	BannerImage         *string            `db:"banner_image" json:"banner_image,omitempty"`
 	ApplicationURL      *string            `db:"application_url" json:"application_url,omitempty"`
 	CreatedAt           internal.LocalTime `db:"created_at" json:"created_at"`

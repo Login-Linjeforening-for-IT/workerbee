@@ -14,7 +14,6 @@ SELECT
     ja.job_type,
     ja.time_publish,
     ja.time_expire,
-    ja.application_deadline,
     ja.banner_image,
     ja.application_url,
     ja.created_at,

@@ -179,7 +179,6 @@ CREATE TABLE "jobs" (
     "job_type" job_type NOT NULL DEFAULT 'full_time',
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
-    "application_deadline" timestamp NOT NULL,
     "banner_image" varchar,
     "organization_id" int NOT NULL,
     "application_url" varchar,

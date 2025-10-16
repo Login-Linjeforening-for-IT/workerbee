@@ -14,10 +14,9 @@ SET
     job_type = $12,
     time_publish = $13,
     time_expire = $14,
-    application_deadline = $15,
-    banner_image = $16,
-    organization_id = $17,
-    application_url = $18,
+    banner_image = $15,
+    organization_id = $16,
+    application_url = $17,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *,
