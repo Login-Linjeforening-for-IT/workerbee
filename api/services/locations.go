@@ -33,6 +33,11 @@ func (s *LocationService) CreateLocation(location models.Location) (models.Locat
 		return models.Location{}, err
 	}
 
+	if location.Type == nil {
+		location.Type = new(string)
+		*location.Type = "digital"
+	}
+
 	if !slices.Contains(allowedTypes, *location.Type) {
 		return models.Location{}, internal.ErrInvalidLocationType
 	}

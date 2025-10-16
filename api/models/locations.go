@@ -4,9 +4,9 @@ import "workerbee/internal"
 
 type Location struct {
 	ID              *int                `db:"id" json:"id,omitempty"`
-	NameNO          *string             `db:"name_no" json:"name_no" validate:"required"`
-	NameEN          *string             `db:"name_en" json:"name_en" validate:"required"`
-	Type            *string             `db:"type" json:"type"`
+	NameNO          *string             `db:"name_no" json:"name_no,omitempty" validate:"required"`
+	NameEN          *string             `db:"name_en" json:"name_en,omitempty" validate:"required"`
+	Type            *string             `db:"type" json:"type,omitempty"`
 	MazemapCampusID *int                `db:"mazemap_campus_id" json:"mazemap_campus_id,omitempty"`
 	MazemapPoiID    *int                `db:"mazemap_poi_id" json:"mazemap_poi_id,omitempty"`
 	AddressStreet   *string             `db:"address_street" json:"address_street,omitempty"`
@@ -14,7 +14,7 @@ type Location struct {
 	City            *Cities             `db:"cities" json:"cities,omitempty"`
 	CoordinateLat   *float64            `db:"coordinate_lat" json:"coordinate_lat,omitempty"`
 	CoordinateLon   *float64            `db:"coordinate_lon" json:"coordinate_lon,omitempty"`
-	URL             *string             `db:"url" json:"url,omitempty" validate:"omitempty"`
+	URL             *string             `db:"url" json:"url,omitempty"`
 	CreatedAt       *internal.LocalTime `db:"created_at" json:"created_at"`
 	UpdatedAt       *internal.LocalTime `db:"updated_at" json:"updated_at"`
 }

@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"workerbee/internal"
 
@@ -88,6 +89,7 @@ func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
 		if errors.As(err, &pqErr) && pqErr.Code == "23503" {
 			return result, internal.ErrInvalidForeignKey
 		}
+		log.Println("got error ", err)
 		return result, internal.ErrInvalid
 	}
 	defer rows.Close()
