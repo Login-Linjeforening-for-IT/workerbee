@@ -138,7 +138,6 @@ CREATE TABLE "organizations" (
     "name_en" varchar NOT NULL,
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
-    "type" int NOT NULL DEFAULT 1,
     "link_homepage" varchar NOT NULL,
     "link_linkedin" varchar,
     "link_facebook" varchar,
@@ -221,7 +220,6 @@ CREATE INDEX ON "events" ("created_at");
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
 
-CREATE INDEX ON "organizations" ("type");
 CREATE INDEX ON "organizations" ("updated_at");
 CREATE INDEX ON "organizations" ("created_at");
 

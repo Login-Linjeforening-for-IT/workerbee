@@ -31,7 +31,6 @@ type BaseJob struct {
 }
 
 type Job struct {
-	ID           *int          `db:"id" json:"id"`
 	Organization *Organization `db:"organization" json:"organization,omitempty"`
 	BaseJob
 }

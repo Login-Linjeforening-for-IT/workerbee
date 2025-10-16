@@ -138,7 +138,6 @@ CREATE TABLE "organizations" (
     "name_en" varchar NOT NULL,
     "description_no" varchar NOT NULL,
     "description_en" varchar NOT NULL,
-    "type" int NOT NULL DEFAULT 1,
     "link_homepage" varchar NOT NULL,
     "link_linkedin" varchar,
     "link_facebook" varchar,
@@ -221,7 +220,6 @@ CREATE INDEX ON "events" ("created_at");
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
 
-CREATE INDEX ON "organizations" ("type");
 CREATE INDEX ON "organizations" ("updated_at");
 CREATE INDEX ON "organizations" ("created_at");
 
@@ -475,7 +473,6 @@ INSERT INTO "organizations" (
   "name_en", 
   "description_no", 
   "description_en", 
-  "type", 
   "link_homepage", 
   "link_linkedin", 
   "link_facebook", 
@@ -488,31 +485,31 @@ VALUES
   ('Universitetet i Oslo', 'University of Oslo', 
    'Universitetet i Oslo er Norges største universitet, med et bredt fagtilbud.', 
    'The University of Oslo is Norways largest university, offering a wide range of programs.', 
-   1, 'https://www.uio.no', 'https://www.linkedin.com/school/university-of-oslo', 
+   'https://www.uio.no', 'https://www.linkedin.com/school/university-of-oslo', 
    'https://www.facebook.com/uni.oslo', 'https://www.instagram.com/uniofoslo', 
    'logo.png', now(), now()),
   ('Norges teknisk-naturvitenskapelige universitet', 'Norwegian University of Science and Technology', 
    'NTNU er et teknisk universitet i Trondheim, kjent for sin forskning på teknologi og naturvitenskap.', 
    'NTNU is a technical university in Trondheim, known for its research in technology and natural sciences.', 
-   2, 'https://www.ntnu.no', 'https://www.linkedin.com/school/ntnu', 
+   'https://www.ntnu.no', 'https://www.linkedin.com/school/ntnu', 
    'https://www.facebook.com/NTNU.no', 'https://www.instagram.com/ntnu_official', 
    'logo.png', now(), now()),
   ('DNB ASA', 'DNB ASA', 
    'DNB er Norges største finanskonsern med et bredt tilbud av finansielle tjenester.', 
    'DNB is Norways largest financial group, offering a wide range of financial services.', 
-   3, 'https://www.dnb.no', 'https://www.linkedin.com/company/dnb', 
+   'https://www.dnb.no', 'https://www.linkedin.com/company/dnb', 
    'https://www.facebook.com/dnb.no', 'https://www.instagram.com/dnb.no', 
    'logo.png', now(), now()),
   ('Telenor ASA', 'Telenor ASA', 
    'Telenor er et ledende teleselskap som tilbyr mobil- og bredbåndstjenester.', 
    'Telenor is a leading telecommunications company offering mobile and broadband services.', 
-   3, 'https://www.telenor.no', 'https://www.linkedin.com/company/telenor', 
+   'https://www.telenor.no', 'https://www.linkedin.com/company/telenor', 
    'https://www.facebook.com/telenor', 'https://www.instagram.com/telenor', 
    'logo.png', now(), now()),
   ('SINTEF', 'SINTEF', 
    'SINTEF er en av Europas største uavhengige forskningsorganisasjoner, kjent for sitt arbeid innen teknologi og innovasjon.', 
    'SINTEF is one of Europes largest independent research organizations, known for its work in technology and innovation.', 
-   4, 'https://www.sintef.no', 'https://www.linkedin.com/company/sintef', 
+   'https://www.sintef.no', 'https://www.linkedin.com/company/sintef', 
    'https://www.facebook.com/SINTEF', 'https://www.instagram.com/sintef', 
    'logo.png', now(), now());
 

@@ -23,7 +23,6 @@ SELECT
     org.name_en AS "organization.name_en",
     org.description_no AS "organization.description_no",
     org.description_en AS "organization.description_en",
-    org.type AS "organization.type",
     org.link_homepage AS "organization.link_homepage",
     org.link_facebook AS "organization.link_facebook",
     org.link_linkedin AS "organization.link_linkedin",
