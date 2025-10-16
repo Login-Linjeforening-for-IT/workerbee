@@ -66,7 +66,9 @@ SELECT
     o.link_linkedin AS "organization.link_linkedin",
     o.created_at AS "organization.created_at",
     o.updated_at AS "organization.updated_at",
-    o.logo AS "organization.logo"
+    o.logo AS "organization.logo",
+
+    COUNT(*) OVER() AS total_count
 FROM events AS e
 LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
