@@ -42,6 +42,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		req, err := http.NewRequest(http.MethodGet, internal.USERINFO_URL, nil)
 		if internal.HandleError(c, err) {
+			c.Abort()
 			return
 		}
 
@@ -50,6 +51,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		client := &http.Client{}
 		resp, err := client.Do(req)
 		if internal.HandleError(c, err) {
+			c.Abort()
 			return
 		}
 
