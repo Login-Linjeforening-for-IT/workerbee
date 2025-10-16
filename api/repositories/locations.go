@@ -10,10 +10,10 @@ import (
 )
 
 type LocationRepository interface {
-	CreateLocation(location models.Location) (models.Location, error)
+	CreateLocation(location models.NewLocation) (models.NewLocation, error)
 	GetLocations(limit, offset int, search, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error)
 	GetLocation(id string) (models.Location, error)
-	UpdateLocation(location models.Location) (models.Location, error)
+	UpdateLocation(location models.NewLocation) (models.NewLocation, error)
 	DeleteLocation(id string) (int, error)
 	GetAllLocationTypes() (string, error)
 }
@@ -26,7 +26,7 @@ func NewLocationRepository(db *sqlx.DB) LocationRepository {
 	return &locationRepository{db: db}
 }
 
-func (r *locationRepository) CreateLocation(location models.Location) (models.Location, error) {
+func (r *locationRepository) CreateLocation(location models.NewLocation) (models.NewLocation, error) {
 	return db.AddOneRow(
 		r.db,
 		"./db/locations/post_location.sql",
@@ -34,7 +34,7 @@ func (r *locationRepository) CreateLocation(location models.Location) (models.Lo
 	)
 }
 
-func (r *locationRepository) UpdateLocation(location models.Location) (models.Location, error) {
+func (r *locationRepository) UpdateLocation(location models.NewLocation) (models.NewLocation, error) {
 	return db.AddOneRow(
 		r.db,
 		"./db/locations/put_location.sql",

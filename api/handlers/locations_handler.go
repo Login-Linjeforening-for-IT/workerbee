@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateLocation(c *gin.Context) {
-	var location models.Location
+	var location models.NewLocation
 
 	if err := c.ShouldBindBodyWithJSON(&location); internal.HandleError(c, err) {
 		return
@@ -75,7 +75,7 @@ func (h *Handler) GetAllLocationTypes(c *gin.Context) {
 }
 
 func (h *Handler) UpdateLocation(c *gin.Context) {
-	var location models.Location
+	var location models.NewLocation
 	id := c.Param("id")
 
 	if err := c.ShouldBindBodyWithJSON(&location); internal.HandleError(c, err) {

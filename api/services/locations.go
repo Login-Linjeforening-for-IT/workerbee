@@ -27,10 +27,10 @@ func NewLocationService(repo repositories.LocationRepository) *LocationService {
 	return &LocationService{repo: repo}
 }
 
-func (s *LocationService) CreateLocation(location models.Location) (models.Location, error) {
+func (s *LocationService) CreateLocation(location models.NewLocation) (models.NewLocation, error) {
 	allowedTypes, err := s.GetAllLocationTypes()
 	if err != nil {
-		return models.Location{}, err
+		return models.NewLocation{}, err
 	}
 
 	if location.Type == nil {
@@ -39,7 +39,7 @@ func (s *LocationService) CreateLocation(location models.Location) (models.Locat
 	}
 
 	if !slices.Contains(allowedTypes, *location.Type) {
-		return models.Location{}, internal.ErrInvalidLocationType
+		return models.NewLocation{}, internal.ErrInvalidLocationType
 	}
 
 	return s.repo.CreateLocation(location)
@@ -87,10 +87,10 @@ func (s *LocationService) DeleteLocation(id string) (int, error) {
 	return s.repo.DeleteLocation(id)
 }
 
-func (s *LocationService) UpdateLocation(id_str string, location models.Location) (models.Location, error) {
+func (s *LocationService) UpdateLocation(id_str string, location models.NewLocation) (models.NewLocation, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
-		return models.Location{}, err
+		return models.NewLocation{}, err
 	}
 
 	location.ID = &id
@@ -98,11 +98,11 @@ func (s *LocationService) UpdateLocation(id_str string, location models.Location
 	if location.Type != nil {
 		allowedTypes, err := s.GetAllLocationTypes()
 		if err != nil {
-			return models.Location{}, err
+			return models.NewLocation{}, err
 		}
 
 		if !slices.Contains(allowedTypes, strings.ToLower(*location.Type)) {
-			return models.Location{}, internal.ErrInvalid
+			return models.NewLocation{}, internal.ErrInvalid
 		}
 	}
 
