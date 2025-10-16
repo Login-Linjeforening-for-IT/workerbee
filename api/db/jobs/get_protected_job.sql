@@ -48,5 +48,4 @@ LEFT JOIN (
     GROUP BY asr.job_id
 ) skill_agg ON skill_agg.job_id = ja.id
 WHERE ja.id = $1
-    AND ja.visible = true
     AND ja.time_publish <= now();

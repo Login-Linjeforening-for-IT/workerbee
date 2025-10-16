@@ -42,8 +42,6 @@ type Event struct {
 	Location       *Location     `db:"location" json:"location,omitempty"`
 	Rule           *Rule         `db:"rules" json:"rule,omitempty"`
 	Audience       *int          `db:"audience_id" json:"audience_id,omitempty"`
-	AudienceNameEn *string       `db:"audience_name_en" json:"audience_name_en,omitempty"`
-	AudienceNameNo *string       `db:"audience_name_no" json:"audience_name_no,omitempty"`
 	Organization   *Organization `db:"organization" json:"organization,omitempty"`
 }
 
