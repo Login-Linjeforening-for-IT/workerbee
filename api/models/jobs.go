@@ -1,33 +1,33 @@
 package models
 
 import (
-	"time"
+	"workerbee/internal"
 
 	"github.com/lib/pq"
 )
 
 type BaseJob struct {
-	ID                  *int           `db:"id" json:"id"`
-	Visible             bool           `db:"visible" json:"visible"`
-	Highlight           bool           `db:"highlight" json:"highlight"`
-	TitleNo             string         `db:"title_no" json:"title_no"`
-	TitleEn             string         `db:"title_en" json:"title_en"`
-	Cities              pq.StringArray `db:"cities" json:"cities"`
-	Skills              pq.StringArray `db:"skills" json:"skills"`
-	PositionTitleNo     string         `db:"position_title_no" json:"position_title_no"`
-	PositionTitleEn     string         `db:"position_title_en" json:"position_title_en"`
-	DescriptionShortNo  string         `db:"description_short_no" json:"description_short_no"`
-	DescriptionShortEn  string         `db:"description_short_en" json:"description_short_en"`
-	DescriptionLongNo   string         `db:"description_long_no" json:"description_long_no"`
-	DescriptionLongEn   string         `db:"description_long_en" json:"description_long_en"`
-	JobType             string         `db:"job_type" json:"job_type"`
-	TimePublish         time.Time      `db:"time_publish" json:"time_publish"`
-	TimeExpire          time.Time      `db:"time_expire" json:"time_expire"`
-	ApplicationDeadline time.Time      `db:"application_deadline" json:"application_deadline"`
-	BannerImage         *string        `db:"banner_image" json:"banner_image,omitempty"`
-	ApplicationURL      *string        `db:"application_url" json:"application_url,omitempty"`
-	CreatedAt           time.Time      `db:"created_at" json:"created_at"`
-	UpdatedAt           time.Time      `db:"updated_at" json:"updated_at"`
+	ID                  *int               `db:"id" json:"id"`
+	Visible             bool               `db:"visible" json:"visible"`
+	Highlight           bool               `db:"highlight" json:"highlight"`
+	TitleNo             string             `db:"title_no" json:"title_no"`
+	TitleEn             string             `db:"title_en" json:"title_en"`
+	Cities              pq.StringArray     `db:"cities" json:"cities"`
+	Skills              pq.StringArray     `db:"skills" json:"skills"`
+	PositionTitleNo     string             `db:"position_title_no" json:"position_title_no"`
+	PositionTitleEn     string             `db:"position_title_en" json:"position_title_en"`
+	DescriptionShortNo  string             `db:"description_short_no" json:"description_short_no"`
+	DescriptionShortEn  string             `db:"description_short_en" json:"description_short_en"`
+	DescriptionLongNo   string             `db:"description_long_no" json:"description_long_no"`
+	DescriptionLongEn   string             `db:"description_long_en" json:"description_long_en"`
+	JobType             string             `db:"job_type" json:"job_type"`
+	TimePublish         internal.LocalTime `db:"time_publish" json:"time_publish"`
+	TimeExpire          internal.LocalTime `db:"time_expire" json:"time_expire"`
+	ApplicationDeadline internal.LocalTime `db:"application_deadline" json:"application_deadline"`
+	BannerImage         *string            `db:"banner_image" json:"banner_image,omitempty"`
+	ApplicationURL      *string            `db:"application_url" json:"application_url,omitempty"`
+	CreatedAt           internal.LocalTime `db:"created_at" json:"created_at"`
+	UpdatedAt           internal.LocalTime `db:"updated_at" json:"updated_at"`
 }
 
 type Job struct {

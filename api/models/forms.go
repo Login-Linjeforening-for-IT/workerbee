@@ -2,14 +2,15 @@ package models
 
 import (
 	"time"
+	"workerbee/internal"
 )
 
 type User struct {
 	ID        int       `db:"id" json:"id"`
 	FullName  string    `db:"full_name" json:"full_name"`
 	Email     string    `db:"email" json:"email"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	CreatedAt internal.LocalTime `db:"created_at" json:"created_at"`
+	UpdatedAt internal.LocalTime `db:"updated_at" json:"updated_at"`
 }
 
 type Form struct {
@@ -18,10 +19,10 @@ type Form struct {
 	Title       string    `db:"title" json:"title"`
 	Description *string   `db:"description" json:"description"`
 	Capacity    *int      `db:"capacity" json:"capacity"`
-	OpenAt      time.Time `db:"open_at" json:"open_at"`
-	CloseAt     time.Time `db:"close_at" json:"close_at"`
-	CreatedAt   time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
+	OpenAt      internal.LocalTime `db:"open_at" json:"open_at"`
+	CloseAt     internal.LocalTime `db:"close_at" json:"close_at"`
+	CreatedAt   internal.LocalTime `db:"created_at" json:"created_at"`
+	UpdatedAt   internal.LocalTime `db:"updated_at" json:"updated_at"`
 }
 
 type FormWithTotalCount struct {

@@ -149,7 +149,7 @@ func (h *Handler) GetEventAudiences(c *gin.Context) {
 	if internal.HandleError(c, err) {
 		return
 	}
-	
+
 	audiences := internal.ParseENAndNOArray(audiencesEN, audiencesNO)
 
 	c.JSON(http.StatusOK, audiences)
