@@ -19,7 +19,7 @@ SELECT
 
     COUNT (*) OVER() AS total_count
 FROM locations AS l
-INNER JOIN cities c ON c.id = l.city_id
+LEFT JOIN cities c ON c.id = l.city_id
 WHERE
     (
         $1 = '' OR

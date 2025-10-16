@@ -40,8 +40,8 @@ type NewJob struct {
 }
 
 type Cities struct {
-	ID   int    `db:"id" json:"id,omitempty"`
-	Name string `db:"name"`
+	ID   *int    `db:"id" json:"id,omitempty"`
+	Name *string `db:"name"`
 }
 
 type JobType struct {
@@ -49,8 +49,8 @@ type JobType struct {
 }
 
 type JobSkills struct {
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID   *int    `db:"id"`
+	Name *string `db:"name"`
 }
 
 type CitiesWithTotalCount struct {

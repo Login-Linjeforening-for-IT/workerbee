@@ -17,5 +17,5 @@ SELECT
     c.id AS "cities.id",
     c.name AS "cities.name"
 FROM locations AS l
-INNER JOIN cities c ON c.id = l.city_id
+LEFT JOIN cities c ON c.id = l.city_id
 WHERE l.id = $1;
