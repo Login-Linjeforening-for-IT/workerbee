@@ -11,10 +11,7 @@ import (
 func (h *Handler) CreateRule(c *gin.Context) {
 	var rule models.Rule
 
-	if err := c.ShouldBindBodyWithJSON(&rule); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&rule); internal.HandleError(c, err) {
 		return
 	}
 
@@ -34,10 +31,7 @@ func (h *Handler) UpdateRule(c *gin.Context) {
 	var rule models.Rule
 	id := c.Param("id")
 
-	if err := c.ShouldBindBodyWithJSON(&rule); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&rule); internal.HandleError(c, err) {
 		return
 	}
 

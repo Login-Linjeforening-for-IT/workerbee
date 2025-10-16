@@ -11,10 +11,7 @@ import (
 func (h *Handler) CreateLocation(c *gin.Context) {
 	var location models.Location
 
-	if err := c.ShouldBindBodyWithJSON(&location); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&location); internal.HandleError(c, err) {
 		return
 	}
 
@@ -81,10 +78,7 @@ func (h *Handler) UpdateLocation(c *gin.Context) {
 	var location models.Location
 	id := c.Param("id")
 
-	if err := c.ShouldBindBodyWithJSON(&location); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&location); internal.HandleError(c, err) {
 		return
 	}
 

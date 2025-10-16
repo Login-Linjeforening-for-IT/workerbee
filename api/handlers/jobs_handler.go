@@ -11,10 +11,7 @@ import (
 func (h *Handler) CreateJob(c *gin.Context) {
 	var job models.NewJob
 
-	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&job); internal.HandleError(c, err) {
 		return
 	}
 
@@ -112,10 +109,7 @@ func (h *Handler) UpdateJob(c *gin.Context) {
 	id := c.Param("id")
 	var job models.NewJob
 
-	if err := c.ShouldBindBodyWithJSON(&job); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&job); internal.HandleError(c, err) {
 		return
 	}
 

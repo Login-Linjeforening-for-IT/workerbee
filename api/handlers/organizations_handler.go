@@ -11,10 +11,7 @@ import (
 func (h *Handler) CreateOrganization(c *gin.Context) {
 	var org models.Organization
 
-	if err := c.ShouldBindBodyWithJSON(&org); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&org); internal.HandleError(c, err) {
 		return
 	}
 
@@ -34,10 +31,7 @@ func (h *Handler) UpdateOrganization(c *gin.Context) {
 	var org models.Organization
 	id := c.Param("id")
 
-	if err := c.ShouldBindBodyWithJSON(&org); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid body",
-		})
+	if err := c.ShouldBindBodyWithJSON(&org); internal.HandleError(c, err) {
 		return
 	}
 
