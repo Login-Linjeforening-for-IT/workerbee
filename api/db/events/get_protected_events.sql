@@ -61,7 +61,6 @@ SELECT
     o.name_en AS "organization.name_en",
     o.description_no AS "organization.description_no",
     o.description_en AS "organization.description_en",
-    o.type AS "organization.type",
     o.link_homepage AS "organization.link_homepage",
     o.link_facebook AS "organization.link_facebook",
     o.link_linkedin AS "organization.link_linkedin",
