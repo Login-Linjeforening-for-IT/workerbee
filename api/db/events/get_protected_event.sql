@@ -73,9 +73,16 @@ SELECT
     c.name_en AS "category.name_en",
     c.color AS "category.color",
     c.created_at AS "category.created_at",
-    c.updated_at AS "category.updated_at"
+    c.updated_at AS "category.updated_at",
+
+    a.id AS "audience.id",
+    a.name_no AS "audience.name_no",
+    a.name_en AS "audience.name_en",
+    a.created_at AS "audience.created_at",
+    a.updated_at AS "audience.updated_at"
 FROM events AS e
 LEFT JOIN categories AS c ON e.category_id = c.id
+LEFT JOIN audiences AS a ON e.audience_id = a.id
 LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id

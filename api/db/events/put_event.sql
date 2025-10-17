@@ -29,7 +29,7 @@ SET
     location_id = :location_id,
     parent_id = :parent_id,
     rule_id = :rule_id,
-    audience = :audience,
+    audience_id = :audience_id,
     updated_at = NOW()
 WHERE id = :id
 RETURNING *;

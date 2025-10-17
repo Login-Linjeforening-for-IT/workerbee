@@ -114,7 +114,7 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	categories, err := parseCategories(categories_str)
+	categories, err := parseToArray(categories_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
@@ -138,7 +138,7 @@ func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy
 		return nil, internal.ErrInvalid
 	}
 
-	categories, err := parseCategories(categories_str)
+	categories, err := parseToArray(categories_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
@@ -162,9 +162,9 @@ func (s *EventService) DeleteEvent(id string) (int, error) {
 	return s.repo.DeleteEvent(id)
 }
 
-func parseCategories(categories_str string) ([]int, error) {
-	if categories_str != "" {
-		categories, err := internal.ParseCSVToSlice[int](categories_str)
+func parseToArray(content string) ([]int, error) {
+	if content != "" {
+		categories, err := internal.ParseCSVToSlice[int](content)
 		if err != nil {
 			return nil, internal.ErrInvalid
 		}

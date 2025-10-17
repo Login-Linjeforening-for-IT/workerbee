@@ -74,7 +74,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/skills", h.GetJobSkills)
 			jobs.GET("/types/all", h.GetAllJobTypes)
 		}
-
+		audiences := v2.Group("/audiences")
+		{
+			audiences.GET("/:id", h.GetAudience)
+			audiences.GET("/", h.GetAudiences)
+			audiences.POST("/", middleware.AuthMiddleware(), h.CreateAudience)
+			audiences.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAudience)
+			audiences.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAudience)
+		}
 		stats := v2.Group("/stats")
 		{
 			stats.GET("/total", h.GetTotalStats)

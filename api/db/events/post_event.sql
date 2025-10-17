@@ -27,7 +27,7 @@ INSERT INTO events (
     location_id, 
     parent_id, 
     rule_id, 
-    audience, 
+    audience_id, 
     organization_id
 ) VALUES (
     :visible, 
@@ -58,7 +58,7 @@ INSERT INTO events (
     :location_id,
     :parent_id, 
     :rule_id, 
-    :audience, 
+    :audience_id, 
     :organization_id
 )
 RETURNING *;

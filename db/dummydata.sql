@@ -26,36 +26,12 @@ CREATE TYPE "job_type_no" AS ENUM (
     'verv'
 );
 
-CREATE TYPE audience AS ENUM (
-  'students',
-  'first_semester',
-  'second_semester',
-  'third_semester',
-  'fourth_semester',
-  'fifth_semester',
-  'sixth_semester',
-  'seventh_semester',
-  'Login',
-  'open',
-  'bachelor',
-  'master',
-  'phd'
-);
-
-CREATE TYPE audience_no AS ENUM (
-  'students',
-  'første_semester',
-  'andre_semester',
-  'tredje_semester',
-  'fjerde_semester',
-  'femte_semester',
-  'sjette_semester',
-  'sjuende_semester',
-  'Login',
-  'åpen',
-  'bachelor',
-  'master',
-  'phd'
+CREATE TABLE audiences (
+  id SERIAL PRIMARY KEY,
+  audience_en text NOT NULL,
+  audience_no text NOT NULL,
+  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "categories" (
@@ -98,7 +74,7 @@ CREATE TABLE "events" (
     "location_id" int,
     "parent_id" int,
     "rule_id" int,
-    "audience" audience,
+    "audience_id" int,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -218,6 +194,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -318,6 +295,22 @@ CREATE INDEX ON "answers"("option_id");
 ------------------
 -- Dummy Data
 ------------------
+
+INSERT INTO audiences (audience_en, audience_no)
+VALUES
+('students', 'students'),
+('first_semester', 'første_semester'),
+('second_semester', 'andre_semester'),
+('third_semester', 'tredje_semester'),
+('fourth_semester', 'fjerde_semester'),
+('fifth_semester', 'femte_semester'),
+('sixth_semester', 'sjette_semester'),
+('seventh_semester', 'sjuende_semester'),
+('Login', 'Login'),
+('open', 'åpen'),
+('bachelor', 'bachelor'),
+('master', 'master'),
+('phd', 'phd');
 
 INSERT INTO "skills" ("name") VALUES
 ('Programmering'),
@@ -582,7 +575,7 @@ INSERT INTO events (
   time_publish, time_signup_release, time_signup_deadline, canceled, 
   digital, highlight, image_small, image_banner, link_facebook, 
   link_discord, link_signup, link_stream, capacity, is_full, 
-  organization_id, location_id, parent_id, rule_id, audience, category_id, created_at, updated_at
+  organization_id, location_id, parent_id, rule_id, audience_id, category_id, created_at, updated_at
 )
 VALUES
 (true, 'Hackathon Oslo', 'Hackathon Oslo', 
@@ -591,7 +584,7 @@ VALUES
  'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
  '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
  false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
- NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 'students', 1, now(), now()),
+ NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 1, 1, now(), now()),
 
 (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
  'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
@@ -600,7 +593,7 @@ VALUES
  'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', 
  '2025-02-01 09:00:00', '2025-02-15 08:00:00', '2025-03-01 23:59:00', 
  false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
- NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 'open', 1, now(), now()),
+ NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 2, 1, now(), now()),
 
 (true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
  'Utforsk kunstig intelligens i Trondheim!', 'Explore artificial intelligence in Trondheim!', 
@@ -608,7 +601,7 @@ VALUES
  'whole_day', '2025-04-05 10:00:00', '2025-04-05 16:00:00', 
  '2025-03-20 08:00:00', '2025-03-20 08:00:00', '2025-04-01 23:59:00', 
  false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
- NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 'students', 1, now(), now()),
+ NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 1, 1, now(), now()),
 
 (true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
  'Lær om cybersikkerhet i Stavanger!', 'Learn about cybersecurity in Stavanger!', 
@@ -616,7 +609,7 @@ VALUES
  'whole_day', '2025-05-12 09:00:00', '2025-05-12 17:00:00', 
  '2025-04-01 09:00:00', '2025-04-10 08:00:00', '2025-05-01 23:59:00', 
  false, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
- NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 'students', 4, now(), now()),
+ NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 1, 4, now(), now()),
 
 (true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
  'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
@@ -624,7 +617,7 @@ VALUES
  'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
  '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
  false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
- NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 'open', 5, now(), now());
+ NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 2, 5, now(), now());
 
 -- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
 -- 10 submissions per form (one per user), and 10 answers per question.
