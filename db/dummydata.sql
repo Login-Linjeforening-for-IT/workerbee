@@ -26,12 +26,12 @@ CREATE TYPE "job_type_no" AS ENUM (
     'verv'
 );
 
-CREATE TABLE audiences (
-  id SERIAL PRIMARY KEY,
-  name_no text NOT NULL,
-  name_en text NOT NULL,
-  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "audiences" (
+  "id" SERIAL PRIMARY KEY,
+  "name_no" text NOT NULL,
+  "name_en" text NOT NULL,
+  "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "categories" (

@@ -19,43 +19,12 @@ CREATE TYPE "job_type" AS ENUM (
     'verv'
 );
 
-CREATE TYPE "job_type_no" AS ENUM (
-    'full_tid',
-    'del_tid',
-    'sommer',
-    'verv'
-);
-
-CREATE TYPE audience AS ENUM (
-  'students',
-  'first_semester',
-  'second_semester',
-  'third_semester',
-  'fourth_semester',
-  'fifth_semester',
-  'sixth_semester',
-  'seventh_semester',
-  'Login',
-  'open',
-  'bachelor',
-  'master',
-  'phd'
-);
-
-CREATE TYPE audience_no AS ENUM (
-  'students',
-  'første_semester',
-  'andre_semester',
-  'tredje_semester',
-  'fjerde_semester',
-  'femte_semester',
-  'sjette_semester',
-  'sjuende_semester',
-  'Login',
-  'åpen',
-  'bachelor',
-  'master',
-  'phd'
+CREATE TABLE "audiences" (
+  "id" SERIAL PRIMARY KEY,
+  "name_no" text NOT NULL,
+  "name_en" text NOT NULL,
+  "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "categories" (
