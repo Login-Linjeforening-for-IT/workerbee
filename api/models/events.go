@@ -37,7 +37,7 @@ type EventBase struct {
 
 type Event struct {
 	EventBase
-	Category     Category      `db:"category" json:"category,omitempty"`
+	Category     Category      `db:"category" json:"category"`
 	Location     *Location     `db:"location" json:"location,omitempty"`
 	Rule         *Rule         `db:"rules" json:"rule,omitempty"`
 	Audience     *Audience     `db:"audience" json:"audience,omitempty"`
