@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	"os"
 	"workerbee/db"
 	"workerbee/internal"
@@ -87,6 +88,8 @@ func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
+
+	log.Println(categories)
 
 	return categories, nil
 }

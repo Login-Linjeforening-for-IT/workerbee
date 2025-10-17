@@ -62,3 +62,34 @@ func (h *Handler) CreateCategory(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, categoryResponse)
 }
+
+func (h *Handler) UpdateCategory(c *gin.Context) {
+	var category models.Category
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&category); internal.HandleError(c, err) {
+		return
+	}
+
+	if internal.HandleValidationError(c, category, *h.Services.Validate) {
+		return
+	}
+
+	categoryResponse, err := h.Services.Categories.UpdateCategory(id, category)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, categoryResponse)
+}
+
+func (h *Handler) DeleteCategory(c *gin.Context) {
+	id := c.Param("id")
+
+	catID, err := h.Services.Categories.DeleteCategory(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"id": catID})
+}

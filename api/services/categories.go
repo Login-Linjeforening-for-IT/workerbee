@@ -52,3 +52,7 @@ func (s *CategoryService) UpdateCategory(id_str string, category models.Category
 	category.ID = &id
 	return s.repo.UpdateCategory(category)
 }
+
+func (s *CategoryService) DeleteCategory(id string) (int, error) {
+	return s.repo.DeleteCategory(id)
+}
