@@ -39,9 +39,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			categories.GET("/:id", h.GetCategory)
 			categories.GET("/", h.GetCategories)
-			categories.POST("/", h.CreateCategory)
-			categories.PUT("/:id")
-			categories.DELETE("/:id")
+			categories.POST("/", middleware.AuthMiddleware(), h.CreateCategory)
+			categories.PUT("/:id", middleware.AuthMiddleware(), h.UpdateCategory)
+			categories.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteCategory)
 		}
 		locations := v2.Group("/locations")
 		{
@@ -75,9 +75,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			{
 				types.GET("/", h.GetAllJobTypes)
 				types.GET("/:id", h.GetJobType)
-				types.POST("/", h.CreateJobType)
-				types.PUT("/:id", h.UpdateJobType)
-				types.DELETE("/:id", h.DeleteJobType)
+				types.POST("/", middleware.AuthMiddleware(), h.CreateJobType)
+				types.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJobType)
+				types.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJobType)
 			}
 
 		}
