@@ -1,0 +1,3 @@
+DELETE FROM job_types
+WHERE id = $1
+RETURNING id;
