@@ -13,8 +13,8 @@ import (
 
 type Jobsrepositories interface {
 	CreateJob(job models.NewJob) (models.NewJob, error)
-	GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
-	GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error)
+	GetJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error)
+	GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
 	GetJobProtected(id string) (models.Job, error)
 	GetJobsCities() ([]models.Cities, error)
@@ -23,7 +23,11 @@ type Jobsrepositories interface {
 	UpdateJob(job models.NewJob) (models.NewJob, error)
 	DeleteJob(id string) (int, error)
 	GetCities(limit, offset int, search, orderBy, sort string) ([]models.CitiesWithTotalCount, error)
-	GetAllJobTypes() (string, string, error)
+	GetAllJobTypes(limit, offset int, search, orderBy, sort string) ([]models.JobTypeWithTotalCount, error)
+	GetOneJobType(id string) (models.JobType, error)
+	CreateJobType(jobType models.JobType) (models.JobType, error)
+	UpdateJobType(jobType models.JobType) (models.JobType, error)
+	DeleteJobType(id string) (int, error)
 }
 
 type jobsrepositories struct {
@@ -51,7 +55,7 @@ func (r *jobsrepositories) CreateJob(job models.NewJob) (models.NewJob, error) {
 			err = tx.QueryRow(`
 				INSERT INTO skills (name) 
 				VALUES ($1) RETURNING id
-			`, skillName).Scan(&skillID)
+			`, internal.FormatNameWithCapitalFirstLetter(skillName)).Scan(&skillID)
 		}
 
 		if err != nil {
@@ -68,7 +72,7 @@ func (r *jobsrepositories) CreateJob(job models.NewJob) (models.NewJob, error) {
 			err = tx.QueryRow(`
 				INSERT INTO cities (name) 
 				VALUES ($1) RETURNING id
-			`, cityName).Scan(&cityID)
+			`, internal.FormatNameWithCapitalFirstLetter(cityName)).Scan(&cityID)
 		}
 
 		if err != nil {
@@ -152,7 +156,7 @@ func (r *jobsrepositories) CreateJob(job models.NewJob) (models.NewJob, error) {
 	return newJob, tx.Commit()
 }
 
-func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error) {
+func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error) {
 	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
 		r.db,
 		"./db/jobs/get_jobs.sql",
@@ -170,7 +174,7 @@ func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort stri
 	return jobs, nil
 }
 
-func (r *jobsrepositories) GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes, skills, cities []string) ([]models.JobWithTotalCount, error) {
+func (r *jobsrepositories) GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error) {
 	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
 		r.db,
 		"./db/jobs/get_protected_jobs.sql",
@@ -320,7 +324,7 @@ func (r *jobsrepositories) UpdateJob(job models.NewJob) (models.NewJob, error) {
 			err = tx.QueryRow(`
 				INSERT INTO skills (name) 
 				VALUES ($1) RETURNING id
-			`, skillName).Scan(&skillID)
+			`, internal.FormatNameWithCapitalFirstLetter(skillName)).Scan(&skillID)
 		}
 
 		if err != nil {
@@ -350,7 +354,7 @@ func (r *jobsrepositories) UpdateJob(job models.NewJob) (models.NewJob, error) {
 			err = tx.QueryRow(`
 				INSERT INTO cities (name) 
 				VALUES ($1) RETURNING id
-			`, cityName).Scan(&cityID)
+			`, internal.FormatNameWithCapitalFirstLetter(cityName)).Scan(&cityID)
 		}
 
 		if err != nil {
@@ -418,22 +422,50 @@ func (r *jobsrepositories) GetCities(limit, offset int, search, orderBy, sort st
 	return cities, nil
 }
 
-func (r *jobsrepositories) GetAllJobTypes() (string, string, error) {
-	jobTypesEN, err := db.FetchAllEnumTypes(
+func (r *jobsrepositories) GetAllJobTypes(limit, offset int, search, orderBy, sort string) ([]models.JobTypeWithTotalCount, error) {
+	jobTypes, err := db.FetchAllElements[models.JobTypeWithTotalCount](
 		r.db,
-		"./db/jobs/get_all_job_types_en.sql",
+		"./db/jobs/job_type/get_job_types.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
 	)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
+	return jobTypes, nil
+}
 
-	jobTypesNO, err := db.FetchAllEnumTypes(
+func (r *jobsrepositories) GetOneJobType(id string) (models.JobType, error) {
+	return db.ExecuteOneRow[models.JobType](
 		r.db,
-		"./db/jobs/get_all_job_types_no.sql",
+		"./db/jobs/job_type/get_job_type.sql",
+		id,
 	)
-	if err != nil {
-		return "", "", err
-	}
+}
 
-	return jobTypesEN, jobTypesNO, nil
+
+func (r *jobsrepositories) CreateJobType(jobType models.JobType) (models.JobType, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/jobs/job_type/post_job_type.sql",
+		jobType,
+	)
+}
+
+func (r *jobsrepositories) UpdateJobType(jobType models.JobType) (models.JobType, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/jobs/job_type/put_job_type.sql",
+		jobType,
+	)
+}
+
+func (r *jobsrepositories) DeleteJobType(id string) (int, error) {
+	return db.ExecuteOneRow[int](
+		r.db,
+		"./db/jobs/job_type/delete_job_type.sql",
+		id,
+	)
 }

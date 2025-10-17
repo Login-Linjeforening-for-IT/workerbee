@@ -1,7 +1,6 @@
 package services
 
 import (
-	"slices"
 	"strconv"
 	"strings"
 	"workerbee/internal"
@@ -27,6 +26,12 @@ var allowedSortColumnsCities = map[string]string{
 	"name": "c.name",
 }
 
+var allowedSortColumnsTypes = map[string]string{
+	"id":      "jt.id",
+	"name_no": "jt.name_no",
+	"name_en": "jt.name_en",
+}
+
 type JobsService struct {
 	repo repositories.Jobsrepositories
 }
@@ -36,13 +41,10 @@ func NewJobsService(repo repositories.Jobsrepositories) *JobsService {
 }
 
 func (s *JobsService) CreateJob(job models.NewJob) (models.NewJob, error) {
-	jobTypes, _, err := s.GetAllJobTypes()
+	var err error
+	job.Cities, err = parseCitiesAndSkills(job.Cities)
 	if err != nil {
-		return models.NewJob{}, err
-	}
-
-	if !slices.Contains(jobTypes, job.JobType) {
-		return models.NewJob{}, internal.ErrInvalidJobType
+		return models.NewJob{}, internal.ErrInvalid
 	}
 
 	newJob, err := s.repo.CreateJob(job)
@@ -55,17 +57,17 @@ func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, s
 		return nil, internal.ErrInvalid
 	}
 
-	jobTypesSlice, err := parseFromStringToSlice(jobTypes)
+	jobTypesSlice, err := internal.ParseFromStringToSlice[int](jobTypes)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	skillsSlice, err := parseFromStringToSlice(skills)
+	skillsSlice, err := internal.ParseFromStringToSlice[string](skills)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	citiesSlice, err := parseFromStringToSlice(cities)
+	citiesSlice, err := internal.ParseFromStringToSlice[string](cities)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
@@ -85,17 +87,17 @@ func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobT
 		return nil, internal.ErrInvalid
 	}
 
-	jobTypesSlice, err := parseFromStringToSlice(jobTypes)
+	jobTypesSlice, err := internal.ParseFromStringToSlice[int](jobTypes)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	skillsSlice, err := parseFromStringToSlice(skills)
+	skillsSlice, err := internal.ParseFromStringToSlice[string](skills)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	citiesSlice, err := parseFromStringToSlice(cities)
+	citiesSlice, err := internal.ParseFromStringToSlice[string](cities)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
@@ -128,30 +130,18 @@ func (s *JobsService) GetJobSkills() ([]models.JobSkills, error) {
 	return s.repo.GetJobSkills()
 }
 
-func (s *JobsService) GetAllJobTypes() ([]string, []string, error) {
-	jobTypesEN, jobTypesNO, err := s.repo.GetAllJobTypes()
-	if err != nil {
-		return nil, nil, err
-	}
-	return internal.ParsePgArray(jobTypesEN), internal.ParsePgArray(jobTypesNO), nil
-}
-
 func (s *JobsService) UpdateJob(id_str string, job models.NewJob) (models.NewJob, error) {
 	id, err := strconv.Atoi(id_str)
 	if err != nil {
 		return models.NewJob{}, internal.ErrInvalid
 	}
 
-	job.ID = &id
-
-	jobTypes, _, err := s.GetAllJobTypes()
+	job.Cities, err = parseCitiesAndSkills(job.Cities)
 	if err != nil {
-		return models.NewJob{}, err
+		return models.NewJob{}, internal.ErrInvalid
 	}
 
-	if !slices.Contains(jobTypes, job.JobType) {
-		return models.NewJob{}, internal.ErrInvalidJobType
-	}
+	job.ID = &id
 
 	return s.repo.UpdateJob(job)
 }
@@ -172,17 +162,51 @@ func (s *JobsService) GetCities(search, limit_str, offset_str, orderBy, sort str
 	return s.repo.GetCities(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 
-func parseFromStringToSlice(input string) ([]string, error) {
-	if input != "" {
-		slice, err := internal.ParseCSVToSlice[string](input)
-		if err != nil {
-			return nil, internal.ErrInvalid
-		}
-		for i := range slice {
-			slice[i] = strings.ToLower(slice[i])
-		}
-		return slice, nil
-	} else {
-		return make([]string, 0), nil
+func (s *JobsService) GetAllJobTypes(search, limit_str, offset_str, orderBy, sort string) ([]models.JobTypeWithTotalCount, error) {
+	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsTypes)
+	if err != nil {
+		return nil, internal.ErrInvalid
 	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	jobTypes, err := s.repo.GetAllJobTypes(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
+	if err != nil {
+		return nil, err
+	}
+
+	return jobTypes, nil
+}
+
+func (s *JobsService) GetOneJobType(id string) (models.JobType, error) {
+	return s.repo.GetOneJobType(id)
+}
+
+func (s *JobsService) CreateJobType(jobType models.JobType) (models.JobType, error) {
+	return s.repo.CreateJobType(jobType)
+}
+
+func (s *JobsService) UpdateJobType(id_str string, jobType models.JobType) (models.JobType, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.JobType{}, internal.ErrInvalid
+	}
+
+	jobType.ID = id
+
+	return s.repo.UpdateJobType(jobType)
+}
+
+func (s *JobsService) DeleteJobType(id string) (int, error) {
+	return s.repo.DeleteJobType(id)
+}
+
+func parseCitiesAndSkills(cities []string) ([]string, error) {
+	for i := range cities {
+		cities[i] = internal.FormatNameWithCapitalFirstLetter(cities[i])
+	}
+	return cities, nil
 }

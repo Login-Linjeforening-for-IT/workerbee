@@ -70,9 +70,16 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
 			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)
-			jobs.GET("/types", h.GetJobTypes)
 			jobs.GET("/skills", h.GetJobSkills)
-			jobs.GET("/types/all", h.GetAllJobTypes)
+			types := jobs.Group("/types")
+			{
+				types.GET("/", h.GetAllJobTypes)
+				types.GET("/:id", h.GetJobType)
+				types.POST("/", h.CreateJobType)
+				types.PUT("/:id", h.UpdateJobType)
+				types.DELETE("/:id", h.DeleteJobType)
+			}
+
 		}
 		audiences := v2.Group("/audiences")
 		{

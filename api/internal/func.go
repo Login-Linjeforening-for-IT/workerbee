@@ -17,6 +17,26 @@ func ParseENAndNOArray(en, no []string) []map[string]string {
 	return categories
 }
 
+func ParseFromStringToSlice[T any](input string) ([]T, error) {
+	if input != "" {
+		slice, err := ParseCSVToSlice[T](input)
+		if err != nil {
+			return nil, ErrInvalid
+		}
+		return slice, nil
+	} else {
+		return make([]T, 0), nil
+	}
+}
+
+func FormatNameWithCapitalFirstLetter(name string) string {
+	if len(name) == 0 {
+		return name
+	}
+	lowerName := strings.ToLower(name)
+	return strings.ToUpper(string(lowerName[0])) + lowerName[1:]
+}
+
 func ParsePgArray(s string) []string {
 	s = strings.Trim(s, "{}")
 	if s == "" {

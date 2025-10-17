@@ -166,12 +166,77 @@ func (h *Handler) GetJobSkills(c *gin.Context) {
 }
 
 func (h *Handler) GetAllJobTypes(c *gin.Context) {
-	jobTypesEN, jobTypesNO, err := h.Services.Jobs.GetAllJobTypes()
+	search := c.DefaultQuery("search", "")
+	limit := c.DefaultQuery("limit", "20")
+	offset := c.DefaultQuery("offset", "0")
+	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "asc")
+
+	jobTypes, err := h.Services.Jobs.GetAllJobTypes(search, limit, offset, orderBy, sort)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	jobTypes := internal.ParseENAndNOArray(jobTypesEN, jobTypesNO)
-
 	c.JSON(http.StatusOK, jobTypes)
+}
+
+func (h *Handler) GetJobType(c *gin.Context) {
+	id := c.Param("id")
+
+	jobType, err := h.Services.Jobs.GetOneJobType(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, jobType)
+}
+
+func (h *Handler) CreateJobType(c *gin.Context) {
+	var jobType models.JobType
+
+	if err := c.ShouldBindBodyWithJSON(&jobType); internal.HandleError(c, err) {
+		return
+	}
+
+	if internal.HandleValidationError(c, jobType, *h.Services.Validate) {
+		return
+	}
+
+	jobTypeResponse, err := h.Services.Jobs.CreateJobType(jobType)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusCreated, jobTypeResponse)
+}
+
+func (h *Handler) UpdateJobType(c *gin.Context) {
+	var jobType models.JobType
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&jobType); internal.HandleError(c, err) {
+		return
+	}
+
+	if internal.HandleValidationError(c, jobType, *h.Services.Validate) {
+		return
+	}
+
+	jobTypeResponse, err := h.Services.Jobs.UpdateJobType(id, jobType)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, jobTypeResponse)
+}
+
+func (h *Handler) DeleteJobType(c *gin.Context) {
+	id := c.Param("id")
+
+	jobTypeId, err := h.Services.Jobs.DeleteJobType(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"id": jobTypeId})
 }

@@ -31,11 +31,13 @@ type BaseJob struct {
 
 type Job struct {
 	BaseJob
+	JobType      JobType      `db:"job_type" json:"job_type"`
 	Organization Organization `db:"organization" json:"organization"`
 }
 
 type NewJob struct {
 	BaseJob
+	JobTypeID      int `db:"job_type_id" json:"job_type_id" validate:"required"`
 	OrganizationID int `db:"organization_id" json:"organization_id" validate:"required"`
 }
 
@@ -45,7 +47,16 @@ type Cities struct {
 }
 
 type JobType struct {
-	Type string `db:"job_type"`
+	ID        int                `db:"id" json:"id,omitempty"`
+	NameNo    string             `db:"name_no" json:"name_no"`
+	NameEn    string             `db:"name_en" json:"name_en"`
+	UpdatedAt internal.LocalTime `db:"updated_at" json:"updated_at"`
+	CreatedAt internal.LocalTime `db:"created_at" json:"created_at"`
+}
+
+type JobTypeWithTotalCount struct {
+	JobType
+	TotalCount int `db:"total_count"`
 }
 
 type JobSkills struct {

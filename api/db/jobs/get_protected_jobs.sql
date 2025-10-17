@@ -10,7 +10,6 @@ SELECT
     ja.description_long_no,
     ja.position_title_en,
     ja.position_title_no,
-    ja.job_type,
     ja.time_publish,
     ja.time_expire,
     ja.banner_image,
@@ -28,9 +27,14 @@ SELECT
     org.created_at AS "organization.created_at",
     org.updated_at AS "organization.updated_at",
     org.logo AS "organization.logo",
+
+    jt.id AS "job_type.id",
+    jt.name_no AS "job_type.name_no",
+    jt.name_en AS "job_type.name_en",
+    jt.created_at AS "job_type.created_at",
+    jt.updated_at AS "job_type.updated_at",
     city_agg.cities,
-    skill_agg.skills,
-    COUNT(*) OVER() AS total_count
+    skill_agg.skills
 FROM jobs ja
 JOIN organizations org ON ja.organization_id = org.id
 LEFT JOIN (
@@ -47,12 +51,13 @@ LEFT JOIN (
     LEFT JOIN skills s ON asr.skill_id = s.id
     GROUP BY asr.job_id
 ) skill_agg ON skill_agg.job_id = ja.id
+LEFT JOIN job_types jt ON ja.job_type_id = jt.id
 WHERE (
     $1 = '' OR to_json(ja)::text ILIKE '%' || $1 || '%'
     )
     AND (
-        cardinality($2::text[]) = 0
-        OR ja.job_type = ANY($2::job_type[])
+        cardinality($2::int[]) = 0
+        OR ja.job_type_id = ANY($2::int[])
     )
     AND (
         cardinality($3::text[]) = 0

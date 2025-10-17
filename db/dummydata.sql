@@ -127,7 +127,7 @@ CREATE TABLE "jobs" (
     "description_short_en" varchar NOT NULL,
     "description_long_no" varchar NOT NULL,
     "description_long_en" varchar NOT NULL,
-    "job_type" int NOT NULL,
+    "job_type_id" int NOT NULL,
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
     "banner_image" varchar,
@@ -191,7 +191,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("i
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -518,7 +518,7 @@ INSERT INTO "jobs" (
   "description_short_en", 
   "description_long_no", 
   "description_long_en", 
-  "job_type", 
+  "job_type_id", 
   "time_publish", 
   "time_expire", 
   "banner_image", 
@@ -533,14 +533,14 @@ VALUES
   'An exciting opportunity for recent graduates to develop software.', 
   'Som Junior Software Developer vil du være med på utvikling av applikasjoner og programvare.', 
   'As a Junior Software Developer, you will be involved in the development of applications and software.', 
-  1, now(), '2025-03-31','https://www.example.com/banner.jpg', 
+  1, now(), '2026-03-31','https://www.example.com/banner.jpg', 
   1, 'https://www.uio.no/job-apply', now(), now()),
 (true, true, 'Markedsføringskoordinator', 'Marketing Coordinator', 'Markedsføringsspesialist', 
   'Marketing Specialist', 'Bli en del av vårt markedsføringsteam og jobb med spennende prosjekter.', 
   'Join our marketing team and work on exciting projects.', 
   'Som markedsføringskoordinator vil du ha ansvar for markedsføring og kommunikasjon på tvers av kanaler.', 
   'As a Marketing Coordinator, you will be responsible for marketing and communication across channels.', 
-  2, now(), '2025-05-31', 'https://www.example.com/banner2.jpg', 
+  2, now(), '2026-05-31', 'https://www.example.com/banner2.jpg', 
   3, 'https://www.dnb.no/job-apply', now(), now()),
 (false, false, 'Prosjektleder', 'Project Manager', 'Senior prosjektleder', 
   'Senior Project Manager', 'Vi søker en erfaren prosjektleder til å lede store prosjekter.', 
@@ -561,7 +561,7 @@ VALUES
   'Are you a data analyst who loves to derive insights from large datasets?', 
   'Som dataanalytiker vil du analysere data for å identifisere trender og lage rapporter som støtter beslutningstaking.', 
   'As a Data Analyst, you will analyze data to identify trends and create reports that support decision-making.', 
-  1, now(), '2025-07-31', 'https://www.example.com/banner5.jpg', 
+  1, now(), '2026-07-31', 'https://www.example.com/banner5.jpg', 
   2, 'https://www.ntnu.no/job-apply', now(), now());
 
 INSERT INTO "ad_skill_relation" ("job_id", "skill_id")
