@@ -196,8 +196,44 @@ ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills"
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
+-- Insert default audiences
+INSERT INTO "audiences" ("name_en", "name_no")
+VALUES
+('Students', 'students'),
+('First semester', 'Første semester'),
+('Second semester', 'Andre semester'),
+('Third semester', 'Tredje semester'),
+('Fourth semester', 'Fjerde semester'),
+('Fifth semester', 'Femte semester'),
+('Sixth semester', 'Sjette semester'),
+('Seventh semester', 'Sjuende semester'),
+('Login', 'Login'),
+('Open', 'Åpen'),
+('Bachelor', 'Bachelor'),
+('Master', 'Master'),
+('PhD', 'PhD');
+
+INSERT INTO "categories" ("name_en", "name_no", "color")
+VALUES
+('Login', 'Login', '#fd8738'),
+('TekKom', 'TekKom', '#a206c9'),
+('CTFKom', 'CTFKom', '#2da62b'),
+('EvntKom', 'EvntKom', '#d62f43'),
+('PR', 'PR', '#ffff00'),
+('BedKom', 'BedKom', '#1f56c5'),
+('SatKom', 'SatKom', '#64ddd7'),
+('BroomBroom', 'BroomBroom', '#cd53d8'),
+('Pearlgroup', 'Perlegruppa', '#cd53d8'),
+('Bookclub', 'Bokklubb', '#cd53d8'),
+('Houseband', 'Husbandet', '#cd53d8'),
+('Social', 'Sosialt', '#d62f43'),
+('Cyberdays', 'Cyberdagene', 'linear-gradient(120deg, hsla(217, 100%, 50%, 1) 10%, hsla(186, 100%, 69%, 1) 100%)'),
+('Buddyweek', 'Fadderuka', '#fa75a6'),
+('Other', 'Andre', '#545b5f'),
+
+
 -- BeeFormed
-CREATE TYPE question_type_enum AS ENUM (
+/* CREATE TYPE question_type_enum AS ENUM (
     'single_choice',
     'multiple_choice',
     'text',
@@ -281,5 +317,5 @@ CREATE INDEX ON "submissions"("user_id");
 
 CREATE INDEX ON "answers"("submission_id");
 CREATE INDEX ON "answers"("question_id");
-CREATE INDEX ON "answers"("option_id");
+CREATE INDEX ON "answers"("option_id"); */
 

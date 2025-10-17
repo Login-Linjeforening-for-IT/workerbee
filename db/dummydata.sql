@@ -296,21 +296,21 @@ CREATE INDEX ON "answers"("option_id");
 -- Dummy Data
 ------------------
 
-INSERT INTO audiences (name_en, name_no)
+INSERT INTO "audiences" ("name_en", "name_no")
 VALUES
-('students', 'students'),
-('first_semester', 'første_semester'),
-('second_semester', 'andre_semester'),
-('third_semester', 'tredje_semester'),
-('fourth_semester', 'fjerde_semester'),
-('fifth_semester', 'femte_semester'),
-('sixth_semester', 'sjette_semester'),
-('seventh_semester', 'sjuende_semester'),
+('Students', 'students'),
+('First semester', 'Første semester'),
+('Second semester', 'Andre semester'),
+('Third semester', 'Tredje semester'),
+('Fourth semester', 'Fjerde semester'),
+('Fifth semester', 'Femte semester'),
+('Sixth semester', 'Sjette semester'),
+('Seventh semester', 'Sjuende semester'),
 ('Login', 'Login'),
-('open', 'åpen'),
-('bachelor', 'bachelor'),
-('master', 'master'),
-('phd', 'phd');
+('Open', 'Åpen'),
+('Bachelor', 'Bachelor'),
+('Master', 'Master'),
+('PhD', 'PhD');
 
 INSERT INTO "skills" ("name") VALUES
 ('Programmering'),
@@ -487,14 +487,23 @@ VALUES
    'https://www.facebook.com/SINTEF', 'https://www.instagram.com/sintef', 
    'logo.png', now(), now());
 
-INSERT INTO "categories" (name_en, name_no, color)
+INSERT INTO "categories" ("name_en", "name_no", "color")
 VALUES
-('Technology', 'Teknologi', '#1f77b4'),
-('Marketing', 'Markedsføring', '#ff7f0e'),
-('Networking', 'Nettverk', '#2ca02c'),
-('Cybersecurity', 'Cybersikkerhet', '#d62728'),
-('Cloud', 'Sky', '#9467bd');
-
+('Login', 'Login', '#fd8738'),
+('TekKom', 'TekKom', '#a206c9'),
+('CTFKom', 'CTFKom', '#2da62b'),
+('EvntKom', 'EvntKom', '#d62f43'),
+('PR', 'PR', '#ffff00'),
+('BedKom', 'BedKom', '#1f56c5'),
+('SatKom', 'SatKom', '#64ddd7'),
+('BroomBroom', 'BroomBroom', '#cd53d8'),
+('Pearlgroup', 'Perlegruppa', '#cd53d8'),
+('Bookclub', 'Bokklubb', '#cd53d8'),
+('Houseband', 'Husbandet', '#cd53d8'),
+('Social', 'Sosialt', '#d62f43'),
+('Cyberdays', 'Cyberdagene', 'linear-gradient(120deg, hsla(217, 100%, 50%, 1) 10%, hsla(186, 100%, 69%, 1) 100%)'),
+('Buddyweek', 'Fadderuka', '#fa75a6'),
+('Other', 'Andre', '#545b5f'),
 
 INSERT INTO "jobs" (
   "visible", 
