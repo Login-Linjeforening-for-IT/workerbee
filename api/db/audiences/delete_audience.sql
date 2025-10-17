@@ -1,0 +1,3 @@
+DELETE FROM audiences
+WHERE id = $1
+RETURNING id;

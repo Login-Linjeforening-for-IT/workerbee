@@ -39,7 +39,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			categories.GET("/:id", h.GetCategory)
 			categories.GET("/", h.GetCategories)
-			categories.POST("/",  h.CreateCategory)
+			categories.POST("/", h.CreateCategory)
 			categories.PUT("/:id")
 			categories.DELETE("/:id")
 		}
