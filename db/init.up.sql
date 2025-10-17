@@ -93,7 +93,7 @@ CREATE TABLE "events" (
     "link_signup" varchar,
     "link_stream" varchar,
     "capacity" int,
-    "full_time" bool NOT NULL DEFAULT false,
+    "is_full" bool NOT NULL DEFAULT false,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,

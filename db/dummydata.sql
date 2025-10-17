@@ -93,7 +93,7 @@ CREATE TABLE "events" (
     "link_signup" varchar,
     "link_stream" varchar,
     "capacity" int,
-    "full_time" bool NOT NULL DEFAULT false,
+    "is_full" bool NOT NULL DEFAULT false,
     "organization_id" int,
     "location_id" int,
     "parent_id" int,
@@ -581,7 +581,7 @@ INSERT INTO events (
   informational_no, informational_en, time_type, time_start, time_end, 
   time_publish, time_signup_release, time_signup_deadline, canceled, 
   digital, highlight, image_small, image_banner, link_facebook, 
-  link_discord, link_signup, link_stream, capacity, full_time, 
+  link_discord, link_signup, link_stream, capacity, is_full, 
   organization_id, location_id, parent_id, rule_id, audience, category_id, created_at, updated_at
 )
 VALUES

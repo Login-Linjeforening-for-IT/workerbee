@@ -25,6 +25,7 @@ SELECT
     e.link_signup,
     e.link_stream,
     e.capacity,
+    e.is_full,
     e.updated_at,
     e.created_at,
     e.parent_id,

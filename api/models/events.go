@@ -29,7 +29,7 @@ type EventBase struct {
 	LinkSignup         *string             `db:"link_signup" json:"link_signup,omitempty"`
 	LinkStream         *string             `db:"link_stream" json:"link_stream,omitempty"`
 	Capacity           *int                `db:"capacity" json:"capacity,omitempty"`
-	IsFull             bool                `db:"full_time" json:"full_time,omitempty"`
+	IsFull             bool                `db:"is_full" json:"is_full"`
 	ParentID           *int                `db:"parent_id" json:"parent_id,omitempty"`
 	Audience           *string             `db:"audience" json:"audience,omitempty"`
 	UpdatedAt          internal.LocalTime  `db:"updated_at" json:"updated_at,omitempty"`
