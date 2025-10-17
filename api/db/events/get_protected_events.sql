@@ -29,7 +29,6 @@ SELECT
     e.updated_at,
     e.created_at,
     e.parent_id,
-    e.audience,
 
     r.id AS "rules.id",
     r.name_no AS "rules.name_no",
@@ -99,4 +98,8 @@ WHERE (
     AND (
         cardinality($3::int[]) = 0
         OR e.category_id = ANY($3::int[])
+    )
+    AND (
+        cardinality($4::int[]) = 0
+        OR e.audience_id = ANY($4::int[])
     )

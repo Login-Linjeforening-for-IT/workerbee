@@ -28,8 +28,8 @@ CREATE TYPE "job_type_no" AS ENUM (
 
 CREATE TABLE audiences (
   id SERIAL PRIMARY KEY,
-  audience_en text NOT NULL,
-  audience_no text NOT NULL,
+  name_no text NOT NULL,
+  name_en text NOT NULL,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -296,7 +296,7 @@ CREATE INDEX ON "answers"("option_id");
 -- Dummy Data
 ------------------
 
-INSERT INTO audiences (audience_en, audience_no)
+INSERT INTO audiences (name_en, name_no)
 VALUES
 ('students', 'students'),
 ('first_semester', 'første_semester'),

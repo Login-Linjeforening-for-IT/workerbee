@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -12,15 +10,15 @@ import (
 )
 
 type Eventrepositories interface {
-	GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
-	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
+	GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error)
+	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	GetProtectedEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
 	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
-	GetEventAudiences() (string, string, error)
+	GetEventAudiences() ([]models.Audience, error)
 	GetAllTimeTypes() (string, error)
 }
 
@@ -40,7 +38,7 @@ func (r *eventRepositories) CreateEvent(event models.NewEvent) (models.NewEvent,
 	)
 }
 
-func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_protected_events.sql",
@@ -50,6 +48,7 @@ func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderB
 		search,
 		historical,
 		pq.Array(categories),
+		pq.Array(audiences),
 	)
 
 	if err != nil {
@@ -58,7 +57,7 @@ func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderB
 	return events, nil
 }
 
-func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_events.sql",
@@ -68,6 +67,7 @@ func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort s
 		search,
 		historical,
 		pq.Array(categories),
+		pq.Array(audiences),
 	)
 
 	if err != nil {
@@ -77,20 +77,15 @@ func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort s
 }
 
 func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error) {
-	var categories []models.EventCategory
 
-	sqlBytes, err := os.ReadFile("./db/events/get_categories.sql")
+	categories, err := db.FetchAllForeignAttributes[models.EventCategory](
+		r.db,
+		"./db/events/get_event_categories.sql",
+	)
+
 	if err != nil {
 		return nil, err
 	}
-
-	err = r.db.Select(&categories, string(sqlBytes))
-	if err != nil {
-		return nil, internal.ErrInvalid
-	}
-
-	log.Println(categories)
-
 	return categories, nil
 }
 
@@ -124,31 +119,19 @@ func (r *eventRepositories) DeleteEvent(id string) (int, error) {
 	return eventId, nil
 }
 
-func (r *eventRepositories) GetEventAudiences() (string, string, error) {
-	audiencesEN, err := db.FetchAllEnumTypes(
+func (r *eventRepositories) GetEventAudiences() ([]models.Audience, error) {
+	audiences, err := db.FetchAllForeignAttributes[models.Audience](
 		r.db,
-		"./db/events/get_all_audiences_en.sql",
+		"./db/events/get_event_audiences.sql",
 	)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
-
-	audiencesNO, err := db.FetchAllEnumTypes(
-		r.db,
-		"./db/events/get_all_audiences_no.sql",
-	)
-
-	if err != nil {
-		return "", "", err
-	}
-	return audiencesEN, audiencesNO, nil
+	return audiences, nil
 }
 
 func (r *eventRepositories) GetAllTimeTypes() (string, error) {
-	timeTypes, err := db.FetchAllEnumTypes(
-		r.db,
-		"./db/events/get_all_time_types.sql",
-	)
+	timeTypes, err := db.FetchAllEnumTypes(r.db, "./db/events/get_all_time_types.sql")
 	if err != nil {
 		return "", err
 	}

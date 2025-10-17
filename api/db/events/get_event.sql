@@ -29,7 +29,6 @@ SELECT
     e.updated_at,
     e.created_at,
     e.parent_id,
-    e.audience,
 
     r.id AS "rules.id",
     r.name_no AS "rules.name_no",

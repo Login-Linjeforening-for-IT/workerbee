@@ -10,6 +10,22 @@ import (
 	"github.com/lib/pq"
 )
 
+func FetchAllForeignAttributes[T any](db *sqlx.DB, sqlPath string) ([]T, error) {
+	var result []T
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Select(&result, string(sqlBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func FetchAllEnumTypes(db *sqlx.DB, sqlPath string) (string, error) {
 	var result string
 
@@ -21,6 +37,22 @@ func FetchAllEnumTypes(db *sqlx.DB, sqlPath string) (string, error) {
 	err = db.Get(&result, string(sqlBytes))
 	if err != nil {
 		return "", err
+	}
+
+	return result, nil
+}
+
+func FetchSingleElement[T any](db *sqlx.DB, sqlPath string) ([]T, error) {
+	var result []T
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Get(&result, string(sqlBytes))
+	if err != nil {
+		return nil, err
 	}
 
 	return result, nil
