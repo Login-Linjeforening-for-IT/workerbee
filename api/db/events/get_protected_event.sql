@@ -28,7 +28,6 @@ SELECT
     e.updated_at,
     e.created_at,
     e.parent_id,
-    e.category,
     e.audience,
 
     r.id AS "rules.id",
@@ -66,8 +65,16 @@ SELECT
     o.link_linkedin AS "organization.link_linkedin",
     o.created_at AS "organization.created_at",
     o.updated_at AS "organization.updated_at",
-    o.logo AS "organization.logo"
+    o.logo AS "organization.logo",
+
+    c.id AS "category.id",
+    c.name_no AS "category.name_no",
+    c.name_en AS "category.name_en",
+    c.color AS "category.color",
+    c.created_at AS "category.created_at",
+    c.updated_at AS "category.updated_at"
 FROM events AS e
+LEFT JOIN categories AS c ON e.category_id = c.id
 LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id

@@ -26,34 +26,6 @@ CREATE TYPE "job_type_no" AS ENUM (
     'verv'
 );
 
-CREATE TYPE categories AS ENUM (
-  'TekKom',
-  'CTFKom',
-  'EvntKom',
-  'PR',
-  'Social',
-  'Login',
-  'Buddyweek',
-  'BedKom',
-  'Careerdays',
-  'Cyberdays',
-  'Other'
-);
-
-CREATE TYPE categories_no AS ENUM (
-  'TekKom',
-  'CTFKom',
-  'Evntkom',
-  'PR',
-  'Sosialt',
-  'Login',
-  'Fadderuka',
-  'BedKom',
-  'Karrieredagene',
-  'Cyberdagene',
-  'Other'
-);
-
 CREATE TYPE audience AS ENUM (
   'students',
   'first_semester',
@@ -86,6 +58,15 @@ CREATE TYPE audience_no AS ENUM (
   'phd'
 );
 
+CREATE TABLE "categories" (
+    "id" SERIAL PRIMARY KEY,
+    "name_en" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
+    "color" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE "events" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
@@ -102,7 +83,7 @@ CREATE TABLE "events" (
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
     "canceled" bool NOT NULL DEFAULT false,
-    "category" categories NOT NULL,
+    "category_id" int NOT NULL,
     "digital" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
     "image_small" varchar,
@@ -236,6 +217,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizatio
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -512,6 +494,15 @@ VALUES
    'https://www.facebook.com/SINTEF', 'https://www.instagram.com/sintef', 
    'logo.png', now(), now());
 
+INSERT INTO "categories" (name_en, name_no, color)
+VALUES
+('Technology', 'Teknologi', '#1f77b4'),
+('Marketing', 'Markedsføring', '#ff7f0e'),
+('Networking', 'Nettverk', '#2ca02c'),
+('Cybersecurity', 'Cybersikkerhet', '#d62728'),
+('Cloud', 'Sky', '#9467bd');
+
+
 INSERT INTO "jobs" (
   "visible", 
   "highlight", 
@@ -591,49 +582,49 @@ INSERT INTO events (
   time_publish, time_signup_release, time_signup_deadline, canceled, 
   digital, highlight, image_small, image_banner, link_facebook, 
   link_discord, link_signup, link_stream, capacity, full_time, 
-  organization_id, location_id, parent_id, rule_id, audience, category, created_at, updated_at
+  organization_id, location_id, parent_id, rule_id, audience, category_id, created_at, updated_at
 )
 VALUES
- (true, 'Hackathon Oslo', 'Hackathon Oslo', 
-  'Bli med på en spennende hackathon i Oslo!', 'Join an exciting hackathon in Oslo!', 
-  'Mer informasjon kommer snart.', 'More information coming soon.',
-  'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
-  '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
-  false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
-  NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 'Login', 'TekKom', '2025-01-01 10:00:00', '2025-01-01 10:00:00'),
+(true, 'Hackathon Oslo', 'Hackathon Oslo', 
+ 'Bli med på en spennende hackathon i Oslo!', 'Join an exciting hackathon in Oslo!', 
+ 'Mer informasjon kommer snart.', 'More information coming soon.',
+ 'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
+ '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
+ false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
+ NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 'students', 1, now(), now()),
 
- (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
-  'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
-  'Learn about the latest technologies at Tech Conference in Bergen.', 
-  'Påmelding nødvendig.', 'Registration required.',
-  'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', 
-  '2025-02-01 09:00:00', '2025-02-15 08:00:00', '2025-03-01 23:59:00', 
-  false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
-  NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 'open', 'EvntKom', '2025-02-01 09:00:00', '2025-02-01 09:00:00'),
+(true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
+ 'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
+ 'Learn about the latest technologies at Tech Conference in Bergen.', 
+ 'Påmelding nødvendig.', 'Registration required.',
+ 'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', 
+ '2025-02-01 09:00:00', '2025-02-15 08:00:00', '2025-03-01 23:59:00', 
+ false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
+ NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 'open', 1, now(), now()),
 
- (true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
-  'Utforsk kunstig intelligens i Trondheim!', 'Explore artificial intelligence in Trondheim!', 
-  'Gratis workshop for alle interesserte.', 'Free workshop for all interested.',
-  'whole_day', '2025-04-05 10:00:00', '2025-04-05 16:00:00', 
-  '2025-03-20 08:00:00', '2025-03-20 08:00:00', '2025-04-01 23:59:00', 
-  false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
-  NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 'Login', 'TekKom', '2025-03-01 09:00:00', '2025-03-01 09:00:00'),
+(true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
+ 'Utforsk kunstig intelligens i Trondheim!', 'Explore artificial intelligence in Trondheim!', 
+ 'Gratis workshop for alle interesserte.', 'Free workshop for all interested.',
+ 'whole_day', '2025-04-05 10:00:00', '2025-04-05 16:00:00', 
+ '2025-03-20 08:00:00', '2025-03-20 08:00:00', '2025-04-01 23:59:00', 
+ false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
+ NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 'students', 1, now(), now()),
 
- (true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
-  'Lær om cybersikkerhet i Stavanger!', 'Learn about cybersecurity in Stavanger!', 
-  'Fokus på praktiske løsninger.', 'Focus on practical solutions.',
-  'whole_day', '2025-05-12 09:00:00', '2025-05-12 17:00:00', 
-  '2025-04-01 09:00:00', '2025-04-10 08:00:00', '2025-05-01 23:59:00', 
-  true, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
-  NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 'Login', 'CTFKom', '2025-04-01 09:00:00', '2025-04-01 09:00:00'),
+(true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
+ 'Lær om cybersikkerhet i Stavanger!', 'Learn about cybersecurity in Stavanger!', 
+ 'Fokus på praktiske løsninger.', 'Focus on practical solutions.',
+ 'whole_day', '2025-05-12 09:00:00', '2025-05-12 17:00:00', 
+ '2025-04-01 09:00:00', '2025-04-10 08:00:00', '2025-05-01 23:59:00', 
+ false, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
+ NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 'students', 4, now(), now()),
 
- (true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
-  'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
-  'Networking muligheter.', 'Networking opportunities.',
-  'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
-  '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
-  false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
-  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 'open', 'EvntKom', '2025-05-01 09:00:00', '2025-05-01 09:00:00');
+(true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
+ 'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
+ 'Networking muligheter.', 'Networking opportunities.',
+ 'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
+ '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
+ false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
+ NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 'open', 5, now(), now());
 
 -- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
 -- 10 submissions per form (one per user), and 10 answers per question.

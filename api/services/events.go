@@ -30,15 +30,6 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 }
 
 func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error) {
-	allowedCategories, _, err := s.GetAllEventCategories()
-	if err != nil {
-		return models.NewEvent{}, err
-	}
-
-	if !slices.Contains(allowedCategories, body.Category) {
-		return models.NewEvent{}, internal.ErrInvalidCategory
-	}
-
 	allowedAudiences, _, err := s.GetEventAudiences()
 	if err != nil {
 		return models.NewEvent{}, err
@@ -68,15 +59,6 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 		return models.NewEvent{}, internal.ErrInvalid
 	}
 
-	allowedCategories, _, err := s.GetAllEventCategories()
-	if err != nil {
-		return models.NewEvent{}, err
-	}
-
-	if !slices.Contains(allowedCategories, body.Category) {
-		return models.NewEvent{}, internal.ErrInvalidCategory
-	}
-
 	allowedTimeTypes, err := s.GetAllTimeTypes()
 	if err != nil {
 		return models.NewEvent{}, err
@@ -98,15 +80,6 @@ func (s *EventService) UpdateEvent(body models.NewEvent, id_str string) (models.
 	}
 
 	return s.repo.UpdateOneEvent(id, body)
-}
-
-func (s *EventService) GetAllEventCategories() ([]string, []string, error) {
-	rawEventsEn, rawEventsNo, err := s.repo.GetAllCategories()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return internal.ParsePgArray(rawEventsEn), internal.ParsePgArray(rawEventsNo), nil
 }
 
 func (s *EventService) GetAllTimeTypes() ([]string, error) {
@@ -136,23 +109,12 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	allowedCategories, _, err := s.GetAllEventCategories()
-	if err != nil {
-		return nil, err
-	}
-
-	categories, err := parseCategories(categories_str)
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	for _, category := range categories {
-		if !slices.Contains(allowedCategories, category) {
-			return nil, internal.ErrInvalid
-		}
-	}
-
-	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	categories, err := parseCategories(categories_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
@@ -171,23 +133,12 @@ func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy
 		return nil, internal.ErrInvalid
 	}
 
-	allowedCategories, _, err := s.GetAllEventCategories()
-	if err != nil {
-		return nil, err
-	}
-
-	categories, err := parseCategories(categories_str)
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
-	for _, category := range categories {
-		if !slices.Contains(allowedCategories, category) {
-			return nil, internal.ErrInvalid
-		}
-	}
-
-	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	categories, err := parseCategories(categories_str)
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
@@ -211,17 +162,14 @@ func (s *EventService) DeleteEvent(id string) (int, error) {
 	return s.repo.DeleteEvent(id)
 }
 
-func parseCategories(categories_str string) ([]string, error) {
+func parseCategories(categories_str string) ([]int, error) {
 	if categories_str != "" {
-		categories, err := internal.ParseCSVToSlice[string](categories_str)
+		categories, err := internal.ParseCSVToSlice[int](categories_str)
 		if err != nil {
 			return nil, internal.ErrInvalid
 		}
-		for i := range categories {
-			categories[i] = strings.ToLower(categories[i])
-		}
 		return categories, nil
 	} else {
-		return make([]string, 0), nil
+		return make([]int, 0), nil
 	}
 }

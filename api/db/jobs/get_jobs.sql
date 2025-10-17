@@ -64,3 +64,4 @@ WHERE (
     )
     AND ja.visible = true
     AND ja.time_publish <= now()
+    AND ja.time_expire >= now()

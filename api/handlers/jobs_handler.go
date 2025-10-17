@@ -162,9 +162,7 @@ func (h *Handler) GetJobSkills(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"job_skills": jobSkills,
-	})
+	c.JSON(http.StatusOK, jobSkills)
 }
 
 func (h *Handler) GetAllJobTypes(c *gin.Context) {

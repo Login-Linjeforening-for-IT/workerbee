@@ -24,7 +24,7 @@ SET
     link_stream = :link_stream,
     capacity = :capacity,
     full_time = :full_time,
-    category = :category,
+    category_id = :category_id,
     organization_id = :organization_id,
     location_id = :location_id,
     parent_id = :parent_id,

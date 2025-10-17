@@ -20,7 +20,6 @@ type EventBase struct {
 	TimeSignupRelease  *internal.LocalTime `db:"time_signup_release" json:"time_signup_release,omitempty"`
 	TimeSignupDeadline *internal.LocalTime `db:"time_signup_deadline" json:"time_signup_deadline,omitempty"`
 	Canceled           bool                `db:"canceled" json:"canceled,omitempty"`
-	Category           string              `db:"category" json:"category" validate:"required"`
 	Digital            bool                `db:"digital" json:"digital,omitempty"`
 	Highlight          bool                `db:"highlight" json:"highlight,omitempty"`
 	ImageSmall         *string             `db:"image_small" json:"image_small,omitempty"`
@@ -39,14 +38,16 @@ type EventBase struct {
 
 type Event struct {
 	EventBase
-	Location       *Location     `db:"location" json:"location,omitempty"`
-	Rule           *Rule         `db:"rules" json:"rule,omitempty"`
-	Audience       *int          `db:"audience_id" json:"audience_id,omitempty"`
-	Organization   *Organization `db:"organization" json:"organization,omitempty"`
+	Category     Category      `db:"category" json:"category,omitempty"`
+	Location     *Location     `db:"location" json:"location,omitempty"`
+	Rule         *Rule         `db:"rules" json:"rule,omitempty"`
+	Audience     *int          `db:"audience_id" json:"audience_id,omitempty"`
+	Organization *Organization `db:"organization" json:"organization,omitempty"`
 }
 
 type NewEvent struct {
 	EventBase
+	CategoryID     int  `db:"category_id" json:"category_id,omitempty" validate:"required"`
 	LocationID     *int `db:"location_id" json:"location_id"`
 	RuleID         *int `db:"rule_id" json:"rule_id,omitempty"`
 	OrganizationID *int `db:"organization_id" json:"organization_id"`

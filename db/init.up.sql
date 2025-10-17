@@ -26,34 +26,6 @@ CREATE TYPE "job_type_no" AS ENUM (
     'verv'
 );
 
-CREATE TYPE categories AS ENUM (
-  'TekKom',
-  'CTFKom',
-  'EvntKom',
-  'PR',
-  'Social',
-  'Login',
-  'Buddyweek',
-  'BedKom',
-  'Careerdays',
-  'Cyberdays',
-  'Other'
-);
-
-CREATE TYPE categories_no AS ENUM (
-  'TekKom',
-  'CTFKom',
-  'Evntkom',
-  'PR',
-  'Sosialt',
-  'Login',
-  'Fadderuka',
-  'BedKom',
-  'Karrieredagene',
-  'Cyberdagene',
-  'Other'
-);
-
 CREATE TYPE audience AS ENUM (
   'students',
   'first_semester',
@@ -86,6 +58,15 @@ CREATE TYPE audience_no AS ENUM (
   'phd'
 );
 
+CREATE TABLE "categories" (
+    "id" SERIAL PRIMARY KEY,
+    "name_en" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
+    "color" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE "events" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
@@ -102,7 +83,7 @@ CREATE TABLE "events" (
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
     "canceled" bool NOT NULL DEFAULT false,
-    "category" categories NOT NULL,
+    "category_id" categories NOT NULL,
     "digital" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
     "image_small" varchar,
@@ -236,6 +217,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizatio
 ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
@@ -331,3 +313,4 @@ CREATE INDEX ON "submissions"("user_id");
 CREATE INDEX ON "answers"("submission_id");
 CREATE INDEX ON "answers"("question_id");
 CREATE INDEX ON "answers"("option_id");
+

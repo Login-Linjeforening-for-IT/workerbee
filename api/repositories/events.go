@@ -11,15 +11,14 @@ import (
 )
 
 type Eventrepositories interface {
-	GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
-	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error)
+	GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
+	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	GetProtectedEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
 	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
-	GetAllCategories() (string, string, error)
 	GetEventAudiences() (string, string, error)
 	GetAllTimeTypes() (string, error)
 }
@@ -40,7 +39,7 @@ func (r *eventRepositories) CreateEvent(event models.NewEvent) (models.NewEvent,
 	)
 }
 
-func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_protected_events.sql",
@@ -58,7 +57,7 @@ func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderB
 	return events, nil
 }
 
-func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []string) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories []int) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_events.sql",
@@ -120,26 +119,6 @@ func (r *eventRepositories) DeleteEvent(id string) (int, error) {
 		return 0, internal.ErrInvalid
 	}
 	return eventId, nil
-}
-
-func (r *eventRepositories) GetAllCategories() (string, string, error) {
-	categoriesEN, err := db.FetchAllEnumTypes(
-		r.db,
-		"./db/events/get_all_categories_en.sql",
-	)
-	if err != nil {
-		return "", "", err
-	}
-
-	categoriesNO, err := db.FetchAllEnumTypes(
-		r.db,
-		"./db/events/get_all_categories_no.sql",
-	)
-
-	if err != nil {
-		return "", "", err
-	}
-	return categoriesEN, categoriesNO, nil
 }
 
 func (r *eventRepositories) GetEventAudiences() (string, string, error) {

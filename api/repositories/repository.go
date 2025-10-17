@@ -5,6 +5,7 @@ import (
 )
 
 type Repositories struct {
+	Categories    Categoryrepository
 	Forms         Formrepositories
 	Locations     LocationRepository
 	Organizations OrganizationRepository
@@ -18,14 +19,15 @@ type Repositories struct {
 
 func NewRepositories(db *sqlx.DB) *Repositories {
 	return &Repositories{
-		Forms:       NewFormrepositories(db),
-		Events:      NewEventrepositories(db),
-		Jobs:        NewJobrepositories(db),
-		Questions:   NewQuestionrepositories(db),
-		Rules:       NewRulerepositories(db),
-		Stats:       NewStatsrepositories(db),
-		Submissions: NewSubmissionrepositories(db),
-		Locations: NewLocationRepository(db),
+		Categories:    NewCategoryRepository(db),
+		Forms:         NewFormrepositories(db),
+		Events:        NewEventrepositories(db),
+		Jobs:          NewJobrepositories(db),
+		Questions:     NewQuestionrepositories(db),
+		Rules:         NewRulerepositories(db),
+		Stats:         NewStatsrepositories(db),
+		Submissions:   NewSubmissionrepositories(db),
+		Locations:     NewLocationRepository(db),
 		Organizations: NewOrganizationRepository(db),
 	}
 }

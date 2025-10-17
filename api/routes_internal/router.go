@@ -24,7 +24,6 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
 			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
 			events.GET("/categories", h.GetEventCategories)
-			events.GET("/categories/all", h.GetAllEventCategories)
 			events.GET("/audiences", h.GetEventAudiences)
 			events.GET("/time", h.GetAllTimeTypes)
 		}
@@ -35,6 +34,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			rules.POST("/", middleware.AuthMiddleware(), h.CreateRule)
 			rules.PUT("/:id", middleware.AuthMiddleware(), h.UpdateRule)
 			rules.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteRule)
+		}
+		categories := v2.Group("/categories")
+		{
+			categories.GET("/:id", h.GetCategory)
+			categories.GET("/", h.GetCategories)
+			categories.POST("/",  h.CreateCategory)
+			categories.PUT("/:id")
+			categories.DELETE("/:id")
 		}
 		locations := v2.Group("/locations")
 		{

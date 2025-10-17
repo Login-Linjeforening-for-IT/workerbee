@@ -28,7 +28,6 @@ SELECT
     e.updated_at,
     e.created_at,
     e.parent_id,
-    e.category,
     e.audience,
 
     r.id AS "rules.id",
@@ -70,6 +69,7 @@ SELECT
 
     COUNT(*) OVER() AS total_count
 FROM events AS e
+LEFT JOIN categories AS c ON e.category_id = c.id
 LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id
@@ -89,8 +89,8 @@ WHERE (
         OR to_json(e)::text ILIKE '%' || $1 || '%'
     )
     AND (
-        cardinality($3::text[]) = 0
-        OR e.category = ANY($3::categories[])
+        cardinality($3::int[]) = 0
+        OR e.category_id = ANY($3::int[])
     )
     AND (
         e.time_publish <= now()

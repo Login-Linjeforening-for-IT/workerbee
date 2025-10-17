@@ -134,16 +134,6 @@ func (h *Handler) GetProtectedEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
-func (h *Handler) GetAllEventCategories(c *gin.Context) {
-	categories_en, categories_no, err := h.Services.Events.GetAllEventCategories()
-	if internal.HandleError(c, err) {
-		return
-	}
-
-	categories := internal.ParseENAndNOArray(categories_en, categories_no)
-	c.JSON(http.StatusOK, categories)
-}
-
 func (h *Handler) GetEventAudiences(c *gin.Context) {
 	audiencesEN, audiencesNO, err := h.Services.Events.GetEventAudiences()
 	if internal.HandleError(c, err) {

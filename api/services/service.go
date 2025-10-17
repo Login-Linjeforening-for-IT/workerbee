@@ -7,6 +7,7 @@ import (
 )
 
 type Services struct {
+	Categories    *CategoryService
 	Events        *EventService
 	Locations     *LocationService
 	Organizations *OrganizationService
@@ -21,6 +22,7 @@ type Services struct {
 
 func NewServices(repos *repositories.Repositories) *Services {
 	return &Services{
+		Categories:    NewCategoryService(repos.Categories),
 		Events:        NewEventService(repos.Events),
 		Forms:         NewFormService(repos.Forms),
 		Jobs:          NewJobsService(repos.Jobs),
