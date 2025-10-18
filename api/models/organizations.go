@@ -28,3 +28,7 @@ type OrganizationsResponse struct {
 	Organizations []OrganizationWithTotalCount `json:"organizations"`
 	TotalCount    int                          `json:"total_count"`
 }
+
+type OrganizationNames struct {
+	NameEn string `db:"name_en" json:"name_en"`
+}

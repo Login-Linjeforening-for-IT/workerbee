@@ -54,6 +54,15 @@ func (h *Handler) GetLocations(c *gin.Context) {
 	}
 }
 
+func (h *Handler) GetLocationNames(c *gin.Context) {
+	locationNames, err := h.Services.Locations.GetLocationNames()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, locationNames)
+}
+
 func (h *Handler) GetLocation(c *gin.Context) {
 	id := c.Param("id")
 

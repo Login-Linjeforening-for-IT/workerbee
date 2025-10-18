@@ -38,6 +38,10 @@ func (s *RuleService) GetRules(search, limit_str, offset_str, orderBy, sort stri
 	return s.repo.GetRules(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 
+func (s *RuleService) GetRuleNames() ([]models.RuleNames, error) {
+	return s.repo.GetRuleNames()
+}
+
 func (s *RuleService) GetRule(id string) (models.Rule, error) {
 	return s.repo.GetRule(id)
 }

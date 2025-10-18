@@ -38,6 +38,10 @@ func (s *OrganizationService) GetOrgs(search, limit_str, offset_str, orderBy, so
 	return s.repo.GetOrgs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized))
 }
 
+func (s *OrganizationService) GetOrgNames() ([]models.OrganizationNames, error) {
+	return s.repo.GetOrgNames()
+}
+
 func (s *OrganizationService) GetOrg(id string) (models.Organization, error) {
 	return s.repo.GetOrg(id)
 }

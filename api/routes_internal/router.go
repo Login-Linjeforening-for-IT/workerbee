@@ -30,6 +30,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		rules := v2.Group("/rules")
 		{
 			rules.GET("/:id", h.GetRule)
+			rules.GET("/all", h.GetRuleNames)
 			rules.GET("/", h.GetRules)
 			rules.POST("/", middleware.AuthMiddleware(), h.CreateRule)
 			rules.PUT("/:id", middleware.AuthMiddleware(), h.UpdateRule)
@@ -46,6 +47,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		locations := v2.Group("/locations")
 		{
 			locations.GET("/:id", h.GetLocation)
+			locations.GET("/all", h.GetLocationNames)
 			locations.GET("/", h.GetLocations)
 			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
 			locations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateLocation)
@@ -55,6 +57,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		organizations := v2.Group("/organizations")
 		{
 			organizations.GET("/:id", h.GetOrganization)
+			organizations.GET("/all", h.GetOrganizationNames)
 			organizations.GET("/", h.GetOrganizations)
 			organizations.POST("/", middleware.AuthMiddleware(), h.CreateOrganization)
 			organizations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateOrganization)
@@ -73,7 +76,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/skills", h.GetJobSkills)
 			types := jobs.Group("/types")
 			{
-				types.GET("/", h.GetAllJobTypes)
+				types.GET("/", h.GetActiveJobTypes)
+				types.GET("/all", h.GetAllJobTypes)
 				types.GET("/:id", h.GetJobType)
 				types.POST("/", middleware.AuthMiddleware(), h.CreateJobType)
 				types.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJobType)

@@ -145,7 +145,7 @@ func (h *Handler) GetCities(c *gin.Context) {
 	c.JSON(http.StatusOK, cities)
 }
 
-func (h *Handler) GetJobTypes(c *gin.Context) {
+func (h *Handler) GetActiveJobTypes(c *gin.Context) {
 	jobTypes, err := h.Services.Jobs.GetJobTypes()
 	if internal.HandleError(c, err) {
 		return

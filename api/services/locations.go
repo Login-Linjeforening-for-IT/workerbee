@@ -71,6 +71,10 @@ func (s *LocationService) GetLocations(search, limit_str, offset_str, orderBy, s
 	return s.repo.GetLocations(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), typeSlice)
 }
 
+func (s *LocationService) GetLocationNames() ([]models.LocationNames, error) {
+	return s.repo.GetLocationNames()
+}
+
 func (s *LocationService) GetLocation(id string) (models.Location, error) {
 	return s.repo.GetLocation(id)
 }

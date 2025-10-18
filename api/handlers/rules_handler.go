@@ -47,6 +47,15 @@ func (h *Handler) UpdateRule(c *gin.Context) {
 	c.JSON(http.StatusOK, ruleResponse)
 }
 
+func (h *Handler) GetRuleNames(c *gin.Context) {
+	ruleNames, err := h.Services.Rules.GetRuleNames()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, ruleNames)
+}
+
 func (h *Handler) GetRules(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")

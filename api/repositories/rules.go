@@ -11,6 +11,7 @@ import (
 type Rulerepositories interface {
 	CreateRule(rule models.Rule) (models.Rule, error)
 	GetRules(limit, offset int, search, orderBy, sort string) ([]models.RuleWithTotalCount, error)
+	GetRuleNames() ([]models.RuleNames, error)
 	GetRule(id string) (models.Rule, error)
 	UpdateRule(rule models.Rule) (models.Rule, error)
 	DeleteRule(id string) (int, error)
@@ -24,7 +25,7 @@ func NewRulerepositories(db *sqlx.DB) Rulerepositories {
 	return &ruleRepositories{db: db}
 }
 
-func (r *ruleRepositories)	CreateRule(rule models.Rule) (models.Rule, error) {
+func (r *ruleRepositories) CreateRule(rule models.Rule) (models.Rule, error) {
 	return db.AddOneRow(
 		r.db,
 		"./db/rules/post_rule.sql",
@@ -53,6 +54,19 @@ func (r *ruleRepositories) GetRules(limit, offset int, search, orderBy, sort str
 		return nil, err
 	}
 	return rules, nil
+}
+
+func (r *ruleRepositories) GetRuleNames() ([]models.RuleNames, error) {
+	ruleNames, err := db.FetchAllForeignAttributes[models.RuleNames](
+		r.db,
+		"./db/rules/get_all_names.sql",
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ruleNames, nil
 }
 
 func (r *ruleRepositories) GetRule(id string) (models.Rule, error) {

@@ -33,7 +33,7 @@ type LocationWithTotalCount struct {
 	TotalCount int `db:"total_count"`
 }
 
-type LocationsResponse struct {
-	Locations  []Location `json:"locations"`
-	TotalCount int        `json:"total_count"`
+type LocationNames struct {
+	NameEN string `db:"name_en" json:"name_en"`
+	Type   string `db:"type" json:"type"`
 }

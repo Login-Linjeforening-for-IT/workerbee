@@ -11,6 +11,7 @@ import (
 
 type LocationRepository interface {
 	CreateLocation(location models.NewLocation) (models.NewLocation, error)
+	GetLocationNames() ([]models.LocationNames, error)
 	GetLocations(limit, offset int, search, orderBy, sort string, types []string) ([]models.LocationWithTotalCount, error)
 	GetLocation(id string) (models.Location, error)
 	UpdateLocation(location models.NewLocation) (models.NewLocation, error)
@@ -56,6 +57,17 @@ func (r *locationRepository) GetLocations(limit, offset int, search, orderBy, so
 		return nil, err
 	}
 	return locations, nil
+}
+
+func (r *locationRepository) GetLocationNames() ([]models.LocationNames, error) {
+	locationNames, err := db.FetchAllForeignAttributes[models.LocationNames](
+		r.db,
+		"./db/locations/get_all_names.sql",
+	)
+	if err != nil {
+		return nil, err
+	}
+	return locationNames, nil
 }
 
 func (r *locationRepository) GetLocation(id string) (models.Location, error) {

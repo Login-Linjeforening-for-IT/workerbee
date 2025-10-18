@@ -11,6 +11,7 @@ import (
 type OrganizationRepository interface {
 	CreateOrg(org models.Organization) (models.Organization, error)
 	GetOrgs(limit, offset int, search, orderBy, sort string) ([]models.OrganizationWithTotalCount, error)
+	GetOrgNames() ([]models.OrganizationNames, error)
 	GetOrg(id string) (models.Organization, error)
 	UpdateOrg(org models.Organization) (models.Organization, error)
 	DeleteOrg(id string) (int, error)
@@ -34,6 +35,19 @@ func (r *organizationRepository) GetOrgs(limit, offset int, search, orderBy, sor
 	}
 
 	return orgs, nil
+}
+
+func (r *organizationRepository) GetOrgNames() ([]models.OrganizationNames, error) {
+	orgNames, err := db.FetchAllForeignAttributes[models.OrganizationNames](
+		r.db,
+		"./db/organizations/get_all_names.sql",
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return orgNames, nil
 }
 
 func (r *organizationRepository) GetOrg(id string) (models.Organization, error) {
