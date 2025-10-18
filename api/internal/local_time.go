@@ -7,6 +7,17 @@ import (
 	"time"
 )
 
+// Load Oslo location once globally for performance
+var osloLoc *time.Location
+
+func init() {
+	var err error
+	osloLoc, err = time.LoadLocation("Europe/Oslo")
+	if err != nil {
+		panic(fmt.Sprintf("failed to load Europe/Oslo location: %v", err))
+	}
+}
+
 // LocalTime wraps time.Time to customize JSON but remain SQL-compatible
 type LocalTime struct {
 	time.Time
@@ -18,7 +29,9 @@ func (t LocalTime) MarshalJSON() ([]byte, error) {
 	if t.Time.IsZero() {
 		return []byte("null"), nil
 	}
-	return []byte(fmt.Sprintf(`"%s"`, t.Format("2006-01-02T15:04:05"))), nil
+	// Format in Oslo time
+	osloTime := t.In(osloLoc)
+	return []byte(fmt.Sprintf(`"%s"`, osloTime.Format("2006-01-02T15:04:05"))), nil
 }
 
 func (t *LocalTime) UnmarshalJSON(b []byte) error {
@@ -30,7 +43,7 @@ func (t *LocalTime) UnmarshalJSON(b []byte) error {
 		t.Time = time.Time{}
 		return nil
 	}
-	parsed, err := time.Parse("2006-01-02T15:04:05", s)
+	parsed, err := time.ParseInLocation("2006-01-02T15:04:05", s, osloLoc)
 	if err != nil {
 		return err
 	}
@@ -40,38 +53,40 @@ func (t *LocalTime) UnmarshalJSON(b []byte) error {
 
 // --- SQL ---
 
-// Value implements driver.Valuer so the DB can store it
 func (t LocalTime) Value() (driver.Value, error) {
 	if t.IsZero() {
 		return nil, nil
 	}
-	return t.Time, nil
+	// Store as UTC in DB (best practice)
+	return t.UTC(), nil
 }
 
-// Scan implements sql.Scanner so sqlx can load it
 func (lt *LocalTime) Scan(value any) error {
 	if value == nil {
 		lt.Time = time.Time{}
 		return nil
 	}
 
+	var parsed time.Time
 	switch v := value.(type) {
 	case time.Time:
-		lt.Time = v
+		parsed = v
 	case []byte:
-		t, err := time.Parse("2006-01-02 15:04:05", string(v))
+		t, err := time.ParseInLocation("2006-01-02 15:04:05", string(v), osloLoc)
 		if err != nil {
 			return err
 		}
-		lt.Time = t
+		parsed = t
 	case string:
-		t, err := time.Parse("2006-01-02 15:04:05", v)
+		t, err := time.ParseInLocation("2006-01-02 15:04:05", v, osloLoc)
 		if err != nil {
 			return err
 		}
-		lt.Time = t
+		parsed = t
 	default:
 		return fmt.Errorf("cannot scan type %T into LocalTime", value)
 	}
+
+	lt.Time = parsed.In(osloLoc)
 	return nil
 }
