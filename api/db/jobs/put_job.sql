@@ -11,7 +11,7 @@ SET
     description_short_en = $9,
     description_long_no = $10,
     description_long_en = $11,
-    job_type = $12,
+    job_type_id = $12,
     time_publish = $13,
     time_expire = $14,
     banner_image = $15,

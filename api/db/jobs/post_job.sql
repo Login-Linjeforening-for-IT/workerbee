@@ -10,7 +10,7 @@ INSERT INTO jobs
     description_short_en,
     description_long_no,
     description_long_en,
-    job_type,
+    job_type_id,
     time_expire,
     banner_image,
     organization_id,

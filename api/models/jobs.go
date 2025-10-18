@@ -20,7 +20,6 @@ type BaseJob struct {
 	DescriptionShortEn string             `db:"description_short_en" json:"description_short_en"`
 	DescriptionLongNo  string             `db:"description_long_no" json:"description_long_no"`
 	DescriptionLongEn  string             `db:"description_long_en" json:"description_long_en"`
-	JobType            string             `db:"job_type" json:"job_type"`
 	TimePublish        internal.LocalTime `db:"time_publish" json:"time_publish"`
 	TimeExpire         internal.LocalTime `db:"time_expire" json:"time_expire"`
 	BannerImage        *string            `db:"banner_image" json:"banner_image,omitempty"`
