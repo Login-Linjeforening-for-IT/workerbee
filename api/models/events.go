@@ -19,9 +19,9 @@ type EventBase struct {
 	TimePublish        internal.LocalTime  `db:"time_publish" json:"time_publish" validate:"required"`
 	TimeSignupRelease  *internal.LocalTime `db:"time_signup_release" json:"time_signup_release,omitempty"`
 	TimeSignupDeadline *internal.LocalTime `db:"time_signup_deadline" json:"time_signup_deadline,omitempty"`
-	Canceled           bool                `db:"canceled" json:"canceled,omitempty"`
-	Digital            bool                `db:"digital" json:"digital,omitempty"`
-	Highlight          bool                `db:"highlight" json:"highlight,omitempty"`
+	Canceled           bool                `db:"canceled" json:"canceled"`
+	Digital            bool                `db:"digital" json:"digital"`
+	Highlight          bool                `db:"highlight" json:"highlight"`
 	ImageSmall         *string             `db:"image_small" json:"image_small,omitempty"`
 	ImageBanner        *string             `db:"image_banner" json:"image_banner,omitempty"`
 	LinkFacebook       *string             `db:"link_facebook" json:"link_facebook,omitempty"`

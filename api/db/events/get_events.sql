@@ -76,6 +76,7 @@ SELECT
     c.id AS "category.id",
     c.name_no AS "category.name_no",
     c.name_en AS "category.name_en",
+    c.color AS "category.color",
     c.created_at AS "category.created_at",
     c.updated_at AS "category.updated_at",
 
