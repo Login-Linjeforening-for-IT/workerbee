@@ -7,4 +7,3 @@ WHERE
     e.time_publish < NOW() AND
     e.visible = TRUE AND
     e.canceled = FALSE;
-    

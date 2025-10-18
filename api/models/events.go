@@ -59,5 +59,5 @@ type EventWithTotalCount struct {
 }
 
 type EventCategory struct {
-	Category string `db:"category" json:"category"`
+	Category
 }

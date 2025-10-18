@@ -80,7 +80,7 @@ func (r *eventRepositories) GetEventCategories() ([]models.EventCategory, error)
 
 	categories, err := db.FetchAllForeignAttributes[models.EventCategory](
 		r.db,
-		"./db/events/get_event_categories.sql",
+		"./db/events/get_categories.sql",
 	)
 
 	if err != nil {
