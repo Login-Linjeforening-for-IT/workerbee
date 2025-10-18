@@ -43,7 +43,7 @@ type NewJob struct {
 
 type Cities struct {
 	ID   *int    `db:"id" json:"id,omitempty"`
-	Name *string `db:"name"`
+	Name *string `db:"name" json:"name,omitempty"`
 }
 
 type JobType struct {
@@ -56,17 +56,17 @@ type JobType struct {
 
 type JobTypeWithTotalCount struct {
 	JobType
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"total_count"`
 }
 
 type JobSkills struct {
-	ID   *int    `db:"id"`
-	Name *string `db:"name"`
+	ID   *int    `db:"id" json:"id,omitempty"`
+	Name *string `db:"name" json:"name,omitempty"`
 }
 
 type CitiesWithTotalCount struct {
 	Cities
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"total_count"`
 }
 
 type CitiesResponse struct {
@@ -79,7 +79,3 @@ type JobWithTotalCount struct {
 	TotalCount int `db:"total_count"`
 }
 
-type JobsResponse struct {
-	Jobs       []JobWithTotalCount `json:"jobs"`
-	TotalCount int                 `json:"total_count"`
-}

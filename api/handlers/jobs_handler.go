@@ -142,9 +142,7 @@ func (h *Handler) GetCities(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"cities": cities,
-	})
+	c.JSON(http.StatusOK, cities)
 }
 
 func (h *Handler) GetJobTypes(c *gin.Context) {
@@ -177,7 +175,10 @@ func (h *Handler) GetAllJobTypes(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, jobTypes)
+	c.JSON(http.StatusOK, gin.H{
+		"job_types":   jobTypes,
+		"total_count": jobTypes[0].TotalCount,
+	})
 }
 
 func (h *Handler) GetJobType(c *gin.Context) {
