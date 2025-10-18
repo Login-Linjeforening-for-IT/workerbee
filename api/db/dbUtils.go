@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"workerbee/internal"
+	"database/sql"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -100,6 +101,9 @@ func ExecuteOneRow[T any](db *sqlx.DB, sqlPath, id string) (T, error) {
 
 	err = db.Get(&result, string(sqlBytes), id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return result, internal.ErrNoRow
+		}
 		return result, err
 	}
 

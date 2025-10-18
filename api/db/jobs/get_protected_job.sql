@@ -54,5 +54,4 @@ LEFT JOIN (
     GROUP BY asr.job_id
 ) skill_agg ON skill_agg.job_id = ja.id
 LEFT JOIN job_types jt ON ja.job_type_id = jt.id
-WHERE ja.id = $1
-    AND ja.time_publish <= now();
+WHERE ja.id = $1;

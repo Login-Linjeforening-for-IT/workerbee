@@ -14,6 +14,7 @@ import (
 
 var (
 	ErrNotFound            = errors.New("could not find id")
+	ErrNoRow               = errors.New("no row found")
 	ErrInvalid             = errors.New("invalid user data")
 	ErrUnauthorized        = errors.New("unauthorized opperation")
 	ErrInvalidForeignKey   = errors.New("error foreign key does not exist")
@@ -27,6 +28,7 @@ var (
 		Message string
 	}{
 		ErrNotFound:          {Status: http.StatusBadRequest, Message: "did not find document"},
+		ErrNoRow:             {Status: http.StatusBadRequest, Message: "no row found"},
 		ErrInvalid:           {Status: http.StatusBadRequest, Message: "invalid user data"},
 		ErrUnauthorized:      {Status: http.StatusUnauthorized, Message: "unauthorized operation"},
 		ErrInvalidForeignKey: {Status: http.StatusBadRequest, Message: "error foreign key does not exist"},
