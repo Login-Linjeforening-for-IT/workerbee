@@ -35,8 +35,7 @@ SELECT
     jt.created_at AS "job_type.created_at",
     jt.updated_at AS "job_type.updated_at",
     city_agg.cities,
-    skill_agg.skills,
-    COUNT(*) OVER() AS total_count
+    skill_agg.skills
 FROM jobs ja
 JOIN organizations org ON ja.organization_id = org.id
 LEFT JOIN (
