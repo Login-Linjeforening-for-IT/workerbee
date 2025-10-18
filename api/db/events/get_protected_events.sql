@@ -73,6 +73,12 @@ SELECT
     a.created_at AS "audience.created_at",
     a.updated_at AS "audience.updated_at",
 
+    c.id AS "category.id",
+    c.name_no AS "category.name_no",
+    c.name_en AS "category.name_en",
+    c.created_at AS "category.created_at",
+    c.updated_at AS "category.updated_at",
+
     COUNT(*) OVER() AS total_count
 FROM events AS e
 LEFT JOIN categories AS c ON e.category_id = c.id
