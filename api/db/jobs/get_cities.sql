@@ -4,4 +4,6 @@ SELECT
     c.name
 FROM cities c
 WHERE 
-    c.id IN (SELECT city_id FROM ad_city_relation);
+    c.id IN (SELECT city_id FROM ad_city_relation WHERE job_id IN 
+        (SELECT id FROM jobs WHERE visible = TRUE AND time_expire > NOW() AND time_publish < NOW())
+    );
