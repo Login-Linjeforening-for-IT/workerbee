@@ -55,4 +55,5 @@ LEFT JOIN (
 LEFT JOIN job_types jt ON ja.job_type_id = jt.id
 WHERE ja.id = $1
     AND ja.visible = true
-    AND ja.time_publish <= now();
+    AND ja.time_publish <= now()
+    AND ja.time_expire >= now();
