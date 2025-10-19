@@ -62,13 +62,21 @@ func ParseCSVToSlice[T any](s string) ([]T, error) {
 	if err != nil {
 		return nil, ErrInvalid
 	}
-	parts := strings.Split(decoded, ",")
-	for _, part := range parts {
+
+	parts := strings.SplitSeq(decoded, ",")
+	for part := range parts {
+		part = strings.TrimSpace(part)
+
 		var v T
-		_, err := fmt.Sscan(part, &v)
-		if err != nil {
-			return nil, ErrInvalid
+		if _, ok := any(v).(string); ok {
+			v = any(part).(T) 
+		} else {
+			_, err := fmt.Sscan(part, &v)
+			if err != nil {
+				return nil, ErrInvalid
+			}
 		}
+
 		result = append(result, v)
 	}
 

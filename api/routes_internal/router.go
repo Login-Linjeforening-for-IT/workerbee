@@ -69,7 +69,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedJob)
 			jobs.GET("/", h.GetJobs)
 			jobs.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedJobs)
-			jobs.POST("/", middleware.AuthMiddleware(), h.CreateJob)
+			jobs.POST("/",  h.CreateJob)
 			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
 			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
 			jobs.GET("/cities", h.GetCities)

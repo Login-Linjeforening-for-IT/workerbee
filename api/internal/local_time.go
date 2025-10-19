@@ -18,7 +18,6 @@ func init() {
 	}
 }
 
-// LocalTime wraps time.Time to customize JSON but remain SQL-compatible
 type LocalTime struct {
 	time.Time
 }
@@ -57,7 +56,6 @@ func (t LocalTime) Value() (driver.Value, error) {
 	if t.IsZero() {
 		return nil, nil
 	}
-	// Store as UTC in DB (best practice)
 	return t.UTC(), nil
 }
 
