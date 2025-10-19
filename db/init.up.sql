@@ -52,7 +52,7 @@ CREATE TABLE "events" (
     "time_signup_release" timestamp,
     "time_signup_deadline" timestamp,
     "canceled" bool NOT NULL DEFAULT false,
-    "category_id" categories NOT NULL,
+    "category_id" int NOT NULL,
     "digital" bool NOT NULL DEFAULT false,
     "highlight" bool NOT NULL DEFAULT false,
     "image_small" varchar,
@@ -67,7 +67,7 @@ CREATE TABLE "events" (
     "location_id" int,
     "parent_id" int,
     "rule_id" int,
-    "audience" audience,
+    "audience_id" int,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -187,6 +187,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id
 ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
