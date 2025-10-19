@@ -18,6 +18,7 @@ type Services struct {
 	Rules         *RuleService
 	Stats         *StatsService
 	Submissions   *SubmissionService
+	ImageService  *ImageService
 	Validate      *validator.Validate
 }
 
@@ -34,6 +35,7 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Submissions:   NewSubmissionService(repos.Submissions),
 		Locations:     NewLocationService(repos.Locations),
 		Organizations: NewOrganizationService(repos.Organizations),
+		ImageService:  NewImageService(),
 		Validate:      validator.New(),
 	}
 }

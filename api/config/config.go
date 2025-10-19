@@ -7,10 +7,13 @@ import (
 )
 
 var (
-	Port      string
-	Host      string
-	DB_url    string
-	StartTime time.Time
+	Port                 string
+	Host                 string
+	DB_url               string
+	DO_URL               string
+	DO_access_key_id     string
+	DO_secret_access_key string
+	StartTime            time.Time
 )
 
 func GetEnv(key, fallback string) string {
@@ -31,5 +34,8 @@ func Init() {
 	db_host := GetEnv("POSTGRES_HOST", "localhost")
 
 	DB_url = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, db_host, port, db_name)
+	DO_URL = GetEnv("DO_URL", "")
+	DO_access_key_id = GetEnv("DO_ACCESS_KEY_ID", "")
+	DO_secret_access_key = GetEnv("DO_SECRET_ACCESS_KEY", "")
 	StartTime = time.Now()
 }
