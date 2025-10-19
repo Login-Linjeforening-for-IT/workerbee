@@ -11,6 +11,7 @@ import (
 
 type ImageService struct {
 	Client *s3.Client
+	Bucket string
 }
 
 func NewImageService() *ImageService {
@@ -30,5 +31,6 @@ func NewImageService() *ImageService {
 
 	return &ImageService{
 		Client: client,
+		Bucket: internal.BUCKET_NAME,
 	}
 }
