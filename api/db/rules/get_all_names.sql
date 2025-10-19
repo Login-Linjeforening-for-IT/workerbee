@@ -1,2 +1,4 @@
-SELECT r.name_en
+SELECT 
+    r.id,
+    r.name_en
 FROM rules r;

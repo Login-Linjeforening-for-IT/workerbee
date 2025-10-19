@@ -34,6 +34,7 @@ type LocationWithTotalCount struct {
 }
 
 type LocationNames struct {
+	ID     int    `db:"id" json:"id"`
 	NameEN string `db:"name_en" json:"name_en"`
 	Type   string `db:"type" json:"type"`
 }

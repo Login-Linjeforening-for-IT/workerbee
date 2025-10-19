@@ -25,5 +25,6 @@ type RulesResponse struct {
 }
 
 type RuleNames struct {
+	ID     int    `db:"id" json:"id"`
 	NameEn string `db:"name_en" json:"name_en"`
 }
