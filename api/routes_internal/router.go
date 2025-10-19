@@ -115,5 +115,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				submissions.DELETE("/:submission_id", handlers.PingHandler)
 			}
 		}
+		images := v2.Group("/images")
+		{
+			images.POST("/:path", h.UploadImage)
+		}
 	}
 }

@@ -6,4 +6,5 @@ const (
 	QUEENBEE_GROUP = "QueenBee"
 	BUCKET_NAME    = "beehive"
 	REGION         = "ams3"
+	CDN_URL        = "https://cdn.login.no/"
 )

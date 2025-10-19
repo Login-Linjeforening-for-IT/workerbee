@@ -16,6 +16,7 @@ var (
 	ErrNotFound            = errors.New("could not find id")
 	ErrNoRow               = errors.New("no row found")
 	ErrInvalid             = errors.New("invalid user data")
+	ErrInvalidImagePath    = errors.New("invalid image path")
 	ErrUnauthorized        = errors.New("unauthorized opperation")
 	ErrInvalidForeignKey   = errors.New("error foreign key does not exist")
 	ErrInvalidAudience     = errors.New("invalid audience does not exist in enum")
@@ -30,6 +31,7 @@ var (
 		ErrNotFound:          {Status: http.StatusBadRequest, Message: "did not find document"},
 		ErrNoRow:             {Status: http.StatusBadRequest, Message: "no row found"},
 		ErrInvalid:           {Status: http.StatusBadRequest, Message: "invalid user data"},
+		ErrInvalidImagePath:  {Status: http.StatusBadRequest, Message: "invalid image path"},
 		ErrUnauthorized:      {Status: http.StatusUnauthorized, Message: "unauthorized operation"},
 		ErrInvalidForeignKey: {Status: http.StatusBadRequest, Message: "error foreign key does not exist"},
 		ErrInvalidAudience:   {Status: http.StatusBadRequest, Message: "invalid audience does not exist in enum"},

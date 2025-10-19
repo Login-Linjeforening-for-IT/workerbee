@@ -175,10 +175,17 @@ func (h *Handler) GetAllJobTypes(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"job_types":   jobTypes,
-		"total_count": jobTypes[0].TotalCount,
-	})
+	if len(jobTypes) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"job_types":   jobTypes,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"job_types":   jobTypes,
+			"total_count": jobTypes[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetJobType(c *gin.Context) {
