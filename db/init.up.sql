@@ -199,7 +199,7 @@ ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills"
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
--- Insert default audiences
+-- Insert default values
 INSERT INTO "audiences" ("name_en", "name_no")
 VALUES
 ('Students', 'students'),
@@ -233,6 +233,13 @@ VALUES
 ('Cyberdays', 'Cyberdagene', 'linear-gradient(120deg, hsla(217, 100%, 50%, 1) 10%, hsla(186, 100%, 69%, 1) 100%)'),
 ('Buddyweek', 'Fadderuka', '#fa75a6'),
 ('Other', 'Andre', '#545b5f');
+
+INSERT INTO "job_types" ("name_en", "name_no") VALUES
+('Full Time', 'Fulltid'),
+('Part Time', 'Deltid'),
+('Internship', 'Praksisplass'),
+('Voluntairy', 'Verv'),
+('Summer', 'Sommer');
 
 
 -- BeeFormed
