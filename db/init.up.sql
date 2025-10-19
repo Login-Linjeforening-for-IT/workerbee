@@ -12,11 +12,12 @@ CREATE TYPE "location_type" AS ENUM (
     'digital'
 );
 
-CREATE TYPE "job_type" AS ENUM (
-    'full_time',
-    'part_time',
-    'summer',
-    'verv'
+CREATE TABLE "job_types" (
+    "id" SERIAL PRIMARY KEY,
+    "name_en" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "audiences" (
@@ -126,7 +127,7 @@ CREATE TABLE "jobs" (
     "description_short_en" varchar NOT NULL,
     "description_long_no" varchar NOT NULL,
     "description_long_en" varchar NOT NULL,
-    "job_type" job_type NOT NULL DEFAULT 'full_time',
+    "job_type_id" int NOT NULL,
     "time_publish" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "time_expire" timestamp NOT NULL,
     "banner_image" varchar,
@@ -190,6 +191,7 @@ ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("i
 ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
