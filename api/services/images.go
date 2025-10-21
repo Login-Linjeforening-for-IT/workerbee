@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"image"
-	"log"
 	"mime/multipart"
 	"slices"
 	"strings"
