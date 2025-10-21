@@ -71,7 +71,6 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 		return "", err
 	}
 
-	// Reset the reader to the beginning for S3 upload
 	src.Seek(0, 0)
 
 	contentType := "image/" + format
