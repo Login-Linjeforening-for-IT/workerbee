@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"strings"
 	"workerbee/models"
 	"workerbee/repositories"
 )
@@ -32,7 +33,7 @@ func (s *HoneyService) GetAllPathsInService(service string) (map[string][]string
 }
 
 func (s *HoneyService) GetAllContentInPath(service, path string) (map[string]map[string]string, error) {
-	if path[0] != '/' {
+	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
 
@@ -54,6 +55,10 @@ func (s *HoneyService) GetAllContentInPath(service, path string) (map[string]map
 }
 
 func (s *HoneyService) GetOneLanguage(service, path, language string) (models.LanguageContentResponse, error) {
+	if !strings.HasPrefix(path, "/") {
+    	path = "/" + path
+	}
+	
 	row, err := s.repo.GetOneLanguage(service, path, language)
 	if err != nil {
 		return models.LanguageContentResponse{}, err
@@ -61,7 +66,7 @@ func (s *HoneyService) GetOneLanguage(service, path, language string) (models.La
 
 	formattedText := make(map[string]map[string]string)
 	var content map[string]string
-	
+
 	err = json.Unmarshal([]byte(row.Text), &content)
 	if err != nil {
 		return models.LanguageContentResponse{}, err

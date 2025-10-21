@@ -130,6 +130,10 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				content := service.Group("/:path")
 				{
 					content.GET("/", h.GetAllContentInPath)
+					language := content.Group("/:language")
+					{
+						language.GET("/", h.GetOneLanguage)
+					}
 				}
 			}
 		}

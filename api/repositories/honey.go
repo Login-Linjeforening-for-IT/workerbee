@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"log"
 	"os"
 	"workerbee/db"
 	"workerbee/models"
@@ -62,7 +63,6 @@ func (r *honeyRepository) GetAllContentInPath(service, path string) ([]models.Ho
 	return result, nil
 }
 
-
 func (r *honeyRepository) GetOneLanguage(service, path, language string) (models.LanguageContent, error) {
 	sqlBytes, err := os.ReadFile("./db/honey/get_info_for_one_language.sql")
 	if err != nil {
@@ -70,6 +70,7 @@ func (r *honeyRepository) GetOneLanguage(service, path, language string) (models
 	}
 
 	var result models.LanguageContent
+	log.Println(service, path, language)
 	err = r.db.Get(&result, string(sqlBytes), service, path, language)
 	if err != nil {
 		return models.LanguageContent{}, err
