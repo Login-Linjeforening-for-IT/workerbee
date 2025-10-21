@@ -30,6 +30,19 @@ CREATE TABLE IF NOT EXISTS honey (
     UNIQUE(service, page, language)
 );
 
+-- Dummy data for honey table
+INSERT INTO honey (service, language, page, text) VALUES
+('beehive', 'no', '/events', '{"title": "Arrangementer", "description": "Alle kommende arrangementer for Login."}'),
+('beehive', 'en', '/events', '{"title": "Events", "description": "All upcoming events for Login."}'),
+('beehive', 'no', '/jobs', '{"title": "Jobber", "description": "Ledige stillinger og verv for medlemmer."}'),
+('beehive', 'en', '/jobs', '{"title": "Jobs", "description": "Open positions and roles for members."}'),
+('tekkom', 'no', '/events', '{"title": "TekKom Arrangementer", "description": "TekKom sine arrangementer og workshops."}'),
+('tekkom', 'en', '/events', '{"title": "TekKom Events", "description": "TekKom events and workshops."}'),
+('tekkom', 'no', '/jobs', '{"title": "TekKom Jobber", "description": "Jobbmuligheter via TekKom."}'),
+('tekkom', 'en', '/jobs', '{"title": "TekKom Jobs", "description": "Job opportunities via TekKom."}');
+
+
+
 CREATE INDEX idx_honey_service_page ON honey(service, page);
 CREATE INDEX idx_honey_service ON honey(service);
 

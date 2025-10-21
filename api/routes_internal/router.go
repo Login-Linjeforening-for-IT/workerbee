@@ -121,5 +121,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			images.GET("/",  middleware.AuthMiddleware(), h.GetImageURLs)
 			images.DELETE("/:imageName", middleware.AuthMiddleware(), h.DeleteImage)
 		}
+		text := v2.Group("/text")
+		{
+			text.GET("/", h.GetTextServices)
+		}
 	}
 }
