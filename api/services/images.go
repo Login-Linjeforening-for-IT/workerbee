@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"log"
 	"mime/multipart"
 	"slices"
 	"strings"
@@ -122,7 +123,11 @@ func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]str
 		}
 
 		for _, obj := range page.Contents {
-			images = append(images, strings.Trim(*obj.Key, prefix))
+			if strings.HasSuffix(*obj.Key, "/") {
+				continue
+			}
+
+			images = append(images, strings.TrimPrefix(*obj.Key, prefix))
 		}
 	}
 	return images, nil
