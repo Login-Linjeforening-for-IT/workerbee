@@ -91,7 +91,7 @@ func FetchAllElements[T any](
 	return result, nil
 }
 
-func ExecuteOneRow[T any](db *sqlx.DB, sqlPath, id string) (T, error) {
+func ExecuteOneRow[T any](db *sqlx.DB, sqlPath string, args ...any) (T, error) {
 	var result T
 
 	sqlBytes, err := os.ReadFile(sqlPath)
@@ -99,7 +99,7 @@ func ExecuteOneRow[T any](db *sqlx.DB, sqlPath, id string) (T, error) {
 		return result, err
 	}
 
-	err = db.Get(&result, string(sqlBytes), id)
+	err = db.Get(&result, string(sqlBytes), args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return result, internal.ErrNoRow
