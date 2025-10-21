@@ -5,7 +5,7 @@ import (
 )
 
 type Rule struct {
-	ID            *int                `db:"id" json:"id"`
+	ID            *int                `db:"id" json:"id,omitempty"`
 	NameNo        *string             `db:"name_no" json:"name_no" validate:"required"`
 	NameEn        *string             `db:"name_en" json:"name_en" validate:"required"`
 	DescriptionNo *string             `db:"description_no" json:"description_no" validate:"required"`

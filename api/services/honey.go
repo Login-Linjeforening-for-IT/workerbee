@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"workerbee/models"
 	"workerbee/repositories"
 )
 
@@ -50,4 +51,27 @@ func (s *HoneyService) GetAllContentInPath(service, path string) (map[string]map
 		result[row.Language] = content
 	}
 	return result, nil
+}
+
+func (s *HoneyService) GetOneLanguage(service, path, language string) (models.LanguageContentResponse, error) {
+	row, err := s.repo.GetOneLanguage(service, path, language)
+	if err != nil {
+		return models.LanguageContentResponse{}, err
+	}
+
+	formattedText := make(map[string]map[string]string)
+	var content map[string]string
+	
+	err = json.Unmarshal([]byte(row.Text), &content)
+	if err != nil {
+		return models.LanguageContentResponse{}, err
+	}
+	formattedText[row.Language] = content
+
+	return models.LanguageContentResponse{
+		Service:  row.Service,
+		Page:     row.Page,
+		Language: row.Language,
+		Text:     formattedText,
+	}, nil
 }

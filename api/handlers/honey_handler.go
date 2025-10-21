@@ -38,3 +38,16 @@ func (h *Handler) GetAllContentInPath(c *gin.Context) {
 
 	c.JSON(http.StatusOK, content)
 }
+
+func (h *Handler) GetInfoAboutOneLanguage(c *gin.Context) {
+	service := c.Param("service")
+	path := c.Param("path")
+	language := c.Param("language")
+
+	response, err := h.Services.Honey.GetOneLanguage(service, path, language)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}

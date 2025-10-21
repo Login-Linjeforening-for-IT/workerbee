@@ -12,6 +12,7 @@ type HoneyRepository interface {
 	GetTextServices() ([]string, error)
 	GetAllPathsInService(service string) ([]models.PathLanguages, error)
 	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
+	GetOneLanguage(service, path, language string) (models.LanguageContent, error)
 }
 
 type honeyRepository struct {
@@ -57,6 +58,21 @@ func (r *honeyRepository) GetAllContentInPath(service, path string) ([]models.Ho
 	err = r.db.Select(&result, string(sqlBytes), service, path)
 	if err != nil {
 		return nil, err
+	}
+	return result, nil
+}
+
+
+func (r *honeyRepository) GetOneLanguage(service, path, language string) (models.LanguageContent, error) {
+	sqlBytes, err := os.ReadFile("./db/honey/get_info_for_one_language.sql")
+	if err != nil {
+		return models.LanguageContent{}, err
+	}
+
+	var result models.LanguageContent
+	err = r.db.Get(&result, string(sqlBytes), service, path, language)
+	if err != nil {
+		return models.LanguageContent{}, err
 	}
 	return result, nil
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"workerbee/internal"
 )
 
@@ -38,10 +39,10 @@ type EventBase struct {
 type Event struct {
 	EventBase
 	Category     Category      `db:"category" json:"category"`
-	Location     *Location     `db:"location" json:"location,omitempty"`
-	Rule         *Rule         `db:"rules" json:"rule,omitempty"`
-	Audience     *Audience     `db:"audience" json:"audience,omitempty"`
-	Organization *Organization `db:"organization" json:"organization,omitempty"`
+	Location     *Location     `db:"location" json:"location"`
+	Rule         *Rule         `db:"rules" json:"rule"`
+	Audience     *Audience     `db:"audience" json:"audience"`
+	Organization *Organization `db:"organization" json:"organization"`
 }
 
 type NewEvent struct {
@@ -60,4 +61,44 @@ type EventWithTotalCount struct {
 
 type EventCategory struct {
 	Category
+}
+
+func (e Event) MarshalJSON() ([]byte, error) {
+    type Alias Event
+    
+    aux := &struct {
+        *Alias
+        Location     *Location      `json:"location"`
+        Rule         *Rule          `json:"rule"`
+        Audience     *Audience      `json:"audience"`
+        Organization *Organization  `json:"organization"`
+    }{
+        Alias: (*Alias)(&e),
+    }
+    
+    if e.Location != nil && e.Location.ID == nil {
+        aux.Location = nil
+    } else {
+        aux.Location = e.Location
+    }
+    
+    if e.Rule != nil && e.Rule.ID == nil {
+        aux.Rule = nil
+    } else {
+        aux.Rule = e.Rule
+    }
+    
+    if e.Audience != nil && e.Audience.ID == nil {
+        aux.Audience = nil
+    } else {
+        aux.Audience = e.Audience
+    }
+    
+    if e.Organization != nil && e.Organization.ID == nil {
+        aux.Organization = nil
+    } else {
+        aux.Organization = e.Organization
+    }
+    
+    return json.Marshal(aux)
 }

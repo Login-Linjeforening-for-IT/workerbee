@@ -664,6 +664,23 @@ VALUES
  false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 2, 5, now(), now());
 
+INSERT INTO events (
+  visible, name_no, name_en, description_no, description_en, 
+  informational_no, informational_en, time_type, time_start, time_end, 
+  time_publish, time_signup_release, time_signup_deadline, canceled, 
+  digital, highlight, image_small, image_banner, link_facebook, 
+  link_discord, link_signup, link_stream, capacity, is_full, 
+  organization_id, location_id, parent_id, rule_id, category_id, created_at, updated_at
+)
+VALUES
+(true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
+ 'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
+ 'Networking muligheter.', 'Networking opportunities.',
+ 'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
+ '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
+ false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
+ NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 5, now(), now());
+
 -- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
 -- 10 submissions per form (one per user), and 10 answers per question.
 INSERT INTO users (full_name, email) VALUES
