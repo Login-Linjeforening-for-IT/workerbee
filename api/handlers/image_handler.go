@@ -22,3 +22,15 @@ func (h *Handler) UploadImage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, imageURL)
 }
+
+func (h *Handler) GetImageURLs(c *gin.Context) {
+	path := c.Param("path")
+
+	imageURLs, err := h.Services.ImageService.GetImagesInPath(c.Request.Context(), path)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, imageURLs)
+}
+

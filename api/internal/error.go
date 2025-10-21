@@ -17,6 +17,8 @@ var (
 	ErrNoRow               = errors.New("no row found")
 	ErrInvalid             = errors.New("invalid user data")
 	ErrInvalidImagePath    = errors.New("invalid image path")
+	ErrImageTooLarge       = errors.New("image size exceeds maximum limit")
+	ErrInvalidImageRatio   = errors.New("invalid image aspect ratio")
 	ErrUnauthorized        = errors.New("unauthorized opperation")
 	ErrInvalidForeignKey   = errors.New("error foreign key does not exist")
 	ErrInvalidAudience     = errors.New("invalid audience does not exist in enum")
@@ -41,7 +43,9 @@ var (
 			Status:  http.StatusBadRequest,
 			Message: "invalid location type does not exist in enum",
 		},
-		ErrInvalidJobType: {Status: http.StatusBadRequest, Message: "invalid job type does not exist in enum"},
+		ErrInvalidJobType:    {Status: http.StatusBadRequest, Message: "invalid job type does not exist in enum"},
+		ErrImageTooLarge:     {Status: http.StatusBadRequest, Message: "image size exceeds maximum limit, max 1MB"},
+		ErrInvalidImageRatio: {Status: http.StatusBadRequest, Message: "invalid image aspect ratio, max 2.5"},
 	}
 )
 

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"image"
 	"mime/multipart"
 	"slices"
 	"strings"
@@ -20,6 +21,9 @@ var validPaths = []string{
 	"jobs",
 	"organizations",
 }
+
+var maxImageSizeMB = int64(1000000)
+var imageRatio = 2.5
 
 type ImageService struct {
 	Client *s3.Client
@@ -58,10 +62,27 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	}
 	defer src.Close()
 
+	img, _, err := image.Decode(src)
+	if err != nil {
+		return "", err
+	}
+
+	bounds := img.Bounds()
+	width := bounds.Dx()
+	height := bounds.Dy()
+
+	if float64(width)/float64(height) != imageRatio {
+		return "", internal.ErrInvalidImageRatio
+	}
+
+	if file.Size > maxImageSizeMB {
+		return "", internal.ErrImageTooLarge
+	}
+
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
-	key := "img/" + path + file.Filename
+	key := internal.IMG_PATH + path + file.Filename
 
 	_, err = is.Client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(is.Bucket),
@@ -75,4 +96,36 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	}
 
 	return fmt.Sprintf("%s%s", internal.CDN_URL, key), nil
+}
+
+func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]string, error) {
+	if !slices.Contains(validPaths, path) {
+		return nil, internal.ErrInvalidImagePath
+	}
+
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
+	}
+
+	prefix := internal.IMG_PATH + path
+	var images []string
+
+	paginator := s3.NewListObjectsV2Paginator(is.Client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(is.Bucket),
+		Prefix: aws.String(prefix),
+	})
+
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, obj := range page.Contents {
+			imageURL := *obj.Key
+			images = append(images, imageURL)
+		}
+	}
+
+	return images, nil
 }
