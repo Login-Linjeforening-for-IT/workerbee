@@ -13,20 +13,21 @@ import (
 )
 
 var (
-	ErrNotFound            = errors.New("could not find id")
-	ErrNoRow               = errors.New("no row found")
-	ErrInvalid             = errors.New("invalid user data")
-	ErrInvalidImagePath    = errors.New("invalid image path")
-	ErrImageTooLarge       = errors.New("image size exceeds maximum limit")
-	ErrInvalidImageRatio   = errors.New("invalid image aspect ratio")
-	ErrUnauthorized        = errors.New("unauthorized opperation")
-	ErrInvalidForeignKey   = errors.New("error foreign key does not exist")
-	ErrInvalidAudience     = errors.New("invalid audience does not exist in enum")
-	ErrInvalidTimeType     = errors.New("invalid time type does not exist in enum")
-	ErrInvalidCategory     = errors.New("invalid category does not exist in enum")
-	ErrInvalidLocationType = errors.New("invalid location type does not exist in enum")
-	ErrInvalidJobType      = errors.New("invalid job type does not exist in enum")
-	ErrorMap               = map[error]struct {
+	ErrNotFound               = errors.New("could not find id")
+	ErrNoRow                  = errors.New("no row found")
+	ErrInvalid                = errors.New("invalid user data")
+	ErrInvalidImagePath       = errors.New("invalid image path")
+	ErrImageTooLarge          = errors.New("image size exceeds maximum limit")
+	ErrInvalidImageRatio      = errors.New("invalid image aspect ratio")
+	ErrUnauthorized           = errors.New("unauthorized opperation")
+	ErrInvalidForeignKey      = errors.New("error foreign key does not exist")
+	ErrInvalidAudience        = errors.New("invalid audience does not exist in enum")
+	ErrInvalidTimeType        = errors.New("invalid time type does not exist in enum")
+	ErrInvalidCategory        = errors.New("invalid category does not exist in enum")
+	ErrInvalidLocationType    = errors.New("invalid location type does not exist in enum")
+	ErrInvalidJobType         = errors.New("invalid job type does not exist in enum")
+	ErrS3ClientNotInitialized = errors.New("s3 client not initialized")
+	ErrorMap                  = map[error]struct {
 		Status  int
 		Message string
 	}{
@@ -43,9 +44,10 @@ var (
 			Status:  http.StatusBadRequest,
 			Message: "invalid location type does not exist in enum",
 		},
-		ErrInvalidJobType:    {Status: http.StatusBadRequest, Message: "invalid job type does not exist in enum"},
-		ErrImageTooLarge:     {Status: http.StatusBadRequest, Message: "image size exceeds maximum limit, max 1MB"},
-		ErrInvalidImageRatio: {Status: http.StatusBadRequest, Message: "invalid image aspect ratio, max 2.5"},
+		ErrInvalidJobType:         {Status: http.StatusBadRequest, Message: "invalid job type does not exist in enum"},
+		ErrImageTooLarge:          {Status: http.StatusBadRequest, Message: "image size exceeds maximum limit, max 1MB"},
+		ErrInvalidImageRatio:      {Status: http.StatusBadRequest, Message: "invalid image aspect ratio, max 2.5"},
+		ErrS3ClientNotInitialized: {Status: http.StatusInternalServerError, Message: "s3 client not initialized"},
 	}
 )
 

@@ -60,6 +60,10 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 		return "", internal.ErrInvalidImagePath
 	}
 
+	if is.Client == nil {
+		return "", internal.ErrS3ClientNotInitialized
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return "", err
@@ -111,6 +115,10 @@ func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]str
 		return nil, internal.ErrInvalidImagePath
 	}
 
+	if is.Client == nil {
+		return nil, internal.ErrS3ClientNotInitialized
+	}
+
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
@@ -143,6 +151,10 @@ func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]str
 func (is *ImageService) DeleteImage(ctx context.Context, path, imageName string) (string, error) {
 	if !slices.Contains(validPaths, path) {
 		return "", internal.ErrInvalidImagePath
+	}
+
+	if is.Client == nil {
+		return "", internal.ErrS3ClientNotInitialized
 	}
 
 	if !strings.HasSuffix(path, "/") {
