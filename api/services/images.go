@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"image"
+	"math"
 	"mime/multipart"
 	"slices"
 	"strings"
@@ -83,7 +84,8 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	width := bounds.Dx()
 	height := bounds.Dy()
 
-	if float64(width)/float64(height) != imageRatio {
+	ratio := float64(width) / float64(height)
+	if math.Abs(ratio-imageRatio) > 0.01 {
 		return "", internal.ErrInvalidImageRatio
 	}
 
