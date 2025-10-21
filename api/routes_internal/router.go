@@ -115,10 +115,11 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				submissions.DELETE("/:submission_id", handlers.PingHandler)
 			}
 		}
-		images := v2.Group("/images")
+		images := v2.Group("/images/:path")
 		{
-			images.POST("/:path", h.UploadImage)
-			images.GET("/:path", h.GetImageURLs)
+			images.POST("/", middleware.AuthMiddleware(), h.UploadImage)
+			images.GET("/",  h.GetImageURLs)
+			images.DELETE("/:imageName", middleware.AuthMiddleware(), h.DeleteImage)
 		}
 	}
 }

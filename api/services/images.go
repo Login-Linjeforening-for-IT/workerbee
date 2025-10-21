@@ -122,10 +122,29 @@ func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]str
 		}
 
 		for _, obj := range page.Contents {
-			imageURL := *obj.Key
-			images = append(images, imageURL)
+			images = append(images, strings.Trim(*obj.Key, prefix))
 		}
 	}
-
 	return images, nil
+}
+
+func (is *ImageService) DeleteImage(ctx context.Context, path, imageName string) (string, error) {
+	if !slices.Contains(validPaths, path) {
+		return "", internal.ErrInvalidImagePath
+	}
+
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
+	}
+	key := internal.IMG_PATH + path + imageName
+
+	_, err := is.Client.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(is.Bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return key, nil
 }
