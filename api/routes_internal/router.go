@@ -124,6 +124,10 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		text := v2.Group("/text")
 		{
 			text.GET("/", h.GetTextServices)
+			service := text.Group("/:service")
+			{
+				service.GET("", h.GetAllPathsInService)
+			}
 		}
 	}
 }

@@ -1,13 +1,16 @@
 package repositories
 
 import (
+	"os"
 	"workerbee/db"
+	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type HoneyRepository interface {
 	GetTextServices() ([]string, error)
+	GetAllPathsInService(service string) ([]models.PathLanguages, error)
 }
 
 type honeyRepository struct {
@@ -27,4 +30,18 @@ func (r *honeyRepository) GetTextServices() ([]string, error) {
 		return nil, err
 	}
 	return response, nil
+}
+
+func (r *honeyRepository) GetAllPathsInService(service string) ([]models.PathLanguages, error) {
+	sqlBytes, err := os.ReadFile("./db/honey/get_all_paths_in_service.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	var result []models.PathLanguages
+	err = r.db.Select(&result, string(sqlBytes), service)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

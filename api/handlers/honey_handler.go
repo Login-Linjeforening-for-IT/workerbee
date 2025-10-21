@@ -15,3 +15,14 @@ func (h *Handler) GetTextServices(c *gin.Context) {
 
 	c.JSON(http.StatusOK, services)
 }
+
+func (h *Handler) GetAllPathsInService(c *gin.Context) {
+	service := c.Param("service")
+
+	paths, err := h.Services.Honey.GetAllPathsInService(service)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, paths)
+}
