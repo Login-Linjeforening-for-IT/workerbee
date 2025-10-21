@@ -118,7 +118,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		images := v2.Group("/images/:path")
 		{
 			images.POST("", middleware.AuthMiddleware(), h.UploadImage)
-			images.GET("/",  middleware.AuthMiddleware(), h.GetImageURLs)
+			images.GET("/", middleware.AuthMiddleware(), h.GetImageURLs)
 			images.DELETE("/:imageName", middleware.AuthMiddleware(), h.DeleteImage)
 		}
 		text := v2.Group("/text")
@@ -126,7 +126,11 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			text.GET("/", h.GetTextServices)
 			service := text.Group("/:service")
 			{
-				service.GET("", h.GetAllPathsInService)
+				service.GET("/", h.GetAllPathsInService)
+				content := service.Group("/:path")
+				{
+					content.GET("/", h.GetAllContentInPath)
+				}
 			}
 		}
 	}

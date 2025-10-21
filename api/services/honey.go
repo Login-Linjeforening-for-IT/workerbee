@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"workerbee/repositories"
 )
 
@@ -25,6 +26,28 @@ func (s *HoneyService) GetAllPathsInService(service string) (map[string][]string
 	result := make(map[string][]string)
 	for _, row := range rows {
 		result[row.Page] = row.Languages
+	}
+	return result, nil
+}
+
+func (s *HoneyService) GetAllContentInPath(service, path string) (map[string]map[string]string, error) {
+	if path[0] != '/' {
+		path = "/" + path
+	}
+
+	rows, err := s.repo.GetAllContentInPath(service, path)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]map[string]string)
+	for _, row := range rows {
+		var content map[string]string
+		err := json.Unmarshal([]byte(row.Text), &content)
+		if err != nil {
+			return nil, err
+		}
+		result[row.Language] = content
 	}
 	return result, nil
 }

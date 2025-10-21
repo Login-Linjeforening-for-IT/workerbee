@@ -11,6 +11,7 @@ import (
 type HoneyRepository interface {
 	GetTextServices() ([]string, error)
 	GetAllPathsInService(service string) ([]models.PathLanguages, error)
+	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
 }
 
 type honeyRepository struct {
@@ -40,6 +41,20 @@ func (r *honeyRepository) GetAllPathsInService(service string) ([]models.PathLan
 
 	var result []models.PathLanguages
 	err = r.db.Select(&result, string(sqlBytes), service)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r *honeyRepository) GetAllContentInPath(service, path string) ([]models.HoneyContent, error) {
+	sqlBytes, err := os.ReadFile("./db/honey/get_all_content_in_path.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	var result []models.HoneyContent
+	err = r.db.Select(&result, string(sqlBytes), service, path)
 	if err != nil {
 		return nil, err
 	}

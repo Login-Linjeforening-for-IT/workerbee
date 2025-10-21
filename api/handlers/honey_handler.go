@@ -26,3 +26,15 @@ func (h *Handler) GetAllPathsInService(c *gin.Context) {
 
 	c.JSON(http.StatusOK, paths)
 }
+
+func (h *Handler) GetAllContentInPath(c *gin.Context) {
+	service := c.Param("service")
+	path := c.Param("path")
+
+	content, err := h.Services.Honey.GetAllContentInPath(service, path)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, content)
+}
