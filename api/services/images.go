@@ -10,6 +10,10 @@ import (
 	"workerbee/config"
 	"workerbee/internal"
 
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -62,10 +66,15 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	}
 	defer src.Close()
 
-	img, _, err := image.Decode(src)
+	img, format, err := image.Decode(src)
 	if err != nil {
 		return "", err
 	}
+
+	// Reset the reader to the beginning for S3 upload
+	src.Seek(0, 0)
+
+	contentType := "image/" + format
 
 	bounds := img.Bounds()
 	width := bounds.Dx()
@@ -89,7 +98,7 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 		Key:         aws.String(key),
 		Body:        src,
 		ACL:         types.ObjectCannedACLPublicRead,
-		ContentType: aws.String(file.Header.Get("Content-Type")),
+		ContentType: aws.String(contentType),
 	})
 	if err != nil {
 		return "", err

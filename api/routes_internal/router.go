@@ -117,7 +117,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		images := v2.Group("/images/:path")
 		{
-			images.POST("/", middleware.AuthMiddleware(), h.UploadImage)
+			images.POST("", middleware.AuthMiddleware(), h.UploadImage)
 			images.GET("/",  middleware.AuthMiddleware(), h.GetImageURLs)
 			images.DELETE("/:imageName", middleware.AuthMiddleware(), h.DeleteImage)
 		}
