@@ -12,8 +12,8 @@ type EventBase struct {
 	NameEn             string              `db:"name_en" json:"name_en" validate:"required"`
 	DescriptionNo      string              `db:"description_no" json:"description_no" validate:"required"`
 	DescriptionEn      string              `db:"description_en" json:"description_en" validate:"required"`
-	InformationalNo    string              `db:"informational_no" json:"informational_no" validate:"required"`
-	InformationalEn    string              `db:"informational_en" json:"informational_en" validate:"required"`
+	InformationalNo    *string             `db:"informational_no" json:"informational_no,omitempty"`
+	InformationalEn    *string             `db:"informational_en" json:"informational_en,omitempty"`
 	TimeType           string              `db:"time_type" json:"time_type,omitempty"`
 	TimeStart          internal.LocalTime  `db:"time_start" json:"time_start" validate:"required"`
 	TimeEnd            internal.LocalTime  `db:"time_end" json:"time_end" validate:"required"`
