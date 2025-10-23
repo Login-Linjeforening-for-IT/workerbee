@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"image"
 	"math"
 	"mime/multipart"
@@ -109,7 +108,7 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 		return "", err
 	}
 
-	return fmt.Sprintf("%s%s", internal.CDN_URL, key), nil
+	return key, nil
 }
 
 func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]string, error) {
