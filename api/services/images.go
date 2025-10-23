@@ -107,8 +107,8 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	if err != nil {
 		return "", err
 	}
-
-	return key, nil
+	// TODO futureproof this for folders
+	return file.Filename, nil
 }
 
 func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]string, error) {
