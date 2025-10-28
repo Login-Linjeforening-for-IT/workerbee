@@ -77,6 +77,13 @@ func (r *honeyRepository) GetOneLanguage(service, path, language string) (models
 }
 
 func (r *honeyRepository) UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error) {
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return nil, err
+	}
+
+	defer tx.Rollback()
+	
 	sqlBytes, err := os.ReadFile("./db/honey/update_content_in_path.sql")
 	if err != nil {
 		return nil, err
@@ -90,12 +97,16 @@ func (r *honeyRepository) UpdateContentInPath(service, path string, content map[
 			return nil, err
 		}
 
-		_, err = r.db.Exec(string(sqlBytes), string(contentJSON), service, path, language)
+		_, err = tx.Exec(string(sqlBytes), string(contentJSON), service, path, language)
 		if err != nil {
 			return nil, err
 		}
 
 		languages = append(languages, language)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
 	}
 
 	resp := make(map[string]any)
