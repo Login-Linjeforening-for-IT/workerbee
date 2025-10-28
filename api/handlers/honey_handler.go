@@ -7,6 +7,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (h *Handler) CreateTextInService(c *gin.Context) {
+	service := c.Param("service")
+	path := c.Param("path")
+	language := c.Param("language")
+
+	var content map[string]map[string]string
+	if err := c.ShouldBindJSON(&content); internal.HandleError(c, err) {
+		return
+	}
+
+	response, err := h.Services.Honey.CreateTextInService(service, path, language, content)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *Handler) GetTextServices(c *gin.Context) {
 	services, err := h.Services.Honey.GetTextServices()
 	if internal.HandleError(c, err) {

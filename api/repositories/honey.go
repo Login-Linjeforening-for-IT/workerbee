@@ -2,14 +2,18 @@ package repositories
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"workerbee/db"
+	"workerbee/internal"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type HoneyRepository interface {
+	CreateTextInService(service, path, language string, content map[string]map[string]string) (map[string]any, error)
 	GetTextServices() ([]string, error)
 	GetAllPathsInService(service string) ([]models.PathLanguages, error)
 	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
@@ -23,6 +27,51 @@ type honeyRepository struct {
 
 func NewHoneyRepository(db *sqlx.DB) HoneyRepository {
 	return &honeyRepository{db: db}
+}
+
+func (r *honeyRepository) CreateTextInService(
+	service, path, language string,
+	content map[string]map[string]string,
+) (map[string]any, error) {
+	var pqErr *pq.Error
+	sqlBytes, err := os.ReadFile("./db/honey/add_content_in_service.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return nil, err
+	}
+
+	defer tx.Rollback()
+
+	var languages []string
+
+	for language, fields := range content {
+		contentJSON, err := json.Marshal(fields)
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = tx.Exec(string(sqlBytes), string(contentJSON), service, path, language)
+		if err != nil {
+			if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+				return nil, internal.ErrConflict
+			}
+			return nil, err
+		}
+
+		languages = append(languages, language)
+	}
+
+	resp := make(map[string]any)
+	resp["status"] = "success"
+	resp["service"] = service
+	resp["path"] = path
+	resp["updated"] = languages
+
+	return resp, nil
 }
 
 func (r *honeyRepository) GetTextServices() ([]string, error) {
@@ -77,17 +126,17 @@ func (r *honeyRepository) GetOneLanguage(service, path, language string) (models
 }
 
 func (r *honeyRepository) UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error) {
+	sqlBytes, err := os.ReadFile("./db/honey/update_content_in_path.sql")
+	if err != nil {
+		return nil, err
+	}
+
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return nil, err
 	}
 
 	defer tx.Rollback()
-	
-	sqlBytes, err := os.ReadFile("./db/honey/update_content_in_path.sql")
-	if err != nil {
-		return nil, err
-	}
 
 	var languages []string
 

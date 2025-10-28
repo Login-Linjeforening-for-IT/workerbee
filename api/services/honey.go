@@ -22,6 +22,32 @@ func NewHoneyService(repo repositories.HoneyRepository) *HoneyService {
 	return &HoneyService{repo: repo}
 }
 
+func (s *HoneyService) CreateTextInService(
+	service, path, language string,
+	content map[string]map[string]string,
+) (map[string]any, error) {
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+
+	if len(content) != 2 {
+		return nil, internal.ErrInvalid
+	}
+
+	for lang := range content {
+		if !slices.Contains(validLanguages, lang) {
+			return nil, internal.ErrInvalid
+		}
+	}
+
+	err := validateHoneyContent(content)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.repo.CreateTextInService(service, path, language, content)
+}
+
 func (s *HoneyService) GetTextServices() ([]string, error) {
 	return s.repo.GetTextServices()
 }
@@ -114,18 +140,18 @@ func (s *HoneyService) GetOneLanguage(service, path, language string) (models.La
 func validateHoneyContent(content map[string]map[string]string) error {
 	enFields := make(map[string]bool)
 	noFields := make(map[string]bool)
-		
+
 	for field := range content["en"] {
 		enFields[field] = true
 	}
 	for field := range content["no"] {
 		noFields[field] = true
 	}
-	
+
 	if len(enFields) != len(noFields) {
 		return internal.ErrInvalid
 	}
-	
+
 	for field := range enFields {
 		if !noFields[field] {
 			return internal.ErrInvalid

@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	ErrConflict               = errors.New("resource already exists")
 	ErrNotFound               = errors.New("could not find id")
 	ErrNoRow                  = errors.New("no row found")
 	ErrInvalid                = errors.New("invalid user data")
@@ -48,6 +49,7 @@ var (
 		ErrImageTooLarge:          {Status: http.StatusBadRequest, Message: "image size exceeds maximum limit, max 1MB"},
 		ErrInvalidImageRatio:      {Status: http.StatusBadRequest, Message: "invalid image aspect ratio, max 2.5"},
 		ErrS3ClientNotInitialized: {Status: http.StatusInternalServerError, Message: "s3 client not initialized"},
+		ErrConflict:               {Status: http.StatusConflict, Message: "resource already exists"},
 	}
 )
 
