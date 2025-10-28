@@ -211,6 +211,49 @@ ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills"
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
+CREATE TABLE daily_insert_history (
+    insert_date DATE NOT NULL PRIMARY KEY,
+    inserted_count INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE OR REPLACE FUNCTION update_insert_history()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO daily_insert_history (insert_date, inserted_count)
+    VALUES (DATE(NEW.created_at AT TIME ZONE 'Europe/Oslo'), 1)
+    ON CONFLICT (insert_date)
+    DO UPDATE SET 
+        inserted_count = daily_insert_history.inserted_count + 1;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER track_events_inserts
+    AFTER INSERT ON events
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_rules_inserts
+    AFTER INSERT ON rules
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_organizations_inserts
+    AFTER INSERT ON organizations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_locations_inserts
+    AFTER INSERT ON locations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_jobs_inserts
+    AFTER INSERT ON jobs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
 -- Insert default values
 INSERT INTO "audiences" ("name_en", "name_no")
 VALUES

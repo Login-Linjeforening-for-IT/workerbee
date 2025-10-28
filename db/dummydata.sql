@@ -310,7 +310,48 @@ CREATE INDEX ON "answers"("submission_id");
 CREATE INDEX ON "answers"("question_id");
 CREATE INDEX ON "answers"("option_id");
 
+CREATE TABLE daily_insert_history (
+    insert_date DATE NOT NULL PRIMARY KEY,
+    inserted_count INTEGER NOT NULL DEFAULT 0
+);
 
+CREATE OR REPLACE FUNCTION update_insert_history()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO daily_insert_history (insert_date, inserted_count)
+    VALUES (DATE(NEW.created_at AT TIME ZONE 'Europe/Oslo'), 1)
+    ON CONFLICT (insert_date)
+    DO UPDATE SET 
+        inserted_count = daily_insert_history.inserted_count + 1;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER track_events_inserts
+    AFTER INSERT ON events
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_rules_inserts
+    AFTER INSERT ON rules
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_organizations_inserts
+    AFTER INSERT ON organizations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_locations_inserts
+    AFTER INSERT ON locations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_jobs_inserts
+    AFTER INSERT ON jobs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
 ------------------
 -- Dummy Data
 ------------------
@@ -804,3 +845,32 @@ SELECT s.id, q.id, to_char((CURRENT_DATE + (s.user_id || ' days')::interval)::da
 FROM submissions s
 JOIN questions q ON q.form_id = s.form_id
 WHERE q.question_type = 'date';
+
+INSERT INTO events (
+  visible, name_no, name_en, description_no, description_en, 
+  time_type, time_start, time_end, time_publish, category_id, 
+  created_at, updated_at
+)
+VALUES
+-- 3 days ago at 00:30 UTC (should be counted on day -2 in Norwegian time)
+(true, 'Test Event -3d UTC midnight', 'Test Event -3d UTC midnight', 'Test timezone', 'Test timezone', 
+ 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
+ (CURRENT_DATE - INTERVAL '3 days' + TIME '00:30:00') AT TIME ZONE 'UTC', 
+ (CURRENT_DATE - INTERVAL '3 days' + TIME '00:30:00') AT TIME ZONE 'UTC'),
+ 
+(true, 'Test Event -2d (1)', 'Test Event -2d (1)', 'Test', 'Test', 
+ 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
+ now() - INTERVAL '2 days', now() - INTERVAL '2 days'),
+(true, 'Test Event -2d (2)', 'Test Event -2d (2)', 'Test', 'Test', 
+ 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
+ now() - INTERVAL '2 days', now() - INTERVAL '2 days'),
+
+(true, 'Test Event -1d (1)', 'Test Event -1d (1)', 'Test', 'Test', 
+ 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
+ now() - INTERVAL '1 day', now() - INTERVAL '1 day'),
+(true, 'Test Event -1d (2)', 'Test Event -1d (2)', 'Test', 'Test', 
+ 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
+ now() - INTERVAL '1 day', now() - INTERVAL '1 day'),
+(true, 'Test Event -1d (3)', 'Test Event -1d (3)', 'Test', 'Test', 
+ 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
+ now() - INTERVAL '1 day', now() - INTERVAL '1 day');

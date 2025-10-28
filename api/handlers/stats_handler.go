@@ -24,13 +24,13 @@ func (h *Handler) GetMostActiveCategory(c *gin.Context) {
 // @Success      200  {object}  models.TotalStats
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/total [get]
-func (h *Handler) GetTotalStats(c *gin.Context) {
-	totalStats, err := h.Services.Stats.GetTotalStats()
+func (h *Handler) GetYearlyStats(c *gin.Context) {
+	yearlyStats, err := h.Services.Stats.GetYearlyStats()
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, totalStats)
+	c.JSON(http.StatusOK, yearlyStats)
 }
 
 // GetCategoriesStats godoc

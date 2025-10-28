@@ -18,8 +18,8 @@ func (s *StatsService) GetMostActiveCategory() (models.CategoriesStats, error) {
 	return s.repo.GetMostActiveCategory()
 }
 
-func (s *StatsService) GetTotalStats() ([]models.TotalStats, error) {
-	return s.repo.GetTotalStats()
+func (s *StatsService) GetYearlyStats() ([]models.YearlyActivity, error) {
+	return s.repo.GetYearlyStats()
 }
 
 func (s *StatsService) GetCategoriesStats() ([]models.CategoriesStats, error) {

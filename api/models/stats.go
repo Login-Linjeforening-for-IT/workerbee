@@ -4,14 +4,10 @@ import (
 	"workerbee/internal"
 )
 
-type TotalStats struct {
-	TotalEvents        int `db:"total_events"`
-	TotalJobs          int `db:"total_jobs"`
-	TotalOrganizations int `db:"total_organizations"`
-	TotalLocations     int `db:"total_locations"`
-	TotalRules         int `db:"total_rules"`
+type YearlyActivity struct {
+	InsertDate internal.LocalTime `db:"insert_date" json:"insert_date"`
+	InsertedCount int                `db:"inserted_count" json:"inserted_count"`
 }
-
 type CategoriesStats struct {
 	ID         int    `db:"id" json:"id"`
 	NameEN     string `db:"name_en" json:"name_en"`

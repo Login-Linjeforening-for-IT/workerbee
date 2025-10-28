@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"workerbee/db"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Statsrepositories interface {
-	GetTotalStats() ([]models.TotalStats, error)
+	GetYearlyStats() ([]models.YearlyActivity, error)
 	GetCategoriesStats() ([]models.CategoriesStats, error)
 	GetNewAdditionsStats() (models.GroupedNewAdditionsStats, error)
 	GetMostActiveCategory() (models.CategoriesStats, error)
@@ -40,19 +41,15 @@ func (r *statsrepositories) GetMostActiveCategory() (models.CategoriesStats, err
 	return categoryStat, nil
 }
 
-func (r *statsrepositories) GetTotalStats() ([]models.TotalStats, error) {
-	totalStats := []models.TotalStats{}
-	sqlBytes, err := os.ReadFile("./db/stats/get_total_stats.sql")
+func (r *statsrepositories) GetYearlyStats() ([]models.YearlyActivity, error) {
+	stats, err := db.FetchAllForeignAttributes[models.YearlyActivity](
+		r.db,
+		"./db/stats/get_yearly_stats.sql",
+	)
 	if err != nil {
 		return nil, err
 	}
-
-	query := string(sqlBytes)
-	if err := r.db.Select(&totalStats, query); err != nil {
-		return nil, err
-	}
-
-	return totalStats, nil
+	return stats, nil
 }
 
 func (r *statsrepositories) GetCategoriesStats() ([]models.CategoriesStats, error) {

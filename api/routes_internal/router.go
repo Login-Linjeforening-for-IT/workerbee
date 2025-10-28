@@ -95,7 +95,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		stats := v2.Group("/stats")
 		{
-			stats.GET("/total", h.GetTotalStats)
+			stats.GET("/yearly", h.GetYearlyStats)
 			stats.GET("/category", h.GetMostActiveCategory)
 			stats.GET("/new-additions", h.GetNewAdditionsStats)
 		}
