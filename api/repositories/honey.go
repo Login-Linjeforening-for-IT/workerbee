@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"encoding/json"
 	"os"
 	"workerbee/db"
 	"workerbee/models"
@@ -13,6 +14,7 @@ type HoneyRepository interface {
 	GetAllPathsInService(service string) ([]models.PathLanguages, error)
 	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
 	GetOneLanguage(service, path, language string) (models.LanguageContent, error)
+	UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error)
 }
 
 type honeyRepository struct {
@@ -72,4 +74,35 @@ func (r *honeyRepository) GetOneLanguage(service, path, language string) (models
 		return models.LanguageContent{}, err
 	}
 	return result, nil
+}
+
+func (r *honeyRepository) UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error) {
+	sqlBytes, err := os.ReadFile("./db/honey/update_content_in_path.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	var languages []string
+
+	for language, fields := range content {
+		contentJSON, err := json.Marshal(fields)
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = r.db.Exec(string(sqlBytes), string(contentJSON), service, path, language)
+		if err != nil {
+			return nil, err
+		}
+
+		languages = append(languages, language)
+	}
+
+	resp := make(map[string]any)
+	resp["status"] = "success"
+	resp["service"] = service
+	resp["path"] = path
+	resp["updated"] = languages
+
+	return resp, nil
 }

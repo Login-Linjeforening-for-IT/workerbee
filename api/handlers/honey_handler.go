@@ -51,3 +51,20 @@ func (h *Handler) GetOneLanguage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *Handler) UpdateContentInPath(c *gin.Context) {
+	service := c.Param("service")
+	path := c.Param("path")
+
+	var content map[string]map[string]string
+	if err := c.ShouldBindJSON(&content); internal.HandleError(c, err) {
+		return
+	}
+
+	resp, err := h.Services.Honey.UpdateContentInPath(service, path, content)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
