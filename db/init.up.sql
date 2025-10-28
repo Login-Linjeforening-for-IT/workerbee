@@ -29,6 +29,14 @@ CREATE TABLE "categories" (
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE "job_types" (
+    "id" SERIAL PRIMARY KEY,
+    "name_en" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE "events" (
     "id" SERIAL PRIMARY KEY,
     "visible" bool NOT NULL DEFAULT false,
@@ -246,14 +254,6 @@ CREATE TABLE IF NOT EXISTS honey (
 
 CREATE INDEX idx_honey_service_page ON honey(service, page);
 CREATE INDEX idx_honey_service ON honey(service);
-
-CREATE TABLE "job_types" (
-    "id" SERIAL PRIMARY KEY,
-    "name_en" varchar NOT NULL,
-    "name_no" varchar NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
 
 CREATE TABLE daily_insert_history (
     insert_date DATE NOT NULL PRIMARY KEY,
