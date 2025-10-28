@@ -34,7 +34,7 @@ func (r *honeyRepository) CreateTextInService(
 	content map[string]map[string]string,
 ) (map[string]any, error) {
 	var pqErr *pq.Error
-	sqlBytes, err := os.ReadFile("./db/honey/add_content_in_service.sql")
+	sqlBytes, err := os.ReadFile("./db/honey/add_service_with_content.sql")
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (r *honeyRepository) CreateTextInService(
 			return nil, err
 		}
 
-		_, err = tx.Exec(string(sqlBytes), string(contentJSON), service, path, language)
+		_, err = tx.Exec(string(sqlBytes), service, language, path, string(contentJSON))
 		if err != nil {
 			if errors.As(err, &pqErr) && pqErr.Code == "23505" {
 				return nil, internal.ErrConflict
@@ -65,11 +65,15 @@ func (r *honeyRepository) CreateTextInService(
 		languages = append(languages, language)
 	}
 
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
 	resp := make(map[string]any)
 	resp["status"] = "success"
 	resp["service"] = service
 	resp["path"] = path
-	resp["updated"] = languages
+	resp["created"] = languages
 
 	return resp, nil
 }
