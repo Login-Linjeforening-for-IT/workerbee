@@ -13,6 +13,7 @@ type Statsrepositories interface {
 	GetTotalStats() ([]models.TotalStats, error)
 	GetCategoriesStats() ([]models.CategoriesStats, error)
 	GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error)
+	GetMostActiveCategory() (models.CategoriesStats, error)
 }
 
 type statsrepositories struct {
@@ -23,17 +24,30 @@ func NewStatsrepositories(db *sqlx.DB) Statsrepositories {
 	return &statsrepositories{db: db}
 }
 
+func (r *statsrepositories) GetMostActiveCategory() (models.CategoriesStats, error) {
+	var categoryStat models.CategoriesStats
+	sqlBytes, err := os.ReadFile("./db/stats/get_most_active_category.sql")
+	if err != nil {
+		return models.CategoriesStats{}, err
+	}
+
+	query := string(sqlBytes)
+	if err := r.db.Get(&categoryStat, query); err != nil {
+		return models.CategoriesStats{}, err
+	}
+
+	return categoryStat, nil
+}
+
 func (r *statsrepositories) GetTotalStats() ([]models.TotalStats, error) {
 	totalStats := []models.TotalStats{}
 	sqlBytes, err := os.ReadFile("./db/stats/get_total_stats.sql")
 	if err != nil {
-		log.Println("unable to read SQL file:", err)
 		return nil, err
 	}
 
 	query := string(sqlBytes)
 	if err := r.db.Select(&totalStats, query); err != nil {
-		log.Println("unable to query DB:", err)
 		return nil, err
 	}
 

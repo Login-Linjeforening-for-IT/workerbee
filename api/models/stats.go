@@ -11,10 +11,9 @@ type TotalStats struct {
 }
 
 type CategoriesStats struct {
-	CategoryID int    `db:"category_id"`
-	NameEN     string `db:"name_en"`
-	NameNO     string `db:"name_no"`
-	EventCount int    `db:"event_count"`
+	ID int    `db:"id" json:"id"`
+	NameEN     string `db:"name_en" json:"name_en"`
+	EventCount int    `db:"event_count" json:"event_count"`
 }
 
 type NewAdditionsStats struct {

@@ -8,6 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (h *Handler) GetMostActiveCategory(c *gin.Context) {
+	categoryStat, err := h.Services.Stats.GetMostActiveCategory()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, categoryStat)
+}
+
 // GetTotalStats godoc
 // @Summary      Get total statistics
 // @Description  Returns total counts for events, jobs, organizations, locations, and rules (excluding deleted records).
@@ -18,8 +27,8 @@ import (
 // @Router       /api/v2/stats/total [get]
 func (h *Handler) GetTotalStats(c *gin.Context) {
 	totalStats, err := h.Services.Stats.GetTotalStats()
-	if err != nil {
-
+	if internal.HandleError(c, err) {
+		return
 	}
 
 	c.JSON(http.StatusOK, totalStats)
