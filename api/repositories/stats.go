@@ -2,6 +2,7 @@
 package repositories
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"workerbee/models"
@@ -12,7 +13,7 @@ import (
 type Statsrepositories interface {
 	GetTotalStats() ([]models.TotalStats, error)
 	GetCategoriesStats() ([]models.CategoriesStats, error)
-	GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error)
+	GetNewAdditionsStats() (models.GroupedNewAdditionsStats, error)
 	GetMostActiveCategory() (models.CategoriesStats, error)
 }
 
@@ -71,19 +72,27 @@ func (r *statsrepositories) GetCategoriesStats() ([]models.CategoriesStats, erro
 	return categoriesStats, nil
 }
 
-func (r *statsrepositories) GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error) {
-	newAdditions := []models.NewAdditionsStats{}
-	sqlBytes, err := os.ReadFile("./db/stats/get_new_additions_stats.sql")
+func (r *statsrepositories) GetNewAdditionsStats() (models.GroupedNewAdditionsStats, error) {
+	var result struct {
+		GroupedData []byte `db:"grouped_data"`
+	}
+	sqlBytes, err := os.ReadFile("./db/stats/get_last_ten_rows_from_tables_grouped.sql")
 	if err != nil {
 		log.Println("unable to read SQL file:", err)
-		return nil, err
+		return models.GroupedNewAdditionsStats{}, err
 	}
 
 	query := string(sqlBytes)
-	if err := r.db.Select(&newAdditions, query, limit); err != nil {
+	if err := r.db.Get(&result, query); err != nil {
 		log.Println("unable to query DB:", err)
-		return nil, err
+		return models.GroupedNewAdditionsStats{}, err
 	}
 
-	return newAdditions, nil
+	var groupedData models.GroupedNewAdditionsStats
+	if err := json.Unmarshal(result.GroupedData, &groupedData); err != nil {
+		log.Println("unable to unmarshal JSON:", err)
+		return models.GroupedNewAdditionsStats{}, err
+	}
+
+	return groupedData, nil
 }

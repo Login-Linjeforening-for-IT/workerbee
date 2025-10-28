@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
@@ -61,15 +60,8 @@ func (h *Handler) GetCategoriesStats(c *gin.Context) {
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/new_additions [get]
 func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
-	limit := c.DefaultQuery("limit", "20")
-	limitInt, err := strconv.Atoi(limit)
-	if err != nil {
-		internal.HandleError(c, internal.ErrInvalid)
-		return
-	}
-
-	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats(limitInt)
-	if internal.HandleError(c, err){
+	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats()
+	if internal.HandleError(c, err) {
 		return
 	}
 

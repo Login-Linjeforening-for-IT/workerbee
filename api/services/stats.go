@@ -26,6 +26,6 @@ func (s *StatsService) GetCategoriesStats() ([]models.CategoriesStats, error) {
 	return s.repo.GetCategoriesStats()
 }
 
-func (s *StatsService) GetNewAdditionsStats(limit int) ([]models.NewAdditionsStats, error) {
-	return s.repo.GetNewAdditionsStats(limit)
+func (s *StatsService) GetNewAdditionsStats() (models.GroupedNewAdditionsStats, error) {
+	return s.repo.GetNewAdditionsStats()
 }

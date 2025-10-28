@@ -12,22 +12,12 @@ CREATE TYPE "location_type" AS ENUM (
     'digital'
 );
 
--- Honey
 CREATE TABLE IF NOT EXISTS honey (
-    -- 1
     id SERIAL PRIMARY KEY,
-    -- beehive
     service TEXT NOT NULL,
-    -- language
     language TEXT NOT NULL,
-    -- /events
     page TEXT NOT NULL,
-     -- actual text json to be served { "title": "abc", "description": "abc" }
-     -- cannot be further indexed since you dont know what the json object
-     -- will look like, there are no forced or common properties, can be anything
     text TEXT NOT NULL,
-    -- there is only one beehive and one tekkom bot, and each path only exists
-    -- once, but they can have both norwegian and english text
     UNIQUE(service, page, language)
 );
 
