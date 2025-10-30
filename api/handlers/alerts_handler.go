@@ -15,3 +15,14 @@ func (h *Handler) GetAlertServices(c *gin.Context) {
 
 	c.JSON(http.StatusOK, services)
 }
+
+func (h *Handler) GetAllPathsInAlertService(c *gin.Context) {
+	service := c.Param("service")
+
+	alerts, err := h.Services.Alerts.GetAllPathsInAlertService(service)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, alerts)
+}

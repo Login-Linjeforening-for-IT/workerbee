@@ -16,15 +16,16 @@ CREATE TABLE IF NOT EXISTS alerts (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
   language TEXT NOT NULL,
+  page TEXT NOT NULL,
   text TEXT NOT NULL,
-  UNIQUE(service, language)
+  UNIQUE(service, page, language)
 );
 
-INSERT INTO alerts (service, language, text) VALUES
-('beehive', 'no', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
-('beehive', 'en', 'This is an important message for Beehive users. Please read carefully.'),
-('tekkom', 'no', 'Viktig informasjon for TekKom medlemmer. Vennligst følg med.'),
-('tekkom', 'en', 'Important information for TekKom members. Please stay tuned.');
+INSERT INTO alerts (service, language, page, text) VALUES
+('beehive', 'no', 'page1', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
+('beehive', 'en', 'page1', 'This is an important message for Beehive users. Please read carefully.'),
+('tekkom', 'no', 'page1', 'Viktig informasjon for TekKom medlemmer. Vennligst følg med.'),
+('tekkom', 'en', 'page1', 'Important information for TekKom members. Please stay tuned.');
 
 CREATE INDEX idx_alerts_service ON alerts(service);
 CREATE INDEX idx_alerts_language ON alerts(language);
