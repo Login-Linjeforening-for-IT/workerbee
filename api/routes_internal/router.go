@@ -131,13 +131,17 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				{
 					content.GET("/", h.GetAllContentInPath)
 					content.PUT("/", middleware.AuthMiddleware(), h.UpdateContentInPath)
-					content.POST("/", middleware.AuthMiddleware(),h.CreateTextInService)
+					content.POST("/", middleware.AuthMiddleware(), h.CreateTextInService)
 					language := content.Group("/:language")
 					{
 						language.GET("/", h.GetOneLanguage)
 					}
 				}
 			}
+		}
+		alerts := v2.Group("/alerts")
+		{
+			alerts.GET("/", )
 		}
 	}
 }

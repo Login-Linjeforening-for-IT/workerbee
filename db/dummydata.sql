@@ -12,6 +12,23 @@ CREATE TYPE "location_type" AS ENUM (
     'digital'
 );
 
+CREATE TABLE IF NOT EXISTS alerts {
+  id SERIAL PRIMARY KEY,
+  service TEXT NOT NULL,
+  language TEXT NOT NULL,
+  text TEXT NOT NULL,
+  UNIQUE(service, language)
+};
+
+INSERT INTO alerts (service, language, text) VALUES
+('beehive', 'no', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
+('beehive', 'en', 'This is an important message for Beehive users. Please read carefully.'),
+('tekkom', 'no', 'Viktig informasjon for TekKom medlemmer. Vennligst følg med.'),
+('tekkom', 'en', 'Important information for TekKom members. Please stay tuned.');
+
+CREATE INDEX idx_alerts_service ON alerts(service);
+CREATE INDEX idx_alerts_language ON alerts(language);
+
 CREATE TABLE IF NOT EXISTS honey (
     id SERIAL PRIMARY KEY,
     service TEXT NOT NULL,

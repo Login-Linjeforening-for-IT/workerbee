@@ -21,6 +21,7 @@ type Services struct {
 	ImageService  *ImageService
 	Validate      *validator.Validate
 	Honey         *HoneyService
+	Alerts        *AlertService
 }
 
 func NewServices(repos *repositories.Repositories) *Services {
@@ -38,6 +39,7 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Organizations: NewOrganizationService(repos.Organizations),
 		ImageService:  NewImageService(),
 		Honey:         NewHoneyService(repos.Honey),
+		Alerts:        NewAlertService(repos.Alerts),
 		Validate:      validator.New(),
 	}
 }

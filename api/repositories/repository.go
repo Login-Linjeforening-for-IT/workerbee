@@ -17,6 +17,7 @@ type Repositories struct {
 	Stats         Statsrepositories
 	Submissions   Submissionrepositories
 	Honey         HoneyRepository
+	Alerts        AlertRepository
 }
 
 func NewRepositories(db *sqlx.DB) *Repositories {
@@ -33,5 +34,6 @@ func NewRepositories(db *sqlx.DB) *Repositories {
 		Locations:     NewLocationRepository(db),
 		Organizations: NewOrganizationRepository(db),
 		Honey:         NewHoneyRepository(db),
+		Alerts:        NewAlertRepository(db),
 	}
 }
