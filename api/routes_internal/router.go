@@ -141,7 +141,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		alerts := v2.Group("/alerts")
 		{
-			alerts.GET("/", )
+			alerts.GET("/", h.GetAlertServices)
+
 		}
 	}
 }

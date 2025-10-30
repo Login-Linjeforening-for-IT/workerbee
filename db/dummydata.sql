@@ -12,13 +12,13 @@ CREATE TYPE "location_type" AS ENUM (
     'digital'
 );
 
-CREATE TABLE IF NOT EXISTS alerts {
+CREATE TABLE IF NOT EXISTS alerts (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
   language TEXT NOT NULL,
   text TEXT NOT NULL,
   UNIQUE(service, language)
-};
+);
 
 INSERT INTO alerts (service, language, text) VALUES
 ('beehive', 'no', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
