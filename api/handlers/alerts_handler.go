@@ -33,3 +33,14 @@ func (h *Handler) GetAlertByServiceAndPage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, alert)
 }
+
+func (h *Handler) GetAlertByID(c *gin.Context) {
+	id := c.Param("id")
+
+	alert, err := h.Services.Alerts.GetAlertByID(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, alert)
+}

@@ -1,22 +1,23 @@
 package services
 
 import (
+	"strconv"
 	"strings"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
 )
 
-
 var allowedSortColumnsAlerts = map[string]string{
-	"id":       "a.id",
-	"service":  "a.service",
-	"page":     "a.page",
-	"title_en": "a.title_en",
-	"title_no": "a.title_no",
+	"id":             "a.id",
+	"service":        "a.service",
+	"page":           "a.page",
+	"title_en":       "a.title_en",
+	"title_no":       "a.title_no",
 	"description_en": "a.description_en",
 	"description_no": "a.description_no",
 }
+
 type AlertService struct {
 	repo repositories.AlertRepository
 }
@@ -45,4 +46,13 @@ func (s *AlertService) GetAlertByServiceAndPage(service, page string) (models.Al
 	}
 
 	return s.repo.GetAlertByServiceAndPage(service, page)
+}
+
+func (s *AlertService) GetAlertByID(id_str string) (models.Alert, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Alert{}, internal.ErrInvalid
+	}
+
+	return s.repo.GetAlertByID(id)
 }

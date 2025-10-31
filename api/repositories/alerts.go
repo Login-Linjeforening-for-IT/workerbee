@@ -10,6 +10,7 @@ import (
 type AlertRepository interface {
 	GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.Alert, error)
 	GetAlertByServiceAndPage(service, page string) (models.Alert, error)
+	GetAlertByID(id int) (models.Alert, error)
 }
 
 type alertRepository struct {
@@ -37,6 +38,15 @@ func (r *alertRepository) GetAlertByServiceAndPage(service, page string) (models
 		"./db/alerts/get_alert_by_service_and_page.sql",
 		service,
 		page,
+	)
+	return alert, err
+}
+
+func (r *alertRepository) GetAlertByID(id int) (models.Alert, error) {
+	alert, err := db.ExecuteOneRow[models.Alert](
+		r.db,
+		"./db/alerts/get_alert_by_id.sql",
+		id,
 	)
 	return alert, err
 }
