@@ -241,6 +241,20 @@ INSERT INTO "job_types" ("name_en", "name_no") VALUES
 ('Voluntairy', 'Verv'),
 ('Summer', 'Sommer');
 
+-- Alerts
+
+CREATE TABLE IF NOT EXISTS alerts (
+  id SERIAL PRIMARY KEY,
+  service TEXT NOT NULL,
+  language TEXT NOT NULL,
+  page TEXT NOT NULL,
+  text TEXT NOT NULL,
+  UNIQUE(service, page, language)
+);
+
+CREATE INDEX idx_alerts_service ON alerts(service);
+CREATE INDEX idx_alerts_language ON alerts(language);
+
 -- Honey
 
 CREATE TABLE IF NOT EXISTS honey (
