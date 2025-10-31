@@ -159,6 +159,22 @@ CREATE TABLE "skills" (
     "name" varchar NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS "album" {
+    id SERIAL PRIMARY KEY,
+    title_no TEXT NOT NULL,
+    title_en TEXT NOT NULL,
+    description_no TEXT NOT NULL,
+    description_en TEXT NOT NULL,
+    year INT NOT NULL,
+    event_id INT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+};
+
+CREATE INDEX ON "album" ("year");
+CREATE INDEX ON "album" ("created_at");
+CREATE INDEX ON "album" ("updated_at");
+
 CREATE INDEX ON "events" ("visible");
 CREATE INDEX ON "events" ("highlight");
 CREATE INDEX ON "events" ("time_start");
@@ -243,7 +259,7 @@ INSERT INTO "job_types" ("name_en", "name_no") VALUES
 
 -- Alerts
 
-CREATE TABLE IF NOT EXISTS alerts (
+CREATE TABLE IF NOT EXISTS "alerts" (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
   language TEXT NOT NULL,
