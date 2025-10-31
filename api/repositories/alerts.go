@@ -12,6 +12,7 @@ type AlertRepository interface {
 	GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.Alert, error)
 	GetAlertByServiceAndPage(service, page string) (models.Alert, error)
 	GetAlertByID(id int) (models.Alert, error)
+	UpdateAlert(alert models.Alert) (models.Alert, error)
 }
 
 type alertRepository struct {
@@ -58,4 +59,12 @@ func (r *alertRepository) GetAlertByID(id int) (models.Alert, error) {
 		id,
 	)
 	return alert, err
+}
+
+func (r *alertRepository) UpdateAlert(alert models.Alert) (models.Alert, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/alerts/update_alert.sql",
+		alert,
+	)
 }

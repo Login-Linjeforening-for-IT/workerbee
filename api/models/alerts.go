@@ -1,7 +1,7 @@
 package models
 
 type Alert struct {
-	ID            string `db:"id" json:"id,omitempty"`
+	ID            int    `db:"id" json:"id,omitempty"`
 	Service       string `db:"service" json:"service" validate:"required"`
 	Page          string `db:"page" json:"page" validate:"required"`
 	TitleEn       string `db:"title_en" json:"title_en" validate:"required"`

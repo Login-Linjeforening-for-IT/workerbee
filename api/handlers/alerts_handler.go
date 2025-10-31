@@ -64,3 +64,23 @@ func (h *Handler) GetAlertByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, alert)
 }
+
+func (h *Handler) UpdateAlert(c *gin.Context) {
+	var alert models.Alert
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&alert); internal.HandleError(c, err) {
+		return
+	}
+
+	if internal.HandleValidationError(c, alert, *h.Services.Validate) {
+		return
+	}
+
+	alertResponse, err := h.Services.Alerts.UpdateAlert(id, alert)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, alertResponse)
+}

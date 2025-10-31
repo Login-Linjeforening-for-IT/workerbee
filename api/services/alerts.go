@@ -60,3 +60,12 @@ func (s *AlertService) GetAlertByID(id_str string) (models.Alert, error) {
 
 	return s.repo.GetAlertByID(id)
 }
+
+func (s *AlertService) UpdateAlert(id_str string, alert models.Alert) (models.Alert, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.Alert{}, internal.ErrInvalid
+	}
+	alert.ID = id
+	return s.repo.UpdateAlert(alert)
+}
