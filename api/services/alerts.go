@@ -69,3 +69,7 @@ func (s *AlertService) UpdateAlert(id_str string, alert models.Alert) (models.Al
 	alert.ID = id
 	return s.repo.UpdateAlert(alert)
 }
+
+func (s *AlertService) DeleteAlert(id string) (int, error) {
+	return s.repo.DeleteAlert(id)
+}

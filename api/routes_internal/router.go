@@ -144,8 +144,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			alerts.GET("/", h.GetAllAlerts)
 			alerts.GET("/:service/:page", h.GetAlertByServiceAndPage)
 			alerts.GET("/id/:id", h.GetAlertByID)
-			alerts.POST("/", h.CreateAlert)
-			alerts.PUT("/:id", h.UpdateAlert)
+			alerts.POST("/", middleware.AuthMiddleware(), h.CreateAlert)
+			alerts.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAlert)
+			alerts.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAlert)
 		}
 
 	}

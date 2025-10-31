@@ -13,6 +13,7 @@ type AlertRepository interface {
 	GetAlertByServiceAndPage(service, page string) (models.Alert, error)
 	GetAlertByID(id int) (models.Alert, error)
 	UpdateAlert(alert models.Alert) (models.Alert, error)
+	DeleteAlert(id string) (int, error)
 }
 
 type alertRepository struct {
@@ -66,5 +67,13 @@ func (r *alertRepository) UpdateAlert(alert models.Alert) (models.Alert, error) 
 		r.db,
 		"./db/alerts/update_alert.sql",
 		alert,
+	)
+}
+
+func (r *alertRepository) DeleteAlert(id string) (int, error) {
+	return db.ExecuteOneRow[int](
+		r.db,
+		"./db/alerts/delete_alert.sql",
+		id,
 	)
 }

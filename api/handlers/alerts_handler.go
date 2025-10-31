@@ -84,3 +84,14 @@ func (h *Handler) UpdateAlert(c *gin.Context) {
 
 	c.JSON(http.StatusOK, alertResponse)
 }
+
+func (h *Handler) DeleteAlert(c *gin.Context) {
+	id := c.Param("id")
+
+	deletedID, err := h.Services.Alerts.DeleteAlert(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"id": deletedID})
+}

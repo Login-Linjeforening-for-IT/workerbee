@@ -1,0 +1,3 @@
+DELETE FROM alerts 
+WHERE id = $1
+RETURNING id;
