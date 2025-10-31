@@ -30,7 +30,7 @@ func (s *HoneyService) CreateTextInService(
 		path = "/" + path
 	}
 
-	if len(content) != 2 {
+	if len(content) < 1 {
 		return nil, internal.ErrInvalid
 	}
 

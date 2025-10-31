@@ -1,7 +1,22 @@
 package services
 
-import "workerbee/repositories"
+import (
+	"strings"
+	"workerbee/internal"
+	"workerbee/models"
+	"workerbee/repositories"
+)
 
+
+var allowedSortColumnsAlerts = map[string]string{
+	"id":       "a.id",
+	"service":  "a.service",
+	"page":     "a.page",
+	"title_en": "a.title_en",
+	"title_no": "a.title_no",
+	"description_en": "a.description_en",
+	"description_no": "a.description_no",
+}
 type AlertService struct {
 	repo repositories.AlertRepository
 }
@@ -10,19 +25,24 @@ func NewAlertService(repo repositories.AlertRepository) *AlertService {
 	return &AlertService{repo: repo}
 }
 
-func (s *AlertService) GetAlertServices() ([]string, error) {
-	return s.repo.GetAlertServices()
+func (s *AlertService) GetAllAlerts(search, limit_str, offset_str, orderBy, sort string) ([]models.Alert, error) {
+	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsAlerts)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetAllAlerts(limit, offset, search, orderBySanitized, sortSanitized)
 }
 
-func (s *AlertService) GetAllPathsInAlertService(service string) (map[string][]string, error) {
-	rows, err := s.repo.GetAllPathsInAlertService(service)
-	if err != nil {
-		return nil, err
+func (s *AlertService) GetAlertByServiceAndPage(service, page string) (models.Alert, error) {
+	if !strings.HasPrefix(page, "/") {
+		page = "/" + page
 	}
 
-	result := make(map[string][]string)
-	for _, row := range rows {
-		result[row.Page] = row.Languages
-	}
-	return result, nil
+	return s.repo.GetAlertByServiceAndPage(service, page)
 }

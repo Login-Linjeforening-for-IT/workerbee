@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"os"
 	"workerbee/db"
 	"workerbee/models"
 
@@ -9,8 +8,8 @@ import (
 )
 
 type AlertRepository interface {
-	GetAlertServices() ([]string, error)
-	GetAllPathsInAlertService(service string) ([]models.AlertLanguages, error)
+	GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.Alert, error)
+	GetAlertByServiceAndPage(service, page string) (models.Alert, error)
 }
 
 type alertRepository struct {
@@ -21,27 +20,23 @@ func NewAlertRepository(db *sqlx.DB) AlertRepository {
 	return &alertRepository{db: db}
 }
 
-func (r *alertRepository) GetAlertServices() ([]string, error) {
-	response, err := db.FetchAllForeignAttributes[string](
+func (r *alertRepository) GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.Alert, error) {
+	return db.FetchAllElements[models.Alert](
 		r.db,
 		"./db/alerts/get_all_alerts.sql",
+		orderBy, sort,
+		limit,
+		offset,
+		search,
 	)
-	if err != nil {
-		return nil, err
-	}
-	return response, nil
 }
 
-func (r *alertRepository) GetAllPathsInAlertService(service string) ([]models.AlertLanguages, error) {
-	sqlBytes, err := os.ReadFile("./db/alerts/get_all_paths_in_service.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	var result []models.AlertLanguages
-	err = r.db.Select(&result, string(sqlBytes), service)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+func (r *alertRepository) GetAlertByServiceAndPage(service, page string) (models.Alert, error) {
+	alert, err := db.ExecuteOneRow[models.Alert](
+		r.db,
+		"./db/alerts/get_alert_by_service_and_page.sql",
+		service,
+		page,
+	)
+	return alert, err
 }

@@ -15,20 +15,13 @@ CREATE TYPE "location_type" AS ENUM (
 CREATE TABLE IF NOT EXISTS alerts (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
-  language TEXT NOT NULL,
   page TEXT NOT NULL,
-  text TEXT NOT NULL,
-  UNIQUE(service, page, language)
+  title_en TEXT NOT NULL,
+  title_no TEXT NOT NULL,
+  description_en TEXT NOT NULL,
+  description_no TEXT NOT NULL,
+  UNIQUE(service, page)
 );
-
-INSERT INTO alerts (service, language, page, text) VALUES
-('beehive', 'no', 'page1', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
-('beehive', 'en', 'page1', 'This is an important message for Beehive users. Please read carefully.'),
-('tekkom', 'no', 'page1', 'Viktig informasjon for TekKom medlemmer. Vennligst følg med.'),
-('tekkom', 'en', 'page1', 'Important information for TekKom members. Please stay tuned.');
-
-CREATE INDEX idx_alerts_service ON alerts(service);
-CREATE INDEX idx_alerts_language ON alerts(language);
 
 CREATE TABLE IF NOT EXISTS honey (
     id SERIAL PRIMARY KEY,
@@ -38,18 +31,6 @@ CREATE TABLE IF NOT EXISTS honey (
     text TEXT NOT NULL,
     UNIQUE(service, page, language)
 );
-
-INSERT INTO honey (service, language, page, text) VALUES
-('beehive', 'no', '/events', '{"title": "Arrangementer", "description": "Alle kommende arrangementer for Login."}'),
-('beehive', 'en', '/events', '{"title": "Events", "description": "All upcoming events for Login."}'),
-('beehive', 'no', '/jobs', '{"title": "Jobber", "description": "Ledige stillinger og verv for medlemmer."}'),
-('beehive', 'en', '/jobs', '{"title": "Jobs", "description": "Open positions and roles for members."}'),
-('tekkom', 'no', '/events', '{"title": "TekKom Arrangementer", "description": "TekKom sine arrangementer og workshops."}'),
-('tekkom', 'en', '/events', '{"title": "TekKom Events", "description": "TekKom events and workshops."}'),
-('tekkom', 'no', '/jobs', '{"title": "TekKom Jobber", "description": "Jobbmuligheter via TekKom."}'),
-('tekkom', 'en', '/jobs', '{"title": "TekKom Jobs", "description": "Job opportunities via TekKom."}');
-
-
 
 CREATE INDEX idx_honey_service_page ON honey(service, page);
 CREATE INDEX idx_honey_service ON honey(service);
@@ -208,6 +189,7 @@ CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
 
+CREATE INDEX idx_alerts_service ON alerts(service);
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
@@ -374,6 +356,13 @@ CREATE TRIGGER track_jobs_inserts
 -- Dummy Data
 ------------------
 
+INSERT INTO alerts (service, page, title_en, title_no, description_en, description_no) VALUES
+('beehive', '/events', 'Important Beehive Update', 'Viktig Beehive Oppdatering', 'This is an important message for Beehive users. Please read carefully.', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
+('beehive', '/jobs', 'New Job Opportunities', 'Nye Jobbmuligheter', 'Check out the latest job openings available for members.', 'Sjekk ut de siste ledige stillingene tilgjengelig for medlemmer.'),
+('tekkom', '/events', 'TekKom Event Announcement', 'TekKom Arrangement Annonsering', 'Join us for upcoming TekKom events and workshops.', 'Bli med oss for kommende TekKom arrangementer og workshops.'),
+('tekkom', '/jobs', 'TekKom Job Listings', 'TekKom Jobbannonser', 'Explore new job listings through TekKom.', 'Utforsk nye jobbannonser via TekKom.');
+
+
 INSERT INTO "job_types" ("name_en", "name_no") VALUES
 ('Full Time', 'Fulltid'),
 ('Part Time', 'Deltid'),
@@ -435,6 +424,17 @@ INSERT INTO "cities" ("name") VALUES
 ('Bergen'),
 ('Stavanger'),
 ('Tromsø');
+
+INSERT INTO honey (service, language, page, text) VALUES
+('beehive', 'no', '/events', '{"title": "Arrangementer", "description": "Alle kommende arrangementer for Login."}'),
+('beehive', 'en', '/events', '{"title": "Events", "description": "All upcoming events for Login."}'),
+('beehive', 'no', '/jobs', '{"title": "Jobber", "description": "Ledige stillinger og verv for medlemmer."}'),
+('beehive', 'en', '/jobs', '{"title": "Jobs", "description": "Open positions and roles for members."}'),
+('tekkom', 'no', '/events', '{"title": "TekKom Arrangementer", "description": "TekKom sine arrangementer og workshops."}'),
+('tekkom', 'en', '/events', '{"title": "TekKom Events", "description": "TekKom events and workshops."}'),
+('tekkom', 'no', '/jobs', '{"title": "TekKom Jobber", "description": "Jobbmuligheter via TekKom."}'),
+('tekkom', 'en', '/jobs', '{"title": "TekKom Jobs", "description": "Job opportunities via TekKom."}');
+
 
 INSERT INTO "locations" (
   "name_no", 
