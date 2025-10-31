@@ -3,9 +3,29 @@ package handlers
 import (
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
+
+func (h *Handler) CreateAlert(c *gin.Context) {
+	var alert models.Alert
+
+	if err := c.ShouldBindBodyWithJSON(&alert); internal.HandleError(c, err) {
+		return
+	}
+
+	if internal.HandleValidationError(c, alert, *h.Services.Validate) {
+		return
+	}
+
+	alertResponse, err := h.Services.Alerts.CreateAlert(alert)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusCreated, alertResponse)
+}
 
 func (h *Handler) GetAllAlerts(c *gin.Context) {
 	search := c.DefaultQuery("search", "")

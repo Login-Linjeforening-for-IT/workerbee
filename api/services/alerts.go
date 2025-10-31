@@ -26,6 +26,10 @@ func NewAlertService(repo repositories.AlertRepository) *AlertService {
 	return &AlertService{repo: repo}
 }
 
+func (s *AlertService) CreateAlert(alert models.Alert) (models.Alert, error) {
+	return s.repo.CreateAlert(alert)
+}
+
 func (s *AlertService) GetAllAlerts(search, limit_str, offset_str, orderBy, sort string) ([]models.Alert, error) {
 	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsAlerts)
 	if err != nil {
