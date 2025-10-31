@@ -10,6 +10,7 @@ SET
     city_id = :city_id,
     coordinate_lat = :coordinate_lat,
     coordinate_lon = :coordinate_lon,
+    url = :url,
     updated_at = NOW()
 WHERE id = :id
 RETURNING *;

@@ -13,7 +13,7 @@ type LocationBase struct {
 	AddressPostcode *int                `db:"address_postcode" json:"address_postcode,omitempty"`
 	CoordinateLat   *float64            `db:"coordinate_lat" json:"coordinate_lat,omitempty" validate:"omitempty,gte=-90,lte=90"`
 	CoordinateLon   *float64            `db:"coordinate_lon" json:"coordinate_lon,omitempty" validate:"omitempty,gte=-180,lte=180"`
-	URL             *string             `db:"url" json:"url,omitempty" validate:"omitempty"`
+	URL             *string             `db:"url" json:"url,omitempty"`
 	CreatedAt       *internal.LocalTime `db:"created_at" json:"created_at"`
 	UpdatedAt       *internal.LocalTime `db:"updated_at" json:"updated_at"`
 }
