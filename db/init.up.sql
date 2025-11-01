@@ -159,7 +159,7 @@ CREATE TABLE "skills" (
     "name" varchar NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "album" {
+CREATE TABLE IF NOT EXISTS "albums" (
     id SERIAL PRIMARY KEY,
     title_no TEXT NOT NULL,
     title_en TEXT NOT NULL,
@@ -169,11 +169,11 @@ CREATE TABLE IF NOT EXISTS "album" {
     event_id INT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-};
+);
 
-CREATE INDEX ON "album" ("year");
-CREATE INDEX ON "album" ("created_at");
-CREATE INDEX ON "album" ("updated_at");
+CREATE INDEX ON "albums" ("year");
+CREATE INDEX ON "albums" ("created_at");
+CREATE INDEX ON "albums" ("updated_at");
 
 CREATE INDEX ON "events" ("visible");
 CREATE INDEX ON "events" ("highlight");

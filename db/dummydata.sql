@@ -12,7 +12,7 @@ CREATE TYPE "location_type" AS ENUM (
     'digital'
 );
 
-CREATE TABLE IF NOT EXISTS album {
+CREATE TABLE IF NOT EXISTS "albums" (
     id SERIAL PRIMARY KEY,
     name_en TEXT NOT NULL,
     name_no TEXT NOT NULL,
@@ -22,12 +22,12 @@ CREATE TABLE IF NOT EXISTS album {
     event_id INT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-}
+);
 
-INSERT INTO albums (name_en, name_no, description_no, description_en, year, event_id) VALUES
+INSERT INTO "album" (name_en, name_no, description_no, description_en, year, event_id) VALUES
 ('Sample Album EN', 'Eksempel Album NO', 'Dette er en eksempelbeskrivelse på norsk.', 'This is a sample description in English.', 2024, 1);
 
-CREATE TABLE IF NOT EXISTS alerts (
+CREATE TABLE IF NOT EXISTS "alerts" (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
   page TEXT NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS alerts (
   UNIQUE(service, page)
 );
 
-CREATE TABLE IF NOT EXISTS honey (
+CREATE TABLE IF NOT EXISTS "honey" (
     id SERIAL PRIMARY KEY,
     service TEXT NOT NULL,
     language TEXT NOT NULL,
