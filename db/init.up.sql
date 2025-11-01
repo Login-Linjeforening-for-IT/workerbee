@@ -161,8 +161,8 @@ CREATE TABLE "skills" (
 
 CREATE TABLE IF NOT EXISTS "albums" (
     id SERIAL PRIMARY KEY,
-    title_no TEXT NOT NULL,
-    title_en TEXT NOT NULL,
+    name_no TEXT NOT NULL,
+    name_en TEXT NOT NULL,
     description_no TEXT NOT NULL,
     description_en TEXT NOT NULL,
     year INT NOT NULL,
