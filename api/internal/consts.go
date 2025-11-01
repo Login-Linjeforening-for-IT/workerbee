@@ -7,4 +7,5 @@ const (
 	BUCKET_NAME    = "beehive"
 	REGION         = "ams3"
 	IMG_PATH       = "img/"
+	ALBUM_PATH     = "albums/"
 )

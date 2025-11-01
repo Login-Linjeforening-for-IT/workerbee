@@ -37,7 +37,7 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Submissions:   NewSubmissionService(repos.Submissions),
 		Locations:     NewLocationService(repos.Locations),
 		Organizations: NewOrganizationService(repos.Organizations),
-		ImageService:  NewImageService(),
+		ImageService:  NewImageService(repos.Images),
 		Honey:         NewHoneyService(repos.Honey),
 		Alerts:        NewAlertService(repos.Alerts),
 		Validate:      validator.New(),

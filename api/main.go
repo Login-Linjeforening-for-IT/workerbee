@@ -2,7 +2,7 @@ package main
 
 import (
 	"workerbee/config"
-	"workerbee/db"
+	client "workerbee/db"
 	"workerbee/handlers"
 	"workerbee/internal/middleware"
 	repositories "workerbee/repositories"
@@ -23,10 +23,11 @@ func init() {
 }
 
 func main() {
-	db := db.Init()
+	db := client.Init()
+	do := client.DOInit()
 
 	// Repos
-	repos := repositories.NewRepositories(db)
+	repos := repositories.NewRepositories(db, do)
 
 	// Services
 	svcs := services.NewServices(repos)

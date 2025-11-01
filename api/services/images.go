@@ -7,17 +7,12 @@ import (
 	"mime/multipart"
 	"slices"
 	"strings"
-	"workerbee/config"
 	"workerbee/internal"
+	"workerbee/repositories"
 
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
 var validPaths = []string{
@@ -30,38 +25,18 @@ var maxImageSizeMB = int64(1000000)
 var imageRatio = 2.5
 
 type ImageService struct {
-	Client *s3.Client
-	Bucket string
+	repo repositories.ImageRepository
 }
 
-func NewImageService() *ImageService {
-	client := s3.New(s3.Options{
-		Region: internal.REGION,
-		Credentials: aws.NewCredentialsCache(
-			credentials.StaticCredentialsProvider{
-				Value: aws.Credentials{
-					AccessKeyID:     config.DO_access_key_id,
-					SecretAccessKey: config.DO_secret_access_key,
-				},
-			},
-		),
-		EndpointResolver: s3.EndpointResolverFromURL(config.DO_URL),
-		UsePathStyle:     true,
-	})
-
+func NewImageService(repo repositories.ImageRepository) *ImageService {
 	return &ImageService{
-		Client: client,
-		Bucket: internal.BUCKET_NAME,
+		repo: repo,
 	}
 }
 
 func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Context, path string) (string, error) {
 	if !slices.Contains(validPaths, path) {
 		return "", internal.ErrInvalidImagePath
-	}
-
-	if is.Client == nil {
-		return "", internal.ErrS3ClientNotInitialized
 	}
 
 	src, err := file.Open()
@@ -97,17 +72,10 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	}
 	key := internal.IMG_PATH + path + file.Filename
 
-	_, err = is.Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(is.Bucket),
-		Key:         aws.String(key),
-		Body:        src,
-		ACL:         types.ObjectCannedACLPublicRead,
-		ContentType: aws.String(contentType),
-	})
+	err = is.repo.UploadImage(ctx, key, contentType, src)
 	if err != nil {
 		return "", err
 	}
-	// TODO futureproof this for folders
 	return file.Filename, nil
 }
 
@@ -116,36 +84,17 @@ func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]str
 		return nil, internal.ErrInvalidImagePath
 	}
 
-	if is.Client == nil {
-		return nil, internal.ErrS3ClientNotInitialized
-	}
-
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
 
 	prefix := internal.IMG_PATH + path
-	var images []string
 
-	paginator := s3.NewListObjectsV2Paginator(is.Client, &s3.ListObjectsV2Input{
-		Bucket: aws.String(is.Bucket),
-		Prefix: aws.String(prefix),
-	})
-
-	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, obj := range page.Contents {
-			if strings.HasSuffix(*obj.Key, "/") {
-				continue
-			}
-
-			images = append(images, strings.TrimPrefix(*obj.Key, prefix))
-		}
+	images, err := is.repo.GetImagesInPath(ctx, prefix)
+	if err != nil {
+		return nil, err
 	}
+
 	return images, nil
 }
 
@@ -154,19 +103,12 @@ func (is *ImageService) DeleteImage(ctx context.Context, path, imageName string)
 		return "", internal.ErrInvalidImagePath
 	}
 
-	if is.Client == nil {
-		return "", internal.ErrS3ClientNotInitialized
-	}
-
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
 	}
 	key := internal.IMG_PATH + path + imageName
 
-	_, err := is.Client.DeleteObject(ctx, &s3.DeleteObjectInput{
-		Bucket: aws.String(is.Bucket),
-		Key:    aws.String(key),
-	})
+	err := is.repo.DeleteImage(ctx, key)
 	if err != nil {
 		return "", err
 	}

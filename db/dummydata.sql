@@ -14,8 +14,8 @@ CREATE TYPE "location_type" AS ENUM (
 
 CREATE TABLE IF NOT EXISTS album {
     id SERIAL PRIMARY KEY,
-    title_no TEXT NOT NULL,
-    title_en TEXT NOT NULL,
+    name_en TEXT NOT NULL,
+    name_no TEXT NOT NULL,
     description_no TEXT NOT NULL,
     description_en TEXT NOT NULL,
     year INT NOT NULL,
@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS album {
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 }
+
+INSERT INTO albums (name_en, name_no, description_no, description_en, year, event_id) VALUES
+('Sample Album EN', 'Eksempel Album NO', 'Dette er en eksempelbeskrivelse på norsk.', 'This is a sample description in English.', 2024, 1);
 
 CREATE TABLE IF NOT EXISTS alerts (
   id SERIAL PRIMARY KEY,

@@ -148,6 +148,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			alerts.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAlert)
 			alerts.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAlert)
 		}
-
+		albums := v2.Group("/albums")
+		{
+			albums.POST("/", h.CreateAlbum)
+		}
 	}
 }

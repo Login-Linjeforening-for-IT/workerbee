@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,9 +19,11 @@ type Repositories struct {
 	Submissions   Submissionrepositories
 	Honey         HoneyRepository
 	Alerts        AlertRepository
+	Albums        AlbumsRepository
+	Images        ImageRepository
 }
 
-func NewRepositories(db *sqlx.DB) *Repositories {
+func NewRepositories(db *sqlx.DB, do *s3.Client) *Repositories {
 	return &Repositories{
 		Audiences:     NewAudiencerepository(db),
 		Categories:    NewCategoryRepository(db),
@@ -35,5 +38,7 @@ func NewRepositories(db *sqlx.DB) *Repositories {
 		Organizations: NewOrganizationRepository(db),
 		Honey:         NewHoneyRepository(db),
 		Alerts:        NewAlertRepository(db),
+		Albums:        NewAlbumsRepository(db, do),
+		Images:        NewImageRepository(db, do),
 	}
 }

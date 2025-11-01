@@ -14,6 +14,7 @@ import (
 
 var (
 	ErrConflict               = errors.New("resource already exists")
+	ErrNoImagesProvided       = errors.New("no images provided")
 	ErrNotFound               = errors.New("could not find id")
 	ErrNoRow                  = errors.New("no row found")
 	ErrInvalid                = errors.New("invalid user data")
@@ -32,6 +33,7 @@ var (
 		Status  int
 		Message string
 	}{
+		ErrNoImagesProvided:  {Status: http.StatusBadRequest, Message: "no images provided"},
 		ErrNotFound:          {Status: http.StatusBadRequest, Message: "did not find document"},
 		ErrNoRow:             {Status: http.StatusBadRequest, Message: "no row found"},
 		ErrInvalid:           {Status: http.StatusBadRequest, Message: "invalid user data"},
