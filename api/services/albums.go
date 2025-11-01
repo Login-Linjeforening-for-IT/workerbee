@@ -17,6 +17,10 @@ func NewAlbumService(repo repositories.AlbumsRepository) *AlbumService {
 	}
 }
 
-func (as *AlbumService) CreateAlbum(ctx context.Context, images []*multipart.FileHeader, body models.Album) error {
-	return as.repo.CreateAlbum(ctx, images, body)
+func (as *AlbumService) CreateAlbum(ctx context.Context, body models.Album) (models.Album, error) {
+	return as.repo.CreateAlbum(ctx, body)
+}
+
+func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
+	return as.repo.UploadImagesToAlbum(ctx, id, files)
 }

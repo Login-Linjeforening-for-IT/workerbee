@@ -4,15 +4,15 @@ INSERT INTO albums
     name_no,
     description_en,
     description_no,
-    created_at,
-    updated_at
+    year,
+    event_id
 ) VALUES 
 (
-    $1, 
-    $2, 
-    $3, 
-    $4, 
-    $5, 
-    $6
+    :name_en,
+    :name_no,
+    :description_en,
+    :description_no,
+    :year,
+    :event_id
 )
-RETURNING id;
+RETURNING *;

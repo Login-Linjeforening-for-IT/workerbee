@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"log"
+	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
 
@@ -9,19 +9,6 @@ import (
 )
 
 func (h *Handler) CreateAlbum(c *gin.Context) {
-	log.Println("CreateAlbum called")
-
-	form, err := c.MultipartForm()
-	if internal.HandleError(c, err) {
-		return
-	}
-
-	images := form.File["images"]
-	if len(images) == 0 {
-		internal.HandleError(c, internal.ErrNoImagesProvided)
-		return
-	}
-
 	var body models.Album
 	if err := c.ShouldBindBodyWithJSON(&body); internal.HandleError(c, err) {
 		return
@@ -31,12 +18,34 @@ func (h *Handler) CreateAlbum(c *gin.Context) {
 		return
 	}
 
-	err = h.Services.Albums.CreateAlbum(c.Request.Context(), images, body)
+	albumResponse, err := h.Services.Albums.CreateAlbum(c.Request.Context(), body)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "album created successfully",
+	c.JSON(http.StatusOK, albumResponse)
+}
+
+func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
+	id := c.Param("id")
+
+	form, err := c.MultipartForm()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	files := form.File["images"]
+	if len(files) == 0 {
+		internal.HandleError(c, internal.ErrNoImagesProvided)
+		return
+	}
+
+	err = h.Services.Albums.UploadImagesToAlbum(c.Request.Context(), id, files)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Images uploaded successfully",
 	})
 }

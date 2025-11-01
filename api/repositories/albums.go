@@ -3,12 +3,16 @@ package repositories
 import (
 	"context"
 	"image"
+	"log"
 	"mime/multipart"
-	"os"
-	"strconv"
 	"strings"
+	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -19,7 +23,8 @@ import (
 var maxAlbumImageSize = int64(2000000)
 
 type AlbumsRepository interface {
-	CreateAlbum(ctx context.Context, images []*multipart.FileHeader, body models.Album) error
+	CreateAlbum(ctx context.Context, body models.Album) (models.Album, error)
+	UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error
 }
 
 type albumsRepository struct {
@@ -36,34 +41,20 @@ func NewAlbumsRepository(db *sqlx.DB, do *s3.Client) AlbumsRepository {
 	}
 }
 
-func (ar *albumsRepository) CreateAlbum(ctx context.Context, images []*multipart.FileHeader, body models.Album) error {
-	tx, err := ar.db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	sqlBytes, err := os.ReadFile("./db/albums/create_album.sql")
-	if err != nil {
-		return err
-	}
-
-	row := tx.QueryRow(
-		string(sqlBytes),
-		body.NameEn,
-		body.NameNo,
-		body.DescriptionEn,
-		body.DescriptionNo,
+func (ar *albumsRepository) CreateAlbum(ctx context.Context, body models.Album) (models.Album, error) {
+	return db.AddOneRow(
+		ar.db,
+		"./db/albums/post_album.sql",
+		body,
 	)
-	var newAlbumID int
-	err = row.Scan(&newAlbumID)
-	if err != nil {
-		return err
-	}
+}
 
-	path := strconv.Itoa(newAlbumID) + "/"
+func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
+	path := string(id) + "/"
 
-	for _, file := range images {
+	for _, file := range files {
+		log.Println("Uploading image:", file.Filename)
+
 		src, err := file.Open()
 		if err != nil {
 			return err
@@ -103,6 +94,5 @@ func (ar *albumsRepository) CreateAlbum(ctx context.Context, images []*multipart
 			return err
 		}
 	}
-
-	return tx.Commit()
+	return nil
 }
