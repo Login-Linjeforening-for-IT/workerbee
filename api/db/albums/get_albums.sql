@@ -11,7 +11,8 @@ SELECT
     e.name_en AS "event.name_en",
     e.name_no AS "event.name_no",
     e.time_start AS "event.time_start",
-    e.time_end AS "event.time_end"
+    e.time_end AS "event.time_end",
+    COUNT (*) OVER() AS total_count
 FROM albums AS a
 LEFT JOIN events AS e ON a.event_id = e.id
 WHERE 

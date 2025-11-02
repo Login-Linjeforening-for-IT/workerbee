@@ -62,7 +62,17 @@ func (h *Handler) GetAlbums(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, albums)
+	if len(albums) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"albums":      albums,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"albums":      albums,
+			"total_count": albums[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetAlbum(c *gin.Context) {

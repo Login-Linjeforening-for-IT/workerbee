@@ -39,7 +39,7 @@ func (as *AlbumService) GetAlbum(ctx context.Context, id string) (models.AlbumWi
 	return as.repo.GetAlbum(ctx, id)
 }
 
-func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str, offset_str, search string) ([]models.AlbumWithImages, error) {
+func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str, offset_str, search string) ([]models.AlbumsWithTotalCount, error) {
 	orderBySanitized, sortSanitized, err := internal.SanitizeSort(orderBy, sort, allowedSortColumnsAlbums)
 	if err != nil {
 		return nil, internal.ErrInvalid

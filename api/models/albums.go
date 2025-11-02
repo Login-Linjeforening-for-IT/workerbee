@@ -23,7 +23,7 @@ type CreateAlbum struct {
 type AlbumWithImages struct {
 	Album
 	Event  *EventAlbum `db:"event" json:"event"`
-	Images []string   `json:"images"`
+	Images []string    `json:"images"`
 }
 
 type EventAlbum struct {
@@ -32,4 +32,9 @@ type EventAlbum struct {
 	NameNo    *string             `db:"name_no" json:"name_no,omitempty"`
 	TimeStart *internal.LocalTime `db:"time_start" json:"time_start,omitempty"`
 	TimeEnd   *internal.LocalTime `db:"time_end" json:"time_end,omitempty"`
+}
+
+type AlbumsWithTotalCount struct {
+	AlbumWithImages
+	TotalCount int `db:"total_count" json:"total_count"`
 }

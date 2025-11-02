@@ -26,7 +26,7 @@ type AlbumsRepository interface {
 	CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
 	UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error
 	GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error)
-	GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumWithImages, error)
+	GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumsWithTotalCount, error)
 }
 
 type albumsRepository struct {
@@ -136,8 +136,8 @@ func (ar *albumsRepository) GetAlbum(ctx context.Context, id string) (models.Alb
 	return album, nil
 }
 
-func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumWithImages, error) {
-	albums, err := db.FetchAllElements[models.AlbumWithImages](
+func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumsWithTotalCount, error) {
+	albums, err := db.FetchAllElements[models.AlbumsWithTotalCount](
 		ar.db,
 		"./db/albums/get_albums.sql",
 		orderBy, sort,
