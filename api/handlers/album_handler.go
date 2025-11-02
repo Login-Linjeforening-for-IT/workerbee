@@ -85,3 +85,23 @@ func (h *Handler) GetAlbum(c *gin.Context) {
 
 	c.JSON(http.StatusOK, album)
 }
+
+func (h *Handler) UpdateAlbum(c *gin.Context) {
+	id := c.Param("id")
+
+	var body models.CreateAlbum
+	if err := c.ShouldBindBodyWithJSON(&body); internal.HandleError(c, err) {
+		return
+	}
+
+	if internal.HandleValidationError(c, body, *h.Services.Validate) {
+		return
+	}
+
+	albumResponse, err := h.Services.Albums.UpdateAlbum(c.Request.Context(), id, body)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, albumResponse)
+}

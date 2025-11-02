@@ -155,6 +155,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			albums.POST("/:id", middleware.AuthMiddleware(), h.UploadImagesToAlbum)
 			albums.GET("/", h.GetAlbums)
 			albums.GET("/:id", h.GetAlbum)
+			albums.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAlbum)
 		}
 	}
 }

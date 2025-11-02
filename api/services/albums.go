@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"mime/multipart"
+	"strconv"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -51,4 +52,14 @@ func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str,
 	}
 
 	return as.repo.GetAlbums(ctx, orderBySanitized, sortSanitized, search, limit, offset)
+}
+
+func (as *AlbumService) UpdateAlbum(ctx context.Context, id string, body models.CreateAlbum) (models.CreateAlbum, error) {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return models.CreateAlbum{}, internal.ErrInvalid
+	}
+
+	body.ID = idInt
+	return as.repo.UpdateAlbum(ctx, body)
 }
