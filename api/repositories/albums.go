@@ -148,42 +148,51 @@ func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search
 		return nil, err
 	}
 
-	for i, album := range albums {
-		path := strconv.Itoa(album.ID)
+	images := make(map[string][]string)
+	neededAlbums := make(map[string]bool)
+	for _, album := range albums {
+		albumID := strconv.Itoa(album.ID)
+		neededAlbums[albumID] = true
+	}
 
-		if !strings.HasSuffix(path, "/") {
-			path += "/"
+	paginator := s3.NewListObjectsV2Paginator(ar.DO, &s3.ListObjectsV2Input{
+		Bucket: aws.String(ar.Bucket),
+		Prefix: aws.String(internal.ALBUM_PATH),
+	})
+
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return nil, err
 		}
-		prefix := internal.ALBUM_PATH + path
 
-		var images []string
-		paginator := s3.NewListObjectsV2Paginator(ar.DO, &s3.ListObjectsV2Input{
-			Bucket: aws.String(ar.Bucket),
-			Prefix: aws.String(prefix),
-		})
-
-		count := 0
-
-		for paginator.HasMorePages() {
-			page, err := paginator.NextPage(ctx)
-			if err != nil {
-				return nil, err
+		for _, obj := range page.Contents {
+			if strings.HasSuffix(*obj.Key, "/") {
+				continue
 			}
 
-			for _, obj := range page.Contents {
-				if strings.HasSuffix(*obj.Key, "/") {
+			parts := strings.Split(*obj.Key, "/")
+			if len(parts) >= 2 {
+				albumID := parts[1]
+
+				if !neededAlbums[albumID] {
 					continue
 				}
 
-				if count >= 3 {
-					break
-				}
+				if len(images[albumID]) < 3 {
+					filename := parts[len(parts)-1]
+					images[albumID] = append(images[albumID], filename)
 
-				images = append(images, strings.TrimPrefix(*obj.Key, prefix))
-				count++
+					if len(images[albumID]) >= 3 {
+						delete(neededAlbums, albumID)
+					}
+				}
 			}
 		}
-		albums[i].Images = images
+	}
+	for i := range albums {
+		albumID := strconv.Itoa(albums[i].ID)
+		albums[i].Images = images[albumID]
 	}
 
 	return albums, nil
