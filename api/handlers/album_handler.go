@@ -46,7 +46,7 @@ func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Images uploaded successfully",
+		"Success": "Images have been uploaded",
 	})
 }
 
@@ -130,5 +130,19 @@ func (h *Handler) DeleteAlbumImage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Image deleted successfully",
+	})
+}
+
+func (h *Handler) SetAlbumCover(c *gin.Context) {
+	id := c.Param("id")
+	imageName := c.Param("imageName")
+
+	err := h.Services.Albums.SetAlbumCover(c.Request.Context(), id, imageName)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Album cover set successfully",
 	})
 }

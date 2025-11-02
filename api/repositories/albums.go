@@ -1,8 +1,13 @@
 package repositories
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 	"image"
+	"image/jpeg"
 	"mime/multipart"
 	"strconv"
 	"strings"
@@ -10,9 +15,8 @@ import (
 	"workerbee/internal"
 	"workerbee/models"
 
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
+	"github.com/disintegration/imaging"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -20,7 +24,8 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-var maxAlbumImageSize = int64(2000000)
+const maxAlbumImageSize = int64(700000)
+const maxDimension = 2560
 
 type AlbumsRepository interface {
 	CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
@@ -30,6 +35,7 @@ type AlbumsRepository interface {
 	UpdateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
 	DeleteAlbum(ctx context.Context, id string) (int, error)
 	DeleteAlbumImage(ctx context.Context, key, id string) error
+	SetAlbumCover(ctx context.Context, id string, imageName string) error
 }
 
 type albumsRepository struct {
@@ -57,46 +63,154 @@ func (ar *albumsRepository) CreateAlbum(ctx context.Context, body models.CreateA
 func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
 	path := string(id) + "/"
 
+	type uploadResult struct {
+		err error
+	}
+
+	results := make(chan uploadResult, len(files))
+	semaphore := semaphore.NewWeighted(100)
+
 	for _, file := range files {
-		src, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer src.Close()
-
-		_, format, err := image.Decode(src)
-		if err != nil {
+		if err := semaphore.Acquire(ctx, 1); err != nil {
 			return err
 		}
 
-		_, err = src.Seek(0, 0)
-		if err != nil {
-			return err
-		}
+		go func(f *multipart.FileHeader) {
+			defer semaphore.Release(1)
+			src, err := f.Open()
+			if err != nil {
+				results <- uploadResult{err: err}
+				return
+			}
+			defer src.Close()
 
-		if file.Size > maxAlbumImageSize {
-			return internal.ErrImageTooLarge
-		}
+			filename := f.Filename
 
-		if !strings.HasSuffix(path, "/") {
-			path += "/"
-		}
+			// Find the last dot to identify the extension
+			if idx := strings.LastIndex(filename, "."); idx != -1 {
+				base := filename[:idx]
+				ext := filename[idx:]
 
-		key := internal.ALBUM_PATH + path + file.Filename
+				base = strings.ReplaceAll(base, ".", "")
 
-		contentType := "image/" + format
+				ext = "." + strings.ReplaceAll(ext[1:], ".", "")
 
-		_, err = ar.DO.PutObject(ctx, &s3.PutObjectInput{
-			Bucket:      aws.String(ar.Bucket),
-			Key:         aws.String(key),
-			Body:        src,
-			ACL:         types.ObjectCannedACLPublicRead,
-			ContentType: aws.String(contentType),
-		})
-		if err != nil {
-			return err
+				filename = base + ext
+				f.Filename = filename
+			}
+
+			img, _, err := image.Decode(src)
+			if err != nil {
+				results <- uploadResult{err: err}
+				return
+			}
+
+			bounds := img.Bounds()
+			width := bounds.Dx()
+			height := bounds.Dy()
+
+			if width > maxDimension || height > maxDimension {
+				if width > height {
+					newWidth := maxDimension
+					newHeight := int(float64(height) * float64(maxDimension) / float64(width))
+					img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
+				} else {
+					newHeight := maxDimension
+					newWidth := int(float64(width) * float64(maxDimension) / float64(height))
+					img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
+				}
+			}
+
+			quality := 85
+			var buf bytes.Buffer
+
+			for quality >= 20 {
+				buf.Reset()
+				err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: quality})
+				if err != nil {
+					results <- uploadResult{err: err}
+					return
+				}
+
+				if buf.Len() <= int(maxAlbumImageSize) {
+					break
+				}
+
+				quality -= 10
+			}
+
+			for buf.Len() > int(maxAlbumImageSize) {
+				bounds := img.Bounds()
+				width := bounds.Dx()
+				height := bounds.Dy()
+
+				newWidth := int(float64(width) * .9)
+				newHeight := int(float64(height) * .9)
+
+				if newWidth < 100 || newHeight < 100 {
+					break
+				}
+
+				img = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
+
+				buf.Reset()
+				err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 75})
+				if err != nil {
+					results <- uploadResult{err: err}
+					return
+				}
+			}
+			uploadPath := path
+			if !strings.HasSuffix(uploadPath, "/") {
+				uploadPath += "/"
+			}
+
+			lowerFilename := strings.ToLower(filename)
+			if !strings.HasSuffix(lowerFilename, ".jpg") && !strings.HasSuffix(lowerFilename, ".jpeg") {
+				if idx := strings.LastIndex(filename, "."); idx != -1 {
+					filename = filename[:idx] + ".jpg"
+				} else {
+					filename = filename + ".jpg"
+				}
+			}
+
+			randomBytes := make([]byte, 6)
+			_, err = rand.Read(randomBytes)
+			if err != nil {
+				results <- uploadResult{err: err}
+				return
+			}
+
+			hash := sha256.Sum256(randomBytes)
+
+			key := internal.ALBUM_PATH + uploadPath + "img_" + hex.EncodeToString(hash[:4]) + "_" + filename
+
+			contentType := "image/jpeg"
+
+			_, err = ar.DO.PutObject(ctx, &s3.PutObjectInput{
+				Bucket:      aws.String(ar.Bucket),
+				Key:         aws.String(key),
+				Body:        bytes.NewReader(buf.Bytes()),
+				ACL:         types.ObjectCannedACLPublicRead,
+				ContentType: aws.String(contentType),
+			})
+
+			results <- uploadResult{err: err}
+		}(file)
+	}
+	var errors []error
+	for range files {
+		result := <-results
+		if result.err != nil {
+			errors = append(errors, result.err)
 		}
 	}
+	close(results)
+
+	if len(errors) > 0 {
+		return errors[0]
+	}
+
 	return nil
 }
 
@@ -277,6 +391,61 @@ func (ar *albumsRepository) DeleteAlbumImage(ctx context.Context, key, id string
 	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(ar.Bucket),
 		Key:    aws.String(key),
+	})
+	return err
+}
+
+func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageName string) error {
+	prefix := internal.ALBUM_PATH + id + "/"
+
+	listOutput, err := ar.DO.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+		Bucket:  aws.String(ar.Bucket),
+		Prefix:  aws.String(prefix + "coverimg_"),
+		MaxKeys: aws.Int32(1),
+	})
+	if err != nil {
+		return err
+	}
+
+	if len(listOutput.Contents) > 0 {
+		firstKey := *listOutput.Contents[0].Key
+		if strings.Contains(firstKey, "coverimg_") {
+			oldCoverName := strings.Replace(firstKey, "coverimg_", "img_", 1)
+
+			_, err = ar.DO.CopyObject(ctx, &s3.CopyObjectInput{
+				Bucket:     aws.String(ar.Bucket),
+				CopySource: aws.String(ar.Bucket + "/" + firstKey),
+				Key:        aws.String(oldCoverName),
+			})
+			if err != nil {
+				return err
+			}
+
+			_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
+				Bucket: aws.String(ar.Bucket),
+				Key:    aws.String(firstKey),
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+	coverImageName := strings.Replace(imageName, "img_", "coverimg_", 1)
+	path := internal.ALBUM_PATH + id + "/" + imageName
+	coverPath := internal.ALBUM_PATH + id + "/" + coverImageName
+
+	_, err = ar.DO.CopyObject(ctx, &s3.CopyObjectInput{
+		Bucket:     aws.String(ar.Bucket),
+		CopySource: aws.String(ar.Bucket + "/" + path),
+		Key:        aws.String(coverPath),
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(ar.Bucket),
+		Key:    aws.String(internal.ALBUM_PATH + id + "/" + imageName),
 	})
 	return err
 }

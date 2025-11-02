@@ -72,3 +72,7 @@ func (as *AlbumService) DeleteAlbumImage(ctx context.Context, id string, imageNa
 	path := internal.ALBUM_PATH + id + "/" + imageName
 	return as.repo.DeleteAlbumImage(ctx, path, id)
 }
+
+func (as *AlbumService) SetAlbumCover(ctx context.Context, id string, imageName string) error {
+	return as.repo.SetAlbumCover(ctx, id, imageName)
+}

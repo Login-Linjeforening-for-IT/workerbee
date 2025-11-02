@@ -158,6 +158,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			albums.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAlbum)
 			albums.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAlbum)
 			albums.DELETE("/:id/:imageName", middleware.AuthMiddleware(), h.DeleteAlbumImage)
+			albums.PUT("/:id/:imageName", h.SetAlbumCover)
 		}
 	}
 }
