@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateAlbum(c *gin.Context) {
-	var body models.Album
+	var body models.CreateAlbum
 	if err := c.ShouldBindBodyWithJSON(&body); internal.HandleError(c, err) {
 		return
 	}
@@ -48,4 +48,15 @@ func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Images uploaded successfully",
 	})
+}
+
+func (h *Handler) GetAlbum(c *gin.Context) {
+	id := c.Param("id")
+
+	album, err := h.Services.Albums.GetAlbum(c.Request.Context(), id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, album)
 }

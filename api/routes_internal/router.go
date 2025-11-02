@@ -152,6 +152,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			albums.POST("/", h.CreateAlbum)
 			albums.POST("/:id", h.UploadImagesToAlbum)
+			albums.GET("/:id", h.GetAlbum)
 		}
 	}
 }

@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"image"
-	"log"
 	"mime/multipart"
 	"strings"
 	"workerbee/db"
@@ -23,8 +22,9 @@ import (
 var maxAlbumImageSize = int64(2000000)
 
 type AlbumsRepository interface {
-	CreateAlbum(ctx context.Context, body models.Album) (models.Album, error)
+	CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
 	UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error
+	GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error)
 }
 
 type albumsRepository struct {
@@ -41,7 +41,7 @@ func NewAlbumsRepository(db *sqlx.DB, do *s3.Client) AlbumsRepository {
 	}
 }
 
-func (ar *albumsRepository) CreateAlbum(ctx context.Context, body models.Album) (models.Album, error) {
+func (ar *albumsRepository) CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error) {
 	return db.AddOneRow(
 		ar.db,
 		"./db/albums/post_album.sql",
@@ -53,8 +53,6 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 	path := string(id) + "/"
 
 	for _, file := range files {
-		log.Println("Uploading image:", file.Filename)
-
 		src, err := file.Open()
 		if err != nil {
 			return err
@@ -95,4 +93,43 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 		}
 	}
 	return nil
+}
+
+func (ar *albumsRepository) GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error) {
+	album, err := db.ExecuteOneRow[models.AlbumWithImages](ar.db, "./db/albums/get_album.sql", id)
+	if err != nil {
+		return models.AlbumWithImages{}, err
+	}
+
+	path := id
+
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
+	}
+	prefix := internal.ALBUM_PATH + path
+
+	var images []string
+	paginator := s3.NewListObjectsV2Paginator(ar.DO, &s3.ListObjectsV2Input{
+		Bucket: aws.String(ar.Bucket),
+		Prefix: aws.String(prefix),
+	})
+
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return models.AlbumWithImages{}, err
+		}
+
+		for _, obj := range page.Contents {
+			if strings.HasSuffix(*obj.Key, "/") {
+				continue
+			}
+
+			images = append(images, strings.TrimPrefix(*obj.Key, prefix))
+		}
+	}
+
+	album.Images = images
+
+	return album, nil
 }

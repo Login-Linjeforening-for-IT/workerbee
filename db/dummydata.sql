@@ -24,7 +24,7 @@ CREATE TABLE "albums" (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "alerts" (
+CREATE TABLE "alerts" (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
   page TEXT NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS "alerts" (
   UNIQUE(service, page)
 );
 
-CREATE TABLE IF NOT EXISTS "honey" (
+CREATE TABLE  "honey" (
     id SERIAL PRIMARY KEY,
     service TEXT NOT NULL,
     language TEXT NOT NULL,
@@ -194,9 +194,9 @@ CREATE TABLE "skills" (
     "name" varchar NOT NULL
 );
 
-CREATE INDEX ON "album" ("year");
-CREATE INDEX ON "album" ("created_at");
-CREATE INDEX ON "album" ("updated_at");
+CREATE INDEX ON "albums" ("year");
+CREATE INDEX ON "albums" ("created_at");
+CREATE INDEX ON "albums" ("updated_at");
 
 CREATE INDEX ON "events" ("visible");
 CREATE INDEX ON "events" ("highlight");
@@ -223,22 +223,23 @@ CREATE INDEX ON "ad_city_relation" ("city_id");
 CREATE INDEX ON "ad_skill_relation" ("job_id");
 CREATE INDEX ON "ad_skill_relation" ("skill_id");
 
-ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
 
-ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
 
+ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
 -- BeeFormed
 CREATE TYPE question_type_enum AS ENUM (
     'single_choice',
@@ -729,23 +730,6 @@ VALUES
  false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 2, 5, now(), now());
 
-INSERT INTO events (
-  visible, name_no, name_en, description_no, description_en, 
-  informational_no, informational_en, time_type, time_start, time_end, 
-  time_publish, time_signup_release, time_signup_deadline, canceled, 
-  digital, highlight, image_small, image_banner, link_facebook, 
-  link_discord, link_signup, link_stream, capacity, is_full, 
-  organization_id, location_id, parent_id, rule_id, category_id, created_at, updated_at
-)
-VALUES
-(true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
- 'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
- 'Networking muligheter.', 'Networking opportunities.',
- 'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
- '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
- false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
- NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 5, now(), now());
-
 -- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
 -- 10 submissions per form (one per user), and 10 answers per question.
 INSERT INTO users (full_name, email) VALUES
@@ -879,32 +863,3 @@ SELECT s.id, q.id, to_char((CURRENT_DATE + (s.user_id || ' days')::interval)::da
 FROM submissions s
 JOIN questions q ON q.form_id = s.form_id
 WHERE q.question_type = 'date';
-
-INSERT INTO events (
-  visible, name_no, name_en, description_no, description_en, 
-  time_type, time_start, time_end, time_publish, category_id, 
-  created_at, updated_at
-)
-VALUES
--- 3 days ago at 00:30 UTC (should be counted on day -2 in Norwegian time)
-(true, 'Test Event -3d UTC midnight', 'Test Event -3d UTC midnight', 'Test timezone', 'Test timezone', 
- 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
- (CURRENT_DATE - INTERVAL '3 days' + TIME '00:30:00') AT TIME ZONE 'UTC', 
- (CURRENT_DATE - INTERVAL '3 days' + TIME '00:30:00') AT TIME ZONE 'UTC'),
- 
-(true, 'Test Event -2d (1)', 'Test Event -2d (1)', 'Test', 'Test', 
- 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
- now() - INTERVAL '2 days', now() - INTERVAL '2 days'),
-(true, 'Test Event -2d (2)', 'Test Event -2d (2)', 'Test', 'Test', 
- 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
- now() - INTERVAL '2 days', now() - INTERVAL '2 days'),
-
-(true, 'Test Event -1d (1)', 'Test Event -1d (1)', 'Test', 'Test', 
- 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
- now() - INTERVAL '1 day', now() - INTERVAL '1 day'),
-(true, 'Test Event -1d (2)', 'Test Event -1d (2)', 'Test', 'Test', 
- 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
- now() - INTERVAL '1 day', now() - INTERVAL '1 day'),
-(true, 'Test Event -1d (3)', 'Test Event -1d (3)', 'Test', 'Test', 
- 'default', now() + INTERVAL '10 days', now() + INTERVAL '10 days', now(), 1,
- now() - INTERVAL '1 day', now() - INTERVAL '1 day');
