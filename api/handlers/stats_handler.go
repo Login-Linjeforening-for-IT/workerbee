@@ -8,7 +8,7 @@ import (
 )
 
 func (h *Handler) GetMostActiveCategory(c *gin.Context) {
-	categoryStat, err := h.Services.Stats.GetMostActiveCategory()
+	categoryStat, err := h.Services.Stats.GetMostActiveCategories()
 	if internal.HandleError(c, err) {
 		return
 	}

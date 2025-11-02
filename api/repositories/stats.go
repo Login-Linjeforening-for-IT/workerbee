@@ -2,7 +2,6 @@
 package repositories
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"workerbee/db"
@@ -14,8 +13,8 @@ import (
 type Statsrepositories interface {
 	GetYearlyStats() ([]models.YearlyActivity, error)
 	GetCategoriesStats() ([]models.CategoriesStats, error)
-	GetNewAdditionsStats() (models.GroupedNewAdditionsStats, error)
-	GetMostActiveCategory() (models.CategoriesStats, error)
+	GetNewAdditionsStats() ([]models.NewAddition, error)
+	GetMostActiveCategories() ([]models.CategoriesStats, error)
 }
 
 type statsrepositories struct {
@@ -26,19 +25,11 @@ func NewStatsrepositories(db *sqlx.DB) Statsrepositories {
 	return &statsrepositories{db: db}
 }
 
-func (r *statsrepositories) GetMostActiveCategory() (models.CategoriesStats, error) {
-	var categoryStat models.CategoriesStats
-	sqlBytes, err := os.ReadFile("./db/stats/get_most_active_category.sql")
-	if err != nil {
-		return models.CategoriesStats{}, err
-	}
-
-	query := string(sqlBytes)
-	if err := r.db.Get(&categoryStat, query); err != nil {
-		return models.CategoriesStats{}, err
-	}
-
-	return categoryStat, nil
+func (r *statsrepositories) GetMostActiveCategories() ([]models.CategoriesStats, error) {
+	return db.FetchAllForeignAttributes[models.CategoriesStats](
+		r.db,
+		"./db/stats/get_most_active_categories.sql",
+	)
 }
 
 func (r *statsrepositories) GetYearlyStats() ([]models.YearlyActivity, error) {
@@ -69,27 +60,9 @@ func (r *statsrepositories) GetCategoriesStats() ([]models.CategoriesStats, erro
 	return categoriesStats, nil
 }
 
-func (r *statsrepositories) GetNewAdditionsStats() (models.GroupedNewAdditionsStats, error) {
-	var result struct {
-		GroupedData []byte `db:"grouped_data"`
-	}
-	sqlBytes, err := os.ReadFile("./db/stats/get_last_ten_rows_from_tables_grouped.sql")
-	if err != nil {
-		log.Println("unable to read SQL file:", err)
-		return models.GroupedNewAdditionsStats{}, err
-	}
-
-	query := string(sqlBytes)
-	if err := r.db.Get(&result, query); err != nil {
-		log.Println("unable to query DB:", err)
-		return models.GroupedNewAdditionsStats{}, err
-	}
-
-	var groupedData models.GroupedNewAdditionsStats
-	if err := json.Unmarshal(result.GroupedData, &groupedData); err != nil {
-		log.Println("unable to unmarshal JSON:", err)
-		return models.GroupedNewAdditionsStats{}, err
-	}
-
-	return groupedData, nil
+func (r *statsrepositories) GetNewAdditionsStats() ([]models.NewAddition, error) {
+	return db.FetchAllForeignAttributes[models.NewAddition](
+		r.db,
+		"./db/stats/get_new_additions_stats.sql",
+	)
 }

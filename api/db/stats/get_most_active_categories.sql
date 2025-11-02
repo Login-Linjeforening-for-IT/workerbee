@@ -6,5 +6,6 @@ FROM categories c
 LEFT JOIN events e ON e.category_id = c.id
   AND e.created_at >= now() - interval '3 months'
 GROUP BY c.id
-ORDER BY event_count DESC
-LIMIT 1;
+HAVING COUNT(e.id) > 0
+ORDER BY event_count DESC;
+
