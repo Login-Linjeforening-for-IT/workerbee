@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"workerbee/internal"
 )
 
@@ -37,4 +38,23 @@ type EventAlbum struct {
 type AlbumsWithTotalCount struct {
 	AlbumWithImages
 	TotalCount int `db:"total_count" json:"total_count"`
+}
+
+func (a AlbumWithImages) MarshalJSON() ([]byte, error) {
+	type Alias AlbumWithImages
+
+	aux := &struct {
+		*Alias
+		Event *EventAlbum `json:"event"`
+	} {
+		Alias: (*Alias)(&a),
+	}
+
+	if a.Event != nil && a.Event.ID == nil {
+		aux.Event = nil
+	} else {
+		aux.Event = a.Event
+	}
+
+	return json.Marshal(aux)
 }
