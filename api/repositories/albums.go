@@ -28,6 +28,8 @@ type AlbumsRepository interface {
 	GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error)
 	GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumsWithTotalCount, error)
 	UpdateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
+	DeleteAlbum(ctx context.Context, id string) (int, error)
+	DeleteAlbumImage(ctx context.Context, key, id string) error
 }
 
 type albumsRepository struct {
@@ -205,4 +207,76 @@ func (ar *albumsRepository) UpdateAlbum(ctx context.Context, body models.CreateA
 		"./db/albums/put_album.sql",
 		body,
 	)
+}
+
+func (ar *albumsRepository) DeleteAlbum(ctx context.Context, id string) (int, error) {
+	returnID, err := db.ExecuteOneRow[int](
+		ar.db,
+		"./db/albums/delete_album.sql",
+		id,
+	)
+
+	var continuationToken *string
+
+	prefix := internal.ALBUM_PATH + id
+	if !strings.HasSuffix(prefix, "/") {
+		prefix += "/"
+	}
+
+	for {
+		listOutput, err := ar.DO.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+			Bucket:            aws.String(ar.Bucket),
+			Prefix:            aws.String(prefix),
+			ContinuationToken: continuationToken,
+		})
+		if err != nil {
+			return 0, err
+		}
+
+		if len(listOutput.Contents) == 0 {
+			break
+		}
+
+		var objectsToDelete []types.ObjectIdentifier
+		for _, obj := range listOutput.Contents {
+			objectsToDelete = append(objectsToDelete, types.ObjectIdentifier{
+				Key: obj.Key,
+			})
+		}
+
+		_, err = ar.DO.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+			Bucket: aws.String(ar.Bucket),
+			Delete: &types.Delete{
+				Objects: objectsToDelete,
+				Quiet:   aws.Bool(true),
+			},
+		})
+		if err != nil {
+			return 0, err
+		}
+
+		if *listOutput.IsTruncated {
+			continuationToken = listOutput.NextContinuationToken
+		} else {
+			break
+		}
+	}
+	return returnID, err
+}
+
+func (ar *albumsRepository) DeleteAlbumImage(ctx context.Context, key, id string) error {
+	_, err := db.ExecuteOneRow[models.AlbumWithImages](
+		ar.db,
+		"./db/albums/get_album.sql",
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
+		Bucket: aws.String(ar.Bucket),
+		Key:    aws.String(key),
+	})
+	return err
 }

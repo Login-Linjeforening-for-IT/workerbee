@@ -63,3 +63,12 @@ func (as *AlbumService) UpdateAlbum(ctx context.Context, id string, body models.
 	body.ID = idInt
 	return as.repo.UpdateAlbum(ctx, body)
 }
+
+func (as *AlbumService) DeleteAlbum(ctx context.Context, id string) (int, error) {
+	return as.repo.DeleteAlbum(ctx, id)
+}
+
+func (as *AlbumService) DeleteAlbumImage(ctx context.Context, id string, imageName string) error {
+	path := internal.ALBUM_PATH + id + "/" + imageName
+	return as.repo.DeleteAlbumImage(ctx, path, id)
+}

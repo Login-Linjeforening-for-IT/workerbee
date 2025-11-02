@@ -1,0 +1,2 @@
+DELETE FROM albums WHERE id = $1
+RETURNING id;

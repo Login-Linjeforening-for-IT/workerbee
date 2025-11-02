@@ -105,3 +105,30 @@ func (h *Handler) UpdateAlbum(c *gin.Context) {
 
 	c.JSON(http.StatusOK, albumResponse)
 }
+
+func (h *Handler) DeleteAlbum(c *gin.Context) {
+	id := c.Param("id")
+
+	returningID, err := h.Services.Albums.DeleteAlbum(c.Request.Context(), id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id": returningID,
+	})
+}
+
+func (h *Handler) DeleteAlbumImage(c *gin.Context) {
+	id := c.Param("id")
+	imageName := c.Param("imageName")
+
+	err := h.Services.Albums.DeleteAlbumImage(c.Request.Context(), id, imageName)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Image deleted successfully",
+	})
+}
