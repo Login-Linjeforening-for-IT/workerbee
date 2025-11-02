@@ -4,6 +4,7 @@ import (
 	"context"
 	"image"
 	"mime/multipart"
+	"strconv"
 	"strings"
 	"workerbee/db"
 	"workerbee/internal"
@@ -25,6 +26,7 @@ type AlbumsRepository interface {
 	CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
 	UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error
 	GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error)
+	GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumWithImages, error)
 }
 
 type albumsRepository struct {
@@ -132,4 +134,57 @@ func (ar *albumsRepository) GetAlbum(ctx context.Context, id string) (models.Alb
 	album.Images = images
 
 	return album, nil
+}
+
+func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumWithImages, error) {
+	albums, err := db.FetchAllElements[models.AlbumWithImages](
+		ar.db,
+		"./db/albums/get_albums.sql",
+		orderBy, sort,
+		limit, offset,
+		search,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, album := range albums {
+		path := strconv.Itoa(album.ID)
+
+		if !strings.HasSuffix(path, "/") {
+			path += "/"
+		}
+		prefix := internal.ALBUM_PATH + path
+
+		var images []string
+		paginator := s3.NewListObjectsV2Paginator(ar.DO, &s3.ListObjectsV2Input{
+			Bucket: aws.String(ar.Bucket),
+			Prefix: aws.String(prefix),
+		})
+
+		count := 0
+
+		for paginator.HasMorePages() {
+			page, err := paginator.NextPage(ctx)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, obj := range page.Contents {
+				if strings.HasSuffix(*obj.Key, "/") {
+					continue
+				}
+
+				if count >= 3 {
+					break
+				}
+
+				images = append(images, strings.TrimPrefix(*obj.Key, prefix))
+				count++
+			}
+		}
+		albums[i].Images = images
+	}
+
+	return albums, nil
 }

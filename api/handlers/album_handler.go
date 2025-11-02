@@ -50,6 +50,21 @@ func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	})
 }
 
+func (h *Handler) GetAlbums(c *gin.Context) {
+	orderBy := c.DefaultQuery("order_by", "id")
+	sort := c.DefaultQuery("sort", "asc")
+	limit := c.DefaultQuery("limit", "20")
+	offset := c.DefaultQuery("offset", "0")
+	search := c.DefaultQuery("search", "")
+
+	albums, err := h.Services.Albums.GetAlbums(c.Request.Context(), orderBy, sort, limit, offset, search)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, albums)
+}
+
 func (h *Handler) GetAlbum(c *gin.Context) {
 	id := c.Param("id")
 
