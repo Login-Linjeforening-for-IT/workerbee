@@ -205,7 +205,7 @@ CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
 
-CREATE INDEX idx_alerts_service ON alerts(service);
+CREATE INDEX ON "alerts" ("service");
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");

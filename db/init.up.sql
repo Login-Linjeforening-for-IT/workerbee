@@ -269,12 +269,12 @@ CREATE TABLE IF NOT EXISTS "alerts" (
   UNIQUE(service, page, language)
 );
 
-CREATE INDEX idx_alerts_service ON alerts(service);
-CREATE INDEX idx_alerts_language ON alerts(language);
+CREATE INDEX idx_alerts_service ON "alerts"(service);
+CREATE INDEX idx_alerts_language ON "alerts"(language);
 
 -- Honey
 
-CREATE TABLE IF NOT EXISTS honey (
+CREATE TABLE IF NOT EXISTS "honey" (
     id SERIAL PRIMARY KEY,
     service TEXT NOT NULL,
     language TEXT NOT NULL,
@@ -283,8 +283,8 @@ CREATE TABLE IF NOT EXISTS honey (
     UNIQUE(service, page, language)
 );
 
-CREATE INDEX idx_honey_service_page ON honey(service, page);
-CREATE INDEX idx_honey_service ON honey(service);
+CREATE INDEX idx_honey_service_page ON "honey"(service, page);
+CREATE INDEX idx_honey_service ON "honey"(service);
 
 CREATE TABLE daily_insert_history (
     insert_date DATE NOT NULL PRIMARY KEY,
