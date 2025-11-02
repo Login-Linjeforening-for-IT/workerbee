@@ -151,8 +151,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		albums := v2.Group("/albums")
 		{
-			albums.POST("/", h.CreateAlbum)
-			albums.POST("/:id", h.UploadImagesToAlbum)
+			albums.POST("/", middleware.AuthMiddleware(), h.CreateAlbum)
+			albums.POST("/:id", middleware.AuthMiddleware(), h.UploadImagesToAlbum)
 			albums.GET("/", h.GetAlbums)
 			albums.GET("/:id", h.GetAlbum)
 		}
