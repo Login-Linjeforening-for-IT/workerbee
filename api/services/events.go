@@ -150,6 +150,10 @@ func (s *EventService) DeleteEvent(id string) (int, error) {
 	return s.repo.DeleteEvent(id)
 }
 
+func (s *EventService) GetEventNames() ([]models.EventName, error) {
+	return s.repo.GetEventNames()
+}
+
 func parseToArray(content string) ([]int, error) {
 	if content != "" {
 		categories, err := internal.ParseCSVToSlice[int](content)

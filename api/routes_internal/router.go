@@ -18,6 +18,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			events.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedEvent)
 			events.GET("/:id", h.GetEvent)
+			events.GET("/all", middleware.AuthMiddleware(), h.GetEventNames)
 			events.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedEvents)
 			events.GET("/", h.GetEvents)
 			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)

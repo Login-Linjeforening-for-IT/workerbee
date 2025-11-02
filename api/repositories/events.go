@@ -20,6 +20,7 @@ type Eventrepositories interface {
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
 	GetEventAudiences() ([]models.Audience, error)
 	GetAllTimeTypes() (string, error)
+	GetEventNames() ([]models.EventName, error)
 }
 
 type eventRepositories struct {
@@ -136,4 +137,15 @@ func (r *eventRepositories) GetAllTimeTypes() (string, error) {
 		return "", err
 	}
 	return timeTypes, nil
+}
+
+func (r *eventRepositories) GetEventNames() ([]models.EventName, error) {
+	eventNames, err := db.FetchAllForeignAttributes[models.EventName](
+		r.db,
+		"./db/events/get_event_names.sql",
+	)
+	if err != nil {
+		return nil, err
+	}
+	return eventNames, nil
 }

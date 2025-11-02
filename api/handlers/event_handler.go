@@ -172,3 +172,12 @@ func (h *Handler) DeleteEvent(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"id": eventId})
 }
+
+func (h *Handler) GetEventNames(c *gin.Context) {
+	eventNames, err := h.Services.Events.GetEventNames()
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, eventNames)
+}

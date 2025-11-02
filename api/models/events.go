@@ -63,6 +63,12 @@ type EventCategory struct {
 	Category
 }
 
+type EventName struct {
+	ID        int                `db:"id" json:"id"`
+	NameEn    string             `db:"name_en" json:"name_en"`
+	TimeStart internal.LocalTime `db:"time_start" json:"time_start"`
+}
+
 func (e Event) MarshalJSON() ([]byte, error) {
     type Alias Event
     
