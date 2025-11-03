@@ -86,19 +86,6 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 
 			filename := f.Filename
 
-			// Find the last dot to identify the extension
-			if idx := strings.LastIndex(filename, "."); idx != -1 {
-				base := filename[:idx]
-				ext := filename[idx:]
-
-				base = strings.ReplaceAll(base, ".", "")
-
-				ext = "." + strings.ReplaceAll(ext[1:], ".", "")
-
-				filename = base + ext
-				f.Filename = filename
-			}
-
 			img, _, err := image.Decode(src)
 			if err != nil {
 				results <- uploadResult{err: err}
