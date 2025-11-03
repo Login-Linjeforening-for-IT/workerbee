@@ -345,6 +345,60 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_update_history()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO daily_insert_history (insert_date, inserted_count)
+    VALUES (DATE(NEW.updated_at AT TIME ZONE 'Europe/Oslo'), 1)
+    ON CONFLICT (insert_date)
+    DO UPDATE SET 
+        inserted_count = daily_insert_history.inserted_count + 1;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER track_events_updates
+    AFTER UPDATE ON events
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_rules_updates
+    AFTER UPDATE ON rules
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_organizations_updates
+    AFTER UPDATE ON organizations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_locations_updates
+    AFTER UPDATE ON locations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_jobs_updates
+    AFTER UPDATE ON jobs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_albums_updates
+    AFTER UPDATE ON albums
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_honey_updates
+    AFTER UPDATE ON honey
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+CREATE TRIGGER track_alerts_updates
+    AFTER UPDATE ON alerts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_update_history();
+
+
 CREATE TRIGGER track_events_inserts
     AFTER INSERT ON events
     FOR EACH ROW
@@ -375,7 +429,7 @@ CREATE TRIGGER track_albums_inserts
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
 
-CREATE TRIGGER tack_honey_inserts
+CREATE TRIGGER track_honey_inserts
     AFTER INSERT ON honey
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
