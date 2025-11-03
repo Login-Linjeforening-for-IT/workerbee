@@ -369,6 +369,22 @@ CREATE TRIGGER track_jobs_inserts
     AFTER INSERT ON jobs
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_albums_inserts
+    AFTER INSERT ON albums
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER tack_honey_inserts
+    AFTER INSERT ON honey
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
+CREATE TRIGGER track_alerts_inserts
+    AFTER INSERT ON alerts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_insert_history();
+
 ------------------
 -- Dummy Data
 ------------------
