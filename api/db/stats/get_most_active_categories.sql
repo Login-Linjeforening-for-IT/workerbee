@@ -1,6 +1,7 @@
 SELECT 
     c.id, 
     c.name_en,
+    c.color,
     COUNT(e.id) as event_count
 FROM categories c
 LEFT JOIN events e ON e.category_id = c.id

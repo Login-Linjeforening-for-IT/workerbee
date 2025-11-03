@@ -12,6 +12,7 @@ type CategoriesStats struct {
 	ID         int    `db:"id" json:"id"`
 	NameEN     string `db:"name_en" json:"name_en"`
 	EventCount int    `db:"event_count" json:"event_count"`
+	Color      string `db:"color" json:"color"`
 }
 
 type NewAddition struct {
