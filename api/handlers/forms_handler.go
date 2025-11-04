@@ -122,7 +122,7 @@ func (h *Handler) PutForm(c *gin.Context) {
 // @Description  Deletes a form by ID
 // @Tags         forms
 // @Param        id   path  string  true  "Form ID"
-// @Success      200  {object}  gin.H
+// @Success      200  {object}  map[string]string
 // @Failure      404  {object}  error
 // @Router       /api/v2/forms/{id} [delete]
 func (h *Handler) DeleteForm(c *gin.Context) {

@@ -15,6 +15,9 @@ func init() {
 	}
 }
 
+// Date wraps time.Time to handle JSON and SQL marshalling/unmarshalling
+// @swaggertype string
+// @example "2023-10-05"
 type Date struct {
 	time.Time
 }

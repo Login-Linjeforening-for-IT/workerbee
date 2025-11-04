@@ -1,147 +1,632 @@
 definitions:
-  models.CategoriesStats:
+  internal.Date:
     properties:
-      categoryID:
-        type: integer
-      eventCount:
-        type: integer
-      nameEN:
+      time.Time:
         type: string
-      nameNO:
+    type: object
+  internal.LocalTime:
+    properties:
+      time.Time:
         type: string
+    type: object
+  models.Album:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      year:
+        type: integer
+    type: object
+  models.AlbumWithImages:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      event:
+        $ref: '#/definitions/models.EventAlbum'
+      id:
+        type: integer
+      images:
+        items:
+          type: string
+        type: array
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      year:
+        type: integer
+    type: object
+  models.AlbumsWithTotalCount:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      event:
+        $ref: '#/definitions/models.EventAlbum'
+      id:
+        type: integer
+      images:
+        items:
+          type: string
+        type: array
+      name_en:
+        type: string
+      name_no:
+        type: string
+      total_count:
+        type: integer
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      year:
+        type: integer
+    type: object
+  models.Alert:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      id:
+        type: integer
+      page:
+        type: string
+      service:
+        type: string
+      title_en:
+        type: string
+      title_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    required:
+    - description_en
+    - description_no
+    - page
+    - service
+    - title_en
+    - title_no
+    type: object
+  models.Answer:
+    properties:
+      answer_text:
+        type: string
+      id:
+        type: integer
+      selected_options:
+        items:
+          type: integer
+        type: array
+    type: object
+  models.Audience:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    required:
+    - name_en
+    - name_no
+    type: object
+  models.Category:
+    properties:
+      color:
+        type: string
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    required:
+    - color
+    - name_en
+    - name_no
+    type: object
+  models.Cities:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.CreateAlbum:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      event_id:
+        type: integer
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      year:
+        type: integer
     type: object
   models.Event:
     properties:
       audience:
-        type: integer
-      audience_name_en:
-        type: string
-      audience_name_no:
-        type: string
+        $ref: '#/definitions/models.Audience'
       canceled:
         type: boolean
       capacity:
         type: integer
       category:
-        type: integer
-      categoryNameEn:
+        $ref: '#/definitions/models.Category'
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
         type: string
-      categoryNameNo:
-        type: string
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
-      descriptionEn:
-        type: string
-      descriptionNo:
+      description_no:
         type: string
       digital:
-        type: boolean
-      full:
         type: boolean
       highlight:
         type: boolean
       id:
         type: integer
-      imageBanner:
+      image_banner:
         type: string
-      imageSmall:
+      image_small:
         type: string
-      informationalEn:
+      informational_en:
         type: string
-      informationalNo:
+      informational_no:
         type: string
-      is_deleted:
+      is_full:
         type: boolean
-      linkDiscord:
+      link_discord:
         type: string
-      linkFacebook:
+      link_facebook:
         type: string
-      linkSignup:
+      link_signup:
         type: string
-      linkStream:
+      link_stream:
         type: string
       location:
-        type: integer
-      location_name_en:
+        $ref: '#/definitions/models.Location'
+      name_en:
         type: string
-      location_name_no:
-        type: string
-      nameEn:
-        type: string
-      nameNo:
+      name_no:
         type: string
       organization:
-        type: integer
-      organizer_name_en:
-        type: string
-      organizer_name_no:
-        type: string
-      parent:
+        $ref: '#/definitions/models.Organization'
+      parent_id:
         type: integer
       rule:
-        type: integer
-      timeEnd:
+        $ref: '#/definitions/models.Rule'
+      time_end:
+        $ref: '#/definitions/internal.LocalTime'
+      time_publish:
+        $ref: '#/definitions/internal.LocalTime'
+      time_signup_deadline:
+        $ref: '#/definitions/internal.LocalTime'
+      time_signup_release:
+        $ref: '#/definitions/internal.LocalTime'
+      time_start:
+        $ref: '#/definitions/internal.LocalTime'
+      time_type:
         type: string
-      timePublish:
-        type: string
-      timeSignupDeadline:
-        type: string
-      timeSignupRelease:
-        type: string
-      timeStart:
-        type: string
-      timeType:
-        description: Use string or custom type for enum
-        type: string
-      updatedAt:
-        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
       visible:
         type: boolean
+    required:
+    - description_en
+    - description_no
+    - name_en
+    - name_no
+    - time_end
+    - time_publish
+    - time_start
+    type: object
+  models.EventAlbum:
+    properties:
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      time_end:
+        $ref: '#/definitions/internal.LocalTime'
+      time_start:
+        $ref: '#/definitions/internal.LocalTime'
     type: object
   models.Form:
     properties:
       capacity:
         type: integer
-      closeAt:
-        type: string
-      createdAt:
-        type: string
-      deletedAt:
-        type: string
+      close_at:
+        $ref: '#/definitions/internal.LocalTime'
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
       description:
         type: string
       id:
         type: integer
-      openAt:
-        type: string
+      open_at:
+        $ref: '#/definitions/internal.LocalTime'
       title:
         type: string
-      updatedAt:
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      user_id:
+        type: integer
+    type: object
+  models.FormWithTotalCount:
+    properties:
+      capacity:
+        type: integer
+      close_at:
+        $ref: '#/definitions/internal.LocalTime'
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description:
         type: string
-      userID:
+      id:
+        type: integer
+      open_at:
+        $ref: '#/definitions/internal.LocalTime'
+      title:
+        type: string
+      totalCount:
+        type: integer
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      user_id:
         type: integer
     type: object
   models.FormsResponse:
     properties:
       forms:
         items:
-          $ref: '#/definitions/models.Form'
+          $ref: '#/definitions/models.FormWithTotalCount'
         type: array
       total_count:
         type: integer
     type: object
-  models.NewAdditionsStats:
+  models.JobSkills:
     properties:
-      createdAt:
-        type: string
       id:
         type: integer
       name:
         type: string
-      table:
+    type: object
+  models.JobType:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      id:
+        type: integer
+      name_en:
         type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    type: object
+  models.Location:
+    properties:
+      address_postcode:
+        type: integer
+      address_street:
+        type: string
+      cities:
+        $ref: '#/definitions/models.Cities'
+      coordinate_lat:
+        maximum: 90
+        minimum: -90
+        type: number
+      coordinate_lon:
+        maximum: 180
+        minimum: -180
+        type: number
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      id:
+        type: integer
+      mazemap_campus_id:
+        type: integer
+      mazemap_poi_id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      type:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      url:
+        type: string
+    required:
+    - name_en
+    - name_no
+    type: object
+  models.NewAddition:
+    properties:
+      action:
+        type: string
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      id:
+        type: integer
+      name_en:
+        type: string
+      source:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    type: object
+  models.NewEvent:
+    properties:
+      audience_id:
+        type: integer
+      canceled:
+        type: boolean
+      capacity:
+        type: integer
+      category_id:
+        type: integer
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      digital:
+        type: boolean
+      highlight:
+        type: boolean
+      id:
+        type: integer
+      image_banner:
+        type: string
+      image_small:
+        type: string
+      informational_en:
+        type: string
+      informational_no:
+        type: string
+      is_full:
+        type: boolean
+      link_discord:
+        type: string
+      link_facebook:
+        type: string
+      link_signup:
+        type: string
+      link_stream:
+        type: string
+      location_id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      organization_id:
+        type: integer
+      parent_id:
+        type: integer
+      rule_id:
+        type: integer
+      time_end:
+        $ref: '#/definitions/internal.LocalTime'
+      time_publish:
+        $ref: '#/definitions/internal.LocalTime'
+      time_signup_deadline:
+        $ref: '#/definitions/internal.LocalTime'
+      time_signup_release:
+        $ref: '#/definitions/internal.LocalTime'
+      time_start:
+        $ref: '#/definitions/internal.LocalTime'
+      time_type:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      visible:
+        type: boolean
+    required:
+    - category_id
+    - description_en
+    - description_no
+    - name_en
+    - name_no
+    - time_end
+    - time_publish
+    - time_start
+    type: object
+  models.NewJob:
+    type: object
+  models.NewLocation:
+    properties:
+      address_postcode:
+        type: integer
+      address_street:
+        type: string
+      city_id:
+        type: integer
+      coordinate_lat:
+        maximum: 90
+        minimum: -90
+        type: number
+      coordinate_lon:
+        maximum: 180
+        minimum: -180
+        type: number
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      id:
+        type: integer
+      mazemap_campus_id:
+        type: integer
+      mazemap_poi_id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      type:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+      url:
+        type: string
+    required:
+    - name_en
+    - name_no
+    type: object
+  models.Organization:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      id:
+        type: integer
+      link_facebook:
+        type: string
+      link_homepage:
+        type: string
+      link_instagram:
+        type: string
+      link_linkedin:
+        type: string
+      logo:
+        type: string
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    required:
+    - description_en
+    - description_no
+    - link_homepage
+    - name_en
+    - name_no
+    type: object
+  models.Question:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      form_id:
+        type: integer
+      id:
+        type: integer
+      max:
+        type: integer
+      position:
+        type: integer
+      question_description:
+        type: string
+      question_title:
+        type: string
+      question_type:
+        type: string
+      required:
+        type: boolean
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    type: object
+  models.QuestionOption:
+    properties:
+      id:
+        type: integer
+      option_text:
+        type: string
+      position:
+        type: integer
+    type: object
+  models.QuestionWithAnswer:
+    properties:
+      answer:
+        items:
+          $ref: '#/definitions/models.Answer'
+        type: array
+      id:
+        type: integer
+      max:
+        type: integer
+      options:
+        items:
+          $ref: '#/definitions/models.QuestionOption'
+        type: array
+      position:
+        type: integer
+      question_description:
+        type: string
+      question_title:
+        type: string
+      question_type:
+        type: string
+      required:
+        type: boolean
+    type: object
+  models.Rule:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      description_en:
+        type: string
+      description_no:
+        type: string
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    required:
+    - description_en
+    - description_no
+    - name_en
+    - name_no
     type: object
   models.Status:
     properties:
@@ -150,22 +635,718 @@ definitions:
       version:
         type: string
     type: object
-  models.TotalStats:
+  models.Submission:
     properties:
-      totalEvents:
+      id:
         type: integer
-      totalJobs:
+      questions:
+        items:
+          $ref: '#/definitions/models.QuestionWithAnswer'
+        type: array
+      submitted_at:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.User:
+    properties:
+      created_at:
+        $ref: '#/definitions/internal.LocalTime'
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
         type: integer
-      totalLocations:
-        type: integer
-      totalOrganizations:
-        type: integer
-      totalRules:
+      updated_at:
+        $ref: '#/definitions/internal.LocalTime'
+    type: object
+  models.YearlyActivity:
+    properties:
+      insert_date:
+        $ref: '#/definitions/internal.Date'
+      inserted_count:
         type: integer
     type: object
 info:
   contact: {}
 paths:
+  /api/v2/albums:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of albums with optional sorting, pagination, and
+        search
+      parameters:
+      - default: id
+        description: Column to order by
+        in: query
+        name: order_by
+        type: string
+      - default: asc
+        description: Sort direction (asc or desc)
+        in: query
+        name: sort
+        type: string
+      - default: "20"
+        description: Number of records to return
+        in: query
+        name: limit
+        type: string
+      - default: "0"
+        description: Offset for pagination
+        in: query
+        name: offset
+        type: string
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AlbumsWithTotalCount'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get a list of albums
+      tags:
+      - albums
+    post:
+      consumes:
+      - application/json
+      description: Creates a new album with the provided details
+      parameters:
+      - description: Album details
+        in: body
+        name: album
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateAlbum'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Album'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Create a new album
+      tags:
+      - albums
+  /api/v2/albums/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific album by ID
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Delete an album
+      tags:
+      - albums
+    get:
+      consumes:
+      - application/json
+      description: Retrieves details of a specific album by ID
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AlbumWithImages'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get album details
+      tags:
+      - albums
+    put:
+      consumes:
+      - application/json
+      description: Updates the details of a specific album by ID
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated album details
+        in: body
+        name: album
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateAlbum'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateAlbum'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Update album details
+      tags:
+      - albums
+  /api/v2/albums/{id}/cover/{imageName}:
+    put:
+      consumes:
+      - application/json
+      description: Sets a specific image as the cover for an album by album ID and
+        image name
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image Name
+        in: path
+        name: imageName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Set album cover image
+      tags:
+      - albums
+  /api/v2/albums/{id}/images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads one or more images to the specified album
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - collectionFormat: multi
+        description: Images to upload
+        in: formData
+        items:
+          type: file
+        name: images
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Upload images to an album
+      tags:
+      - albums
+  /api/v2/albums/{id}/images/{imageName}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific image from an album by album ID and image name
+      parameters:
+      - description: Album ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Image Name
+        in: path
+        name: imageName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Delete an image from an album
+      tags:
+      - albums
+  /api/v2/alerts:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of all alerts with optional search, pagination,
+        and sorting
+      parameters:
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Limit number of results
+        in: query
+        name: limit
+        type: string
+      - description: Offset for results
+        in: query
+        name: offset
+        type: string
+      - description: Field to order by
+        in: query
+        name: order_by
+        type: string
+      - description: Sort direction (asc or desc)
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get all alerts
+      tags:
+      - alerts
+    post:
+      consumes:
+      - application/json
+      description: Creates a new alert with the provided details
+      parameters:
+      - description: Alert details
+        in: body
+        name: alert
+        required: true
+        schema:
+          $ref: '#/definitions/models.Alert'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Alert'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Create a new alert
+      tags:
+      - alerts
+  /api/v2/alerts/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing alert by ID
+      parameters:
+      - description: Alert ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Delete an alert
+      tags:
+      - alerts
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an alert based on the specified ID
+      parameters:
+      - description: Alert ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Alert'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get alert by ID
+      tags:
+      - alerts
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing alert with the provided details
+      parameters:
+      - description: Alert ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated alert details
+        in: body
+        name: alert
+        required: true
+        schema:
+          $ref: '#/definitions/models.Alert'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Alert'
+        "400":
+          description: Bad Request
+          schema: {}
+      security:
+      - Bearer: []
+      summary: Update an alert
+      tags:
+      - alerts
+  /api/v2/alerts/service/{service}/page/{page}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an alert based on the specified service and page
+      parameters:
+      - description: Service name
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Page name
+        in: path
+        name: page
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Alert'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get alert by service and page
+      tags:
+      - alerts
+  /api/v2/audiences:
+    get:
+      description: Returns a list of audiences, supports search and pagination
+      parameters:
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Order by field
+        in: query
+        name: order_by
+        type: string
+      - description: Sort order (asc/desc)
+        in: query
+        name: sort
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: List audiences
+      tags:
+      - audiences
+    post:
+      consumes:
+      - application/json
+      description: Creates a new audience with the provided details
+      parameters:
+      - description: Audience object
+        in: body
+        name: audience
+        required: true
+        schema:
+          $ref: '#/definitions/models.Audience'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Audience'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create a new audience
+      tags:
+      - audiences
+  /api/v2/audiences/{id}:
+    delete:
+      description: Deletes an audience by its ID
+      parameters:
+      - description: Audience ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete an audience
+      tags:
+      - audiences
+    get:
+      description: Returns an audience by its ID
+      parameters:
+      - description: Audience ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Audience'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get a single audience
+      tags:
+      - audiences
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing audience by its ID
+      parameters:
+      - description: Audience ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated audience object
+        in: body
+        name: audience
+        required: true
+        schema:
+          $ref: '#/definitions/models.Audience'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Audience'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update an audience
+      tags:
+      - audiences
+  /api/v2/categories:
+    get:
+      description: Returns a list of categories, supports search and pagination
+      parameters:
+      - description: Search string
+        in: query
+        name: search
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Order by field
+        in: query
+        name: order_by
+        type: string
+      - description: Sort order (asc/desc)
+        in: query
+        name: sort
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: List categories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Creates a new category with the provided details
+      parameters:
+      - description: Category object
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create a new category
+      tags:
+      - categories
+  /api/v2/categories/{id}:
+    get:
+      description: Returns a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get a single category
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Updates the details of a specific category by ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated category details
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Category'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update category details
+      tags:
+      - categories
   /api/v2/docs:
     get:
       description: Serves the Swagger UI for API documentation.
@@ -214,6 +1395,171 @@ paths:
       summary: Get events
       tags:
       - events
+    post:
+      consumes:
+      - application/json
+      description: Creates a new event with the provided details. Requires authentication.
+      parameters:
+      - description: Event to create
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewEvent'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Event'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create a new event
+      tags:
+      - events
+  /api/v2/events/{id}:
+    delete:
+      description: Deletes an event by its ID. Requires authentication.
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete an event
+      tags:
+      - events
+    get:
+      description: Retrieves a specific protected event by its ID, including detailed
+        information such as category, location, audience, and organizer info.
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Event'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get protected event by ID
+      tags:
+      - events
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing event with the provided details. Requires authentication.
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated event details
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Event'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update an existing event
+      tags:
+      - events
+  /api/v2/events/audiences:
+    get:
+      description: Retrieves a list of all event audiences.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get event audiences
+      tags:
+      - events
+  /api/v2/events/categories:
+    get:
+      description: Retrieves a list of all event categories active.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get event categories
+      tags:
+      - events
+  /api/v2/events/time:
+    get:
+      description: Retrieves a list of all time types for events.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all time types
+      tags:
+      - events
   /api/v2/forms:
     get:
       description: Returns a list of forms, supports search and pagination
@@ -241,7 +1587,86 @@ paths:
       summary: List forms
       tags:
       - forms
+    post:
+      consumes:
+      - application/json
+      description: Creates a new form
+      parameters:
+      - description: Form object
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/models.Form'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Form'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Create a new form
+      tags:
+      - forms
+  /api/v2/forms/{form_id}/questions:
+    put:
+      consumes:
+      - application/json
+      description: Accepts an array of questions and updates them
+      parameters:
+      - description: Form ID
+        in: path
+        name: form_id
+        required: true
+        type: string
+      - description: Array of questions
+        in: body
+        name: questions
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.Question'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Question'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update questions for a form
+      tags:
+      - questions
   /api/v2/forms/{id}:
+    delete:
+      description: Deletes a form by ID
+      parameters:
+      - description: Form ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema: {}
+      summary: Delete a form
+      tags:
+      - forms
     get:
       description: Returns a form by its ID
       parameters:
@@ -261,6 +1686,1105 @@ paths:
       summary: Get a single form
       tags:
       - forms
+    put:
+      consumes:
+      - application/json
+      description: Updates a form by ID
+      parameters:
+      - description: Form ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Form object
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/models.Form'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Form'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Update a form
+      tags:
+      - forms
+  /api/v2/forms/submissions/{id}:
+    get:
+      description: Returns a submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Submission'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get a single submission
+      tags:
+      - submissions
+  /api/v2/honey/{service}/content/{path}:
+    get:
+      description: Retrieves all text content available in the specified path of a
+        text service.
+      parameters:
+      - description: Service name
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Path in the service
+        in: path
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              additionalProperties:
+                type: string
+              type: object
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all content in a specified path
+      tags:
+      - honey
+    put:
+      consumes:
+      - application/json
+      description: Updates text content in the specified path of a text service.
+      parameters:
+      - description: Service name
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Path in the service
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Content to update
+        in: body
+        name: content
+        required: true
+        schema:
+          additionalProperties:
+            additionalProperties:
+              type: string
+            type: object
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update content in a specified path
+      tags:
+      - honey
+  /api/v2/honey/{service}/content/{path}/{language}:
+    get:
+      description: Retrieves text content for a specific language in the specified
+        path of a text service.
+      parameters:
+      - description: Service name
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Path in the service
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Language code
+        in: path
+        name: language
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get content for one language in a specified path
+      tags:
+      - honey
+    post:
+      consumes:
+      - application/json
+      description: Creates text content in the specified service and path for a given
+        language.
+      parameters:
+      - description: Service name
+        in: path
+        name: service
+        required: true
+        type: string
+      - description: Path in the service
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Language code
+        in: path
+        name: language
+        required: true
+        type: string
+      - description: Content to create
+        in: body
+        name: content
+        required: true
+        schema:
+          additionalProperties:
+            additionalProperties:
+              type: string
+            type: object
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create text content in a specified service and path
+      tags:
+      - honey
+  /api/v2/honey/{service}/paths:
+    get:
+      description: Retrieves all paths available in the specified text service.
+      parameters:
+      - description: Service name
+        in: path
+        name: service
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all paths in a specified service
+      tags:
+      - honey
+  /api/v2/honey/services:
+    get:
+      description: Retrieves a list of all available text services.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get available text services
+      tags:
+      - honey
+  /api/v2/images/{path}:
+    get:
+      description: Retrieves a list of image URLs available in the specified path.
+      parameters:
+      - description: Path to retrieve images from
+        in: path
+        name: path
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get image URLs in a specified path in a digital ocean bucket
+      tags:
+      - images
+  /api/v2/images/{path}/{imageName}:
+    delete:
+      description: Deletes an image file from the specified path in the image service.
+      parameters:
+      - description: Path where the image is located
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Name of the image to delete
+        in: path
+        name: imageName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete an image from a specified path in a digital ocean bucket
+      tags:
+      - images
+  /api/v2/images/upload/{path}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Uploads an image file to the specified path in the image service.
+      parameters:
+      - description: Path to upload the image
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Image file to upload
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Upload an image to a specified path in a digital ocean bucket
+      tags:
+      - images
+  /api/v2/jobs:
+    get:
+      description: Retrieves a list of jobs with optional filtering, pagination, and
+        sorting.
+      parameters:
+      - description: Filter by job types (comma-separated)
+        in: query
+        name: jobtypes
+        type: string
+      - description: Filter by skills (comma-separated)
+        in: query
+        name: skills
+        type: string
+      - description: Filter by cities (comma-separated)
+        in: query
+        name: cities
+        type: string
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: "20"
+        description: Number of results to return
+        in: query
+        name: limit
+        type: string
+      - default: "0"
+        description: Number of results to skip
+        in: query
+        name: offset
+        type: string
+      - default: id
+        description: Field to order by
+        in: query
+        name: order_by
+        type: string
+      - default: asc
+        description: Sort order (asc or desc)
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get list of jobs
+      tags:
+      - jobs
+    post:
+      consumes:
+      - application/json
+      description: Creates a new job with the provided details.
+      parameters:
+      - description: Job to create
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewJob'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create a new job
+      tags:
+      - jobs
+  /api/v2/jobs/{id}:
+    delete:
+      description: Deletes a job by its ID.
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete a job
+      tags:
+      - jobs
+    get:
+      description: Retrieves a specific job by its ID.
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get job by ID
+      tags:
+      - jobs
+    put:
+      consumes:
+      - application/json
+      description: Updates a job by ID with the provided details.
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Job to update
+        in: body
+        name: job
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.NewJob'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update a job
+      tags:
+      - jobs
+  /api/v2/jobs/cities:
+    get:
+      description: Retrieves a list of all active job cities.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Cities'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get active job cities
+      tags:
+      - jobs
+  /api/v2/jobs/protected/{id}:
+    get:
+      description: Retrieves a specific protected job by its ID.
+      parameters:
+      - description: Job ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get protected job by ID
+      tags:
+      - jobs
+  /api/v2/jobs/skills:
+    get:
+      description: Retrieves a list of all job skills.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JobSkills'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get job skills
+      tags:
+      - jobs
+  /api/v2/jobs/types:
+    get:
+      description: Retrieves a list of all active job types.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JobType'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get active job types
+      tags:
+      - jobs
+    post:
+      consumes:
+      - application/json
+      description: Creates a new job type with the provided details.
+      parameters:
+      - description: Job Type to create
+        in: body
+        name: jobType
+        required: true
+        schema:
+          $ref: '#/definitions/models.JobType'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JobType'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create a new job type
+      tags:
+      - jobs
+  /api/v2/jobs/types/{id}:
+    delete:
+      description: Deletes a job type by its ID.
+      parameters:
+      - description: Job Type ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete a job type
+      tags:
+      - jobs
+    get:
+      description: Retrieves a specific job type by its ID.
+      parameters:
+      - description: Job Type ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JobType'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get job type by ID
+      tags:
+      - jobs
+    put:
+      consumes:
+      - application/json
+      description: Updates a job type by ID with the provided details.
+      parameters:
+      - description: Job Type ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Job Type to update
+        in: body
+        name: jobType
+        required: true
+        schema:
+          $ref: '#/definitions/models.JobType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JobType'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update a job type
+      tags:
+      - jobs
+  /api/v2/jobs/types/all:
+    get:
+      description: Retrieves a list of all job types with optional filtering, pagination,
+        and sorting.
+      parameters:
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: "20"
+        description: Number of results to return
+        in: query
+        name: limit
+        type: string
+      - default: "0"
+        description: Number of results to skip
+        in: query
+        name: offset
+        type: string
+      - default: id
+        description: Field to order by
+        in: query
+        name: order_by
+        type: string
+      - default: asc
+        description: Sort order (asc or desc)
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all job types
+      tags:
+      - jobs
+  /api/v2/locations:
+    get:
+      description: Retrieves a list of locations with optional filtering, sorting,
+        and pagination.
+      parameters:
+      - description: Filter by location type
+        in: query
+        name: type
+        type: string
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: "20"
+        description: Number of records to return
+        in: query
+        name: limit
+        type: string
+      - default: "0"
+        description: Number of records to skip
+        in: query
+        name: offset
+        type: string
+      - default: asc
+        description: Sort order (asc or desc)
+        in: query
+        name: sort
+        type: string
+      - default: id
+        description: Field to order by
+        in: query
+        name: order_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get locations
+      tags:
+      - locations
+    post:
+      consumes:
+      - application/json
+      description: Creates a new location with the provided details.
+      parameters:
+      - description: Location to create
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewLocation'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Location'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create a new location
+      tags:
+      - locations
+  /api/v2/locations/{id}:
+    delete:
+      description: Deletes a location by ID.
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete a location
+      tags:
+      - locations
+    get:
+      description: Retrieves a specific location by its ID.
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Location'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get location by ID
+      tags:
+      - locations
+    put:
+      consumes:
+      - application/json
+      description: Updates a location by ID with the provided details.
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Location object
+        in: body
+        name: location
+        required: true
+        schema:
+          $ref: '#/definitions/models.NewLocation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Location'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update a location
+      tags:
+      - locations
+  /api/v2/locations/names:
+    get:
+      description: Retrieves a list of all location names.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get location names
+      tags:
+      - locations
+  /api/v2/locations/types:
+    get:
+      description: Retrieves a list of all location types.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all location types
+      tags:
+      - locations
+  /api/v2/organizations:
+    get:
+      description: Retrieves a list of organizations with optional search, pagination,
+        and sorting.
+      parameters:
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: "20"
+        description: Number of records to return
+        in: query
+        name: limit
+        type: string
+      - default: "0"
+        description: Number of records to skip
+        in: query
+        name: offset
+        type: string
+      - default: asc
+        description: Sort order (asc or desc)
+        in: query
+        name: sort
+        type: string
+      - default: id
+        description: Field to order by
+        in: query
+        name: order_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get organizations
+      tags:
+      - organizations
+    post:
+      consumes:
+      - application/json
+      description: Creates a new organization with the provided details.
+      parameters:
+      - description: Organization to create
+        in: body
+        name: organization
+        required: true
+        schema:
+          $ref: '#/definitions/models.Organization'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Organization'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create a new organization
+      tags:
+      - organizations
+  /api/v2/organizations/{id}:
+    delete:
+      description: Deletes an organization by ID.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete an organization
+      tags:
+      - organizations
+    get:
+      description: Retrieves a specific organization by its ID.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Organization'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get organization by ID
+      tags:
+      - organizations
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing organization with the provided details.
+      parameters:
+      - description: Organization ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated organization details
+        in: body
+        name: organization
+        required: true
+        schema:
+          $ref: '#/definitions/models.Organization'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Organization'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update an existing organization
+      tags:
+      - organizations
+  /api/v2/organizations/names:
+    get:
+      description: Retrieves a list of all organization names.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get organization names
+      tags:
+      - organizations
   /api/v2/ping:
     get:
       description: Health check endpoint. Returns a simple pong message.
@@ -276,6 +2800,168 @@ paths:
       summary: Ping endpoint
       tags:
       - health
+  /api/v2/questions/{id}:
+    delete:
+      description: Deletes a question by ID
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Question'
+        "404":
+          description: Not Found
+          schema: {}
+      summary: Delete a question
+      tags:
+      - questions
+  /api/v2/rules:
+    get:
+      description: Retrieves a list of rules with optional search, pagination, and
+        sorting.
+      parameters:
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: "20"
+        description: Number of items to return
+        in: query
+        name: limit
+        type: string
+      - default: "0"
+        description: Number of items to skip
+        in: query
+        name: offset
+        type: string
+      - default: id
+        description: Field to order by
+        in: query
+        name: order_by
+        type: string
+      - default: asc
+        description: Sort order (asc or desc)
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get rules
+      tags:
+      - rules
+    post:
+      consumes:
+      - application/json
+      description: Creates a new rule with the provided details. Requires authentication.
+      parameters:
+      - description: Rule to create
+        in: body
+        name: rule
+        required: true
+        schema:
+          $ref: '#/definitions/models.Rule'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Rule'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create a new rule
+      tags:
+      - rules
+  /api/v2/rules/{id}:
+    get:
+      description: Retrieves a specific rule by its ID.
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Rule'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get rule by ID
+      tags:
+      - rules
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing rule with the provided details. Requires authentication.
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated rule details
+        in: body
+        name: rule
+        required: true
+        schema:
+          $ref: '#/definitions/models.Rule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Rule'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Update an existing rule
+      tags:
+      - rules
+  /api/v2/rules/names:
+    get:
+      description: Retrieves a list of all rule names.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get rule names
+      tags:
+      - rules
   /api/v2/stats/categories:
     get:
       description: Returns, for each category, the number of events in the last 3
@@ -288,7 +2974,8 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.CategoriesStats'
+              additionalProperties: true
+              type: object
             type: array
         "500":
           description: Internal Server Error
@@ -296,7 +2983,7 @@ paths:
       summary: Get category event statistics
       tags:
       - stats
-  /api/v2/stats/new_additions:
+  /api/v2/stats/new-additions:
     get:
       description: Returns a list of the newest additions across events, categories,
         audiences, rules, organizations, locations, and job advertisements. Ordered
@@ -313,7 +3000,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.NewAdditionsStats'
+              $ref: '#/definitions/models.NewAddition'
             type: array
         "500":
           description: Internal Server Error
@@ -331,7 +3018,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TotalStats'
+            items:
+              $ref: '#/definitions/models.YearlyActivity'
+            type: array
         "500":
           description: Internal Server Error
           schema: {}

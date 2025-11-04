@@ -8,6 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetCategory godoc
+// @Summary      Get a single category
+// @Description  Returns a category by its ID
+// @Tags         categories
+// @Param        id   path      string  true  "Category ID"
+// @Success      200  {object}  models.Category
+// @Failure      500  {object}  error
+// @Router       /api/v2/categories/{id} [get]
 func (h *Handler) GetCategory(c *gin.Context) {
 	id := c.Param("id")
 
@@ -19,6 +27,18 @@ func (h *Handler) GetCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, category)
 }
 
+// GetCategories godoc
+// @Summary      List categories
+// @Description  Returns a list of categories, supports search and pagination
+// @Tags         categories
+// @Param        search    query     string  false  "Search string"
+// @Param        limit     query     int     false  "Limit"
+// @Param        offset    query     int     false  "Offset"
+// @Param        order_by  query     string  false  "Order by field"
+// @Param        sort      query     string  false  "Sort order (asc/desc)"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      500  {object}  error
+// @Router       /api/v2/categories [get]
 func (h *Handler) GetCategories(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
@@ -44,6 +64,16 @@ func (h *Handler) GetCategories(c *gin.Context) {
 	}
 }
 
+// CreateCategory godoc
+// @Summary      Create a new category
+// @Description  Creates a new category with the provided details
+// @Tags         categories
+// @Accept       json
+// @Produce      json
+// @Param        category  body      models.Category  true  "Category object"
+// @Success      201  {object}  models.Category
+// @Failure      400  {object}  error
+// @Router       /api/v2/categories [post]
 func (h *Handler) CreateCategory(c *gin.Context) {
 	var category models.Category
 
@@ -63,6 +93,17 @@ func (h *Handler) CreateCategory(c *gin.Context) {
 	c.JSON(http.StatusCreated, categoryResponse)
 }
 
+// UpdateCategory godoc
+// @Summary      Update category details
+// @Description  Updates the details of a specific category by ID
+// @Tags         categories
+// @Accept       json
+// @Produce      json
+// @Param        id    path      string  true  "Category ID"
+// @Param        category body      models.Category true "Updated category details"
+// @Success      200  {object}  models.Category
+// @Failure      400  {object}  error
+// @Router       /api/v2/categories/{id} [put]
 func (h *Handler) UpdateCategory(c *gin.Context) {
 	var category models.Category
 	id := c.Param("id")

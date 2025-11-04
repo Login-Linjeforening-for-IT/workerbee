@@ -8,6 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAudience godoc
+// @Summary      Get a single audience
+// @Description  Returns an audience by its ID
+// @Tags         audiences
+// @Param        id   path      string  true  "Audience ID"
+// @Success      200  {object}  models.Audience
+// @Failure      500  {object}  error
+// @Router       /api/v2/audiences/{id} [get]
 func (h *Handler) GetAudience(c *gin.Context) {
 	id := c.Param("id")
 
@@ -19,6 +27,18 @@ func (h *Handler) GetAudience(c *gin.Context) {
 	c.JSON(http.StatusOK, audience)
 }
 
+// GetAudiences godoc
+// @Summary      List audiences
+// @Description  Returns a list of audiences, supports search and pagination
+// @Tags         audiences
+// @Param        search    query     string  false  "Search string"
+// @Param        limit     query     int     false  "Limit"
+// @Param        offset    query     int     false  "Offset"
+// @Param        order_by  query     string  false  "Order by field"
+// @Param        sort      query     string  false  "Sort order (asc/desc)"
+// @Success      200  {object}  map[string]interface{}
+// @Failure      500  {object}  error
+// @Router       /api/v2/audiences [get]
 func (h *Handler) GetAudiences(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	limit := c.DefaultQuery("limit", "20")
@@ -44,6 +64,16 @@ func (h *Handler) GetAudiences(c *gin.Context) {
 	}
 }
 
+// CreateAudience godoc
+// @Summary      Create a new audience
+// @Description  Creates a new audience with the provided details
+// @Tags         audiences
+// @Accept       json
+// @Produce      json
+// @Param        audience  body      models.Audience  true  "Audience object"
+// @Success      201  {object}  models.Audience
+// @Failure      400  {object}  error
+// @Router       /api/v2/audiences [post]
 func (h *Handler) CreateAudience(c *gin.Context) {
 	var audience models.Audience
 
@@ -63,6 +93,17 @@ func (h *Handler) CreateAudience(c *gin.Context) {
 	c.JSON(http.StatusCreated, audienceResponse)
 }
 
+// UpdateAudience godoc
+// @Summary      Update an audience
+// @Description  Updates an existing audience by its ID
+// @Tags         audiences
+// @Accept       json
+// @Produce      json
+// @Param        id        path      string           true  "Audience ID"
+// @Param        audience  body      models.Audience  true  "Updated audience object"
+// @Success      200  {object}  models.Audience
+// @Failure      400  {object}  error
+// @Router       /api/v2/audiences/{id} [put]
 func (h *Handler) UpdateAudience(c *gin.Context) {
 	var audience models.Audience
 	id := c.Param("id")
@@ -83,6 +124,14 @@ func (h *Handler) UpdateAudience(c *gin.Context) {
 	c.JSON(http.StatusOK, audienceResponse)
 }
 
+// DeleteAudience godoc
+// @Summary      Delete an audience
+// @Description  Deletes an audience by its ID
+// @Tags         audiences
+// @Param        id   path      string  true  "Audience ID"
+// @Success      200  {object}  map[string]string
+// @Failure      500  {object}  error
+// @Router       /api/v2/audiences/{id} [delete]
 func (h *Handler) DeleteAudience(c *gin.Context) {
 	id := c.Param("id")
 

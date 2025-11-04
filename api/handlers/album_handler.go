@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateAlbum godoc
+// @Summary      Create a new album
+// @Description  Creates a new album with the provided details
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        album body      models.CreateAlbum true "Album details"
+// @Success      200  {object}  models.Album
+// @Failure      400  {object}  error
+// @Security     Bearer
+// @Router       /api/v2/albums [post]
 func (h *Handler) CreateAlbum(c *gin.Context) {
 	var body models.CreateAlbum
 	if err := c.ShouldBindBodyWithJSON(&body); internal.HandleError(c, err) {
@@ -26,6 +37,18 @@ func (h *Handler) CreateAlbum(c *gin.Context) {
 	c.JSON(http.StatusOK, albumResponse)
 }
 
+// UploadImagesToAlbum godoc
+// @Summary      Upload images to an album
+// @Description  Uploads one or more images to the specified album
+// @Tags         albums
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        id     path      string  true  "Album ID"
+// @Param        images formData  []file  true  "Images to upload" collectionFormat(multi)
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  error
+// @Security     Bearer
+// @Router       /api/v2/albums/{id}/images [post]
 func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	id := c.Param("id")
 
@@ -50,6 +73,20 @@ func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	})
 }
 
+// GetAlbums godoc
+// @Summary      Get a list of albums
+// @Description  Retrieves a list of albums with optional sorting, pagination, and search
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        order_by  query     string  false  "Column to order by"  default(id)
+// @Param        sort      query     string  false  "Sort direction (asc or desc)"  default(asc)
+// @Param        limit     query     string  false  "Number of records to return"  default(20)
+// @Param        offset    query     string  false  "Offset for pagination"  default(0)
+// @Param        search    query     string  false  "Search term"
+// @Success      200  {array}  models.AlbumsWithTotalCount
+// @Failure      400  {object}  error
+// @Router       /api/v2/albums [get]
 func (h *Handler) GetAlbums(c *gin.Context) {
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "asc")
@@ -75,6 +112,16 @@ func (h *Handler) GetAlbums(c *gin.Context) {
 	}
 }
 
+// GetAlbum godoc
+// @Summary      Get album details
+// @Description  Retrieves details of a specific album by ID
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Album ID"
+// @Success      200  {object}  models.AlbumWithImages
+// @Failure      400  {object}  error
+// @Router       /api/v2/albums/{id} [get]
 func (h *Handler) GetAlbum(c *gin.Context) {
 	id := c.Param("id")
 
@@ -86,6 +133,18 @@ func (h *Handler) GetAlbum(c *gin.Context) {
 	c.JSON(http.StatusOK, album)
 }
 
+// UpdateAlbum godoc
+// @Summary      Update album details
+// @Description  Updates the details of a specific album by ID
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        id    path      string  true  "Album ID"
+// @Param        album body      models.CreateAlbum true "Updated album details"
+// @Success      200  {object}  models.CreateAlbum
+// @Failure      400  {object}  error
+// @Security     Bearer
+// @Router       /api/v2/albums/{id} [put]
 func (h *Handler) UpdateAlbum(c *gin.Context) {
 	id := c.Param("id")
 
@@ -106,6 +165,17 @@ func (h *Handler) UpdateAlbum(c *gin.Context) {
 	c.JSON(http.StatusOK, albumResponse)
 }
 
+// DeleteAlbum godoc
+// @Summary      Delete an album
+// @Description  Deletes a specific album by ID
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Album ID"
+// @Success      200  {object}  map[string]int
+// @Failure      400  {object}  error
+// @Security     Bearer
+// @Router       /api/v2/albums/{id} [delete]
 func (h *Handler) DeleteAlbum(c *gin.Context) {
 	id := c.Param("id")
 
@@ -119,6 +189,18 @@ func (h *Handler) DeleteAlbum(c *gin.Context) {
 	})
 }
 
+// DeleteAlbumImage godoc
+// @Summary      Delete an image from an album
+// @Description  Deletes a specific image from an album by album ID and image name
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        id        path      string  true  "Album ID"
+// @Param        imageName path      string  true  "Image Name"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  error
+// @Security     Bearer
+// @Router       /api/v2/albums/{id}/images/{imageName} [delete]
 func (h *Handler) DeleteAlbumImage(c *gin.Context) {
 	id := c.Param("id")
 	imageName := c.Param("imageName")
@@ -133,6 +215,18 @@ func (h *Handler) DeleteAlbumImage(c *gin.Context) {
 	})
 }
 
+// SetAlbumCover godoc
+// @Summary      Set album cover image
+// @Description  Sets a specific image as the cover for an album by album ID and image name
+// @Tags         albums
+// @Accept       json
+// @Produce      json
+// @Param        id        path      string  true  "Album ID"
+// @Param        imageName path      string  true  "Image Name"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  error
+// @Security     Bearer
+// @Router       /api/v2/albums/{id}/cover/{imageName} [put]
 func (h *Handler) SetAlbumCover(c *gin.Context) {
 	id := c.Param("id")
 	imageName := c.Param("imageName")

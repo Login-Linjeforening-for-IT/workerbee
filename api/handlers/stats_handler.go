@@ -7,21 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) GetMostActiveCategory(c *gin.Context) {
-	categoryStat, err := h.Services.Stats.GetMostActiveCategories()
-	if internal.HandleError(c, err) {
-		return
-	}
-
-	c.JSON(http.StatusOK, categoryStat)
-}
-
 // GetTotalStats godoc
 // @Summary      Get total statistics
 // @Description  Returns total counts for events, jobs, organizations, locations, and rules (excluding deleted records).
 // @Tags         stats
 // @Produce      json
-// @Success      200  {object}  models.TotalStats
+// @Success      200  {object}  []models.YearlyActivity
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/total [get]
 func (h *Handler) GetYearlyStats(c *gin.Context) {
@@ -38,13 +29,13 @@ func (h *Handler) GetYearlyStats(c *gin.Context) {
 // @Description  Returns, for each category, the number of events in the last 3 months. Only categories with at least one event are included, ordered by event count descending.
 // @Tags         stats
 // @Produce      json
-// @Success      200  {array}  models.CategoriesStats
+// @Success      200  {array}  map[string]interface{}
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/categories [get]
-func (h *Handler) GetCategoriesStats(c *gin.Context) {
-	categoriesStats, err := h.Services.Stats.GetCategoriesStats()
-	if err != nil {
-
+func (h *Handler) GetMostActiveCategories(c *gin.Context) {
+	categoriesStats, err := h.Services.Stats.GetMostActiveCategories()
+	if internal.HandleError(c, err) {
+		return
 	}
 
 	c.JSON(http.StatusOK, categoriesStats)
@@ -56,9 +47,9 @@ func (h *Handler) GetCategoriesStats(c *gin.Context) {
 // @Tags         stats
 // @Produce      json
 // @Param        limit  query  int  false  "Maximum number of results"
-// @Success      200  {array}  models.NewAdditionsStats
+// @Success      200  {array}  models.NewAddition
 // @Failure      500  {object}  error
-// @Router       /api/v2/stats/new_additions [get]
+// @Router       /api/v2/stats/new-additions [get]
 func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
 	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats()
 	if internal.HandleError(c, err) {

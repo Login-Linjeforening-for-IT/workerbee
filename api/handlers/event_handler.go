@@ -8,6 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateEvent godoc
+// @Summary      Create a new event
+// @Description  Creates a new event with the provided details. Requires authentication.
+// @Tags         events
+// @Accept       json
+// @Produce      json
+// @Param        event  body      models.NewEvent  true  "Event to create"
+// @Success      201    {object}  models.Event
+// @Failure      400    {object}  error
+// @Failure      500    {object}  error
+// @Router       /api/v2/events [post]
 func (h *Handler) CreateEvent(c *gin.Context) {
 	var event models.NewEvent
 
@@ -27,6 +38,18 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 	c.JSON(http.StatusCreated, event)
 }
 
+// UpdateEvent godoc
+// @Summary      Update an existing event
+// @Description  Updates an existing event with the provided details. Requires authentication.
+// @Tags         events
+// @Accept       json
+// @Produce      json
+// @Param        id     path      string          true  "Event ID"
+// @Param        event  body      models.NewEvent  true  "Updated event details"
+// @Success      200    {object}  models.Event
+// @Failure      400    {object}  error
+// @Failure      500    {object}  error
+// @Router       /api/v2/events/{id} [put]
 func (h *Handler) UpdateEvent(c *gin.Context) {
 	var event models.NewEvent
 	id := c.Param("id")
@@ -47,6 +70,17 @@ func (h *Handler) UpdateEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+// GetEvents godoc
+// @Summary      Get events
+// @Description  Returns a list of events with details, including category, location, audience, and organizer info. Supports historical filtering, limit, and offset.
+// @Tags         events
+// @Produce      json
+// @Param        limit    query  int   false  "Maximum number of results"
+// @Param        offset   query  int   false  "Offset for pagination"
+// @Param        historical query bool false  "Include historical events"
+// @Success      200  {array}  models.Event
+// @Failure      500  {object}  error
+// @Router       /api/v2/events [get]
 func (h *Handler) GetEvents(c *gin.Context) {
 	search := c.DefaultQuery("search", "")
 	categories := c.DefaultQuery("categories", "")
@@ -114,6 +148,16 @@ func (h *Handler) GetProtectedEvents(c *gin.Context) {
 	}
 }
 
+// GetEvent godoc
+// @Summary      Get event by ID
+// @Description  Retrieves a specific event by its ID, including detailed information such as category, location, audience, and organizer info.
+// @Tags         events
+// @Produce      json
+// @Param        id   path      string  true  "Event ID"
+// @Success      200  {object}  models.Event
+// @Failure      400  {object}  error
+// @Failure      500  {object}  error
+// @Router       /api/v2/events/{id} [get]
 func (h *Handler) GetEvent(c *gin.Context) {
 	id := c.Param("id")
 
@@ -125,6 +169,16 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+// GetProtectedEvent godoc
+// @Summary      Get protected event by ID
+// @Description  Retrieves a specific protected event by its ID, including detailed information such as category, location, audience, and organizer info.
+// @Tags         events
+// @Produce      json
+// @Param        id   path      string  true  "Event ID"
+// @Success      200  {object}  models.Event
+// @Failure      400  {object}  error
+// @Failure      500  {object}  error
+// @Router       /api/v2/events/{id} [get]
 func (h *Handler) GetProtectedEvent(c *gin.Context) {
 	id := c.Param("id")
 
@@ -136,6 +190,14 @@ func (h *Handler) GetProtectedEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, event)
 }
 
+// GetEventAudiences godoc
+// @Summary      Get event audiences
+// @Description  Retrieves a list of all event audiences.
+// @Tags         events
+// @Produce      json
+// @Success      200  {array}   string
+// @Failure      500  {object}  error
+// @Router       /api/v2/events/audiences [get]
 func (h *Handler) GetEventAudiences(c *gin.Context) {
 	audiences, err := h.Services.Events.GetEventAudiences()
 	if internal.HandleError(c, err) {
@@ -145,6 +207,14 @@ func (h *Handler) GetEventAudiences(c *gin.Context) {
 	c.JSON(http.StatusOK, audiences)
 }
 
+// GetAllTimeTypes godoc
+// @Summary      Get all time types
+// @Description  Retrieves a list of all time types for events.
+// @Tags         events
+// @Produce      json
+// @Success      200  {array}   string
+// @Failure      500  {object}  error
+// @Router       /api/v2/events/time [get]
 func (h *Handler) GetAllTimeTypes(c *gin.Context) {
 	timeTypes, err := h.Services.Events.GetAllTimeTypes()
 	if internal.HandleError(c, err) {
@@ -154,6 +224,14 @@ func (h *Handler) GetAllTimeTypes(c *gin.Context) {
 	c.JSON(http.StatusOK, timeTypes)
 }
 
+// GetEventCategories godoc
+// @Summary      Get event categories
+// @Description  Retrieves a list of all event categories active.
+// @Tags         events
+// @Produce      json
+// @Success      200  {array}   string
+// @Failure      500  {object}  error
+// @Router       /api/v2/events/categories [get]
 func (h *Handler) GetEventCategories(c *gin.Context) {
 	categories, err := h.Services.Events.GetEventCategories()
 	if internal.HandleError(c, err) {
@@ -163,6 +241,16 @@ func (h *Handler) GetEventCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
+// DeleteEvent godoc
+// @Summary      Delete an event
+// @Description  Deletes an event by its ID. Requires authentication.
+// @Tags         events
+// @Produce      json
+// @Param        id   path      string  true  "Event ID"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  error
+// @Failure      500  {object}  error
+// @Router       /api/v2/events/{id} [delete]
 func (h *Handler) DeleteEvent(c *gin.Context) {
 	id := c.Param("id")
 

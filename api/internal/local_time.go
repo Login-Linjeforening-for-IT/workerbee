@@ -18,6 +18,9 @@ func init() {
 	}
 }
 
+// LocalTime wraps time.Time to handle JSON and SQL marshalling/unmarshalling
+// @swaggertype string
+// @example "2023-10-05T14:30:00"
 type LocalTime struct {
 	time.Time
 }
