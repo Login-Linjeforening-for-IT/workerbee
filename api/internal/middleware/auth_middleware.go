@@ -77,6 +77,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		c.Set("user", respStruct.Sub)
+
 		c.Next()
 	}
 }

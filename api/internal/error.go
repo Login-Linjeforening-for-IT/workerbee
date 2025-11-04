@@ -28,11 +28,13 @@ var (
 	ErrInvalidCategory        = errors.New("invalid category does not exist in enum")
 	ErrInvalidLocationType    = errors.New("invalid location type does not exist in enum")
 	ErrInvalidJobType         = errors.New("invalid job type does not exist in enum")
+	ErrTooManyRequests        = errors.New("too many requests")
 	ErrS3ClientNotInitialized = errors.New("s3 client not initialized")
 	ErrorMap                  = map[error]struct {
 		Status  int
 		Message string
 	}{
+		ErrTooManyRequests:   {Status: http.StatusTooManyRequests, Message: "too many requests"},
 		ErrNoImagesProvided:  {Status: http.StatusBadRequest, Message: "no images provided"},
 		ErrNotFound:          {Status: http.StatusBadRequest, Message: "did not find document"},
 		ErrNoRow:             {Status: http.StatusBadRequest, Message: "no row found"},
