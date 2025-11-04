@@ -39,7 +39,17 @@ func (h *Handler) GetAllAlerts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, alerts)
+	if len(alerts) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"alerts":     alerts,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"alerts":     alerts,
+			"total_count": alerts[0].TotalCount,
+		})
+	}
 }
 
 func (h *Handler) GetAlertByServiceAndPage(c *gin.Context) {

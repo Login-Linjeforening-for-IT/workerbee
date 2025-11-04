@@ -1,4 +1,4 @@
-SELECT a.*
+SELECT a.*, COUNT (*) OVER() AS total_count
 FROM alerts as a
 WHERE 
     (

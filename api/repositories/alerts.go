@@ -9,7 +9,7 @@ import (
 
 type AlertRepository interface {
 	CreateAlert(alert models.Alert) (models.Alert, error)
-	GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.Alert, error)
+	GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.AlertWithTotalCount, error)
 	GetAlertByServiceAndPage(service, page string) (models.Alert, error)
 	GetAlertByID(id int) (models.Alert, error)
 	UpdateAlert(alert models.Alert) (models.Alert, error)
@@ -32,8 +32,8 @@ func (r *alertRepository) CreateAlert(alert models.Alert) (models.Alert, error) 
 	)
 }
 
-func (r *alertRepository) GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.Alert, error) {
-	return db.FetchAllElements[models.Alert](
+func (r *alertRepository) GetAllAlerts(limit, offset int, search, orderBy, sort string) ([]models.AlertWithTotalCount, error) {
+	return db.FetchAllElements[models.AlertWithTotalCount](
 		r.db,
 		"./db/alerts/get_all_alerts.sql",
 		orderBy, sort,

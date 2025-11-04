@@ -13,3 +13,8 @@ type Alert struct {
 	UpdatedAt     internal.LocalTime `db:"updated_at" json:"updated_at,omitempty"`
 	CreatedAt     internal.LocalTime `db:"created_at" json:"created_at,omitempty"`
 }
+
+type AlertWithTotalCount struct {
+	Alert
+	TotalCount int `db:"total_count" json:"total_count"`
+}
