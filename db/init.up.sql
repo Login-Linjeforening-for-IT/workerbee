@@ -260,17 +260,20 @@ INSERT INTO "job_types" ("name_en", "name_no") VALUES
 
 -- Alerts
 
-CREATE TABLE IF NOT EXISTS "alerts" (
+CREATE TABLE "alerts" (
   id SERIAL PRIMARY KEY,
   service TEXT NOT NULL,
-  language TEXT NOT NULL,
   page TEXT NOT NULL,
-  text TEXT NOT NULL,
-  UNIQUE(service, page, language)
+  title_en TEXT NOT NULL,
+  title_no TEXT NOT NULL,
+  description_en TEXT NOT NULL,
+  description_no TEXT NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(service, page)
 );
 
 CREATE INDEX idx_alerts_service ON "alerts"(service);
-CREATE INDEX idx_alerts_language ON "alerts"(language);
 
 -- Honey
 
@@ -286,7 +289,7 @@ CREATE TABLE IF NOT EXISTS "honey" (
 CREATE INDEX idx_honey_service_page ON "honey"(service, page);
 CREATE INDEX idx_honey_service ON "honey"(service);
 
-CREATE TABLE daily_insert_history (
+CREATE TABLE daily_history (
     insert_date DATE NOT NULL PRIMARY KEY,
     inserted_count INTEGER NOT NULL DEFAULT 0
 );
@@ -294,11 +297,11 @@ CREATE TABLE daily_insert_history (
 CREATE OR REPLACE FUNCTION update_insert_history()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO daily_insert_history (insert_date, inserted_count)
+    INSERT INTO daily_history (insert_date, inserted_count)
     VALUES (DATE(NEW.created_at AT TIME ZONE 'Europe/Oslo'), 1)
     ON CONFLICT (insert_date)
     DO UPDATE SET 
-        inserted_count = daily_insert_history.inserted_count + 1;
+        inserted_count = daily_history.inserted_count + 1;
     
     RETURN NEW;
 END;
@@ -307,11 +310,11 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION update_update_history()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO daily_insert_history (insert_date, inserted_count)
+    INSERT INTO daily_history (insert_date, inserted_count)
     VALUES (DATE(NEW.updated_at AT TIME ZONE 'Europe/Oslo'), 1)
     ON CONFLICT (insert_date)
     DO UPDATE SET 
-        inserted_count = daily_insert_history.inserted_count + 1;
+        inserted_count = daily_history.inserted_count + 1;
 
     RETURN NEW;
 END;
@@ -347,11 +350,6 @@ CREATE TRIGGER track_albums_updates
     FOR EACH ROW
     EXECUTE FUNCTION update_update_history();
 
-CREATE TRIGGER track_honey_updates
-    AFTER UPDATE ON honey
-    FOR EACH ROW
-    EXECUTE FUNCTION update_update_history();
-
 CREATE TRIGGER track_alerts_updates
     AFTER UPDATE ON alerts
     FOR EACH ROW
@@ -384,11 +382,6 @@ CREATE TRIGGER track_jobs_inserts
 
 CREATE TRIGGER track_albums_inserts
     AFTER INSERT ON albums
-    FOR EACH ROW
-    EXECUTE FUNCTION update_insert_history();
-
-CREATE TRIGGER track_honey_inserts
-    AFTER INSERT ON honey
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
 

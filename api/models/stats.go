@@ -5,8 +5,8 @@ import (
 )
 
 type YearlyActivity struct {
-	InsertDate    internal.LocalTime `db:"insert_date" json:"insert_date"`
-	InsertedCount int                `db:"inserted_count" json:"inserted_count"`
+	InsertDate    internal.Date `db:"insert_date" json:"insert_date"`
+	InsertedCount int           `db:"inserted_count" json:"inserted_count"`
 }
 type CategoriesStats struct {
 	ID         int    `db:"id" json:"id"`
