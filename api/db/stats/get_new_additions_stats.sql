@@ -4,7 +4,7 @@ SELECT * FROM (
     name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
     'categories' AS source 
   FROM categories
   UNION ALL
@@ -13,7 +13,7 @@ SELECT * FROM (
     name_no AS name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
     'events' AS source 
   FROM events
   UNION ALL
@@ -22,7 +22,7 @@ SELECT * FROM (
     name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
     'locations' AS source 
   FROM locations
   UNION ALL
@@ -31,7 +31,7 @@ SELECT * FROM (
     title_en AS name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
     'jobs' AS source 
   FROM jobs
   UNION ALL
@@ -40,8 +40,8 @@ SELECT * FROM (
     name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
-    'audiences' AS source 
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
+    'audiences' AS source
   FROM audiences
   UNION ALL
   SELECT 
@@ -49,7 +49,7 @@ SELECT * FROM (
     name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
     'rules' AS source 
   FROM rules
   UNION ALL
@@ -58,7 +58,7 @@ SELECT * FROM (
     name_en, 
     created_at, 
     updated_at,
-    CASE WHEN updated_at > created_at THEN 'updated_at' ELSE 'created_at' END AS order_by,
+    CASE WHEN updated_at > created_at THEN 'updated' ELSE 'created' END AS action,
     'organizations' AS source 
   FROM organizations
 ) t

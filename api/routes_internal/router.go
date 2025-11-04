@@ -32,12 +32,6 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				"/:id", 
 				middleware.AuthMiddleware(), 
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
-				h.CreateEvent,
-			)
-			events.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
 				h.UpdateEvent,
 			)
 			events.DELETE(

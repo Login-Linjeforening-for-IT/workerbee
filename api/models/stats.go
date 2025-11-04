@@ -20,6 +20,6 @@ type NewAddition struct {
 	NameEn    string             `db:"name_en" json:"name_en"`
 	CreatedAt internal.LocalTime `db:"created_at" json:"created_at"`
 	UpdatedAt internal.LocalTime `db:"updated_at" json:"updated_at"`
-	OrderBy   string             `db:"order_by" json:"order_by"`
+	Action    string             `db:"action" json:"action"`
 	Source    string             `db:"source" json:"source"`
 }
