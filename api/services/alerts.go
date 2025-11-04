@@ -27,6 +27,10 @@ func NewAlertService(repo repositories.AlertRepository) *AlertService {
 }
 
 func (s *AlertService) CreateAlert(alert models.Alert) (models.Alert, error) {
+	if !strings.HasPrefix(alert.Page, "/") {
+		alert.Page = "/" + alert.Page
+	}
+
 	return s.repo.CreateAlert(alert)
 }
 
@@ -67,6 +71,11 @@ func (s *AlertService) UpdateAlert(id_str string, alert models.Alert) (models.Al
 		return models.Alert{}, internal.ErrInvalid
 	}
 	alert.ID = id
+
+	if !strings.HasPrefix(alert.Page, "/") {
+		alert.Page = "/" + alert.Page
+	}
+
 	return s.repo.UpdateAlert(alert)
 }
 

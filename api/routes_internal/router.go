@@ -259,7 +259,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		alerts := v2.Group("/alerts")
 		{
 			alerts.GET("/", h.GetAllAlerts)
-			alerts.GET("/:service/:page", h.GetAlertByServiceAndPage)
+			alerts.GET("/:service", h.GetAlertByServiceAndPage)
 			alerts.GET("/id/:id", h.GetAlertByID)
 			alerts.POST(
 				"/", 

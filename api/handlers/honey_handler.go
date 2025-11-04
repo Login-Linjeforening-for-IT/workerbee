@@ -12,6 +12,10 @@ func (h *Handler) CreateTextInService(c *gin.Context) {
 	path := c.Param("path")
 	language := c.Param("language")
 
+	if len(path) > 0 && path[0] == '/' {
+		path = path[1:]
+	}
+
 	var content map[string]map[string]string
 	if err := c.ShouldBindJSON(&content); internal.HandleError(c, err) {
 		return
@@ -49,6 +53,10 @@ func (h *Handler) GetAllContentInPath(c *gin.Context) {
 	service := c.Param("service")
 	path := c.Param("path")
 
+	if len(path) > 0 && path[0] == '/' {
+		path = path[1:]
+	}
+
 	content, err := h.Services.Honey.GetAllContentInPath(service, path)
 	if internal.HandleError(c, err) {
 		return
@@ -62,6 +70,10 @@ func (h *Handler) GetOneLanguage(c *gin.Context) {
 	path := c.Param("path")
 	language := c.Param("language")
 
+	if len(path) > 0 && path[0] == '/' {
+		path = path[1:]
+	}
+
 	response, err := h.Services.Honey.GetOneLanguage(service, path, language)
 	if internal.HandleError(c, err) {
 		return
@@ -73,6 +85,10 @@ func (h *Handler) GetOneLanguage(c *gin.Context) {
 func (h *Handler) UpdateContentInPath(c *gin.Context) {
 	service := c.Param("service")
 	path := c.Param("path")
+
+	if len(path) > 0 && path[0] == '/' {
+		path = path[1:]
+	}
 
 	var content map[string]map[string]string
 	if err := c.ShouldBindJSON(&content); internal.HandleError(c, err) {
