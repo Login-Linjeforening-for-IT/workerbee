@@ -1,6 +1,7 @@
 package routes_internal
 
 import (
+	"workerbee/config"
 	"workerbee/handlers"
 	"workerbee/internal"
 	"workerbee/internal/middleware"
@@ -21,9 +22,30 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.GET("/all", middleware.AuthMiddleware(), h.GetEventNames)
 			events.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedEvents)
 			events.GET("/", h.GetEvents)
-			events.POST("/", middleware.AuthMiddleware(), h.CreateEvent)
-			events.PUT("/:id", middleware.AuthMiddleware(), h.UpdateEvent)
-			events.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteEvent)
+			events.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.CreateEvent,
+			)
+			events.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.CreateEvent,
+			)
+			events.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.UpdateEvent,
+			)
+			events.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.DeleteEvent,
+			)
 			events.GET("/categories", h.GetEventCategories)
 			events.GET("/audiences", h.GetEventAudiences)
 			events.GET("/time", h.GetAllTimeTypes)
@@ -33,17 +55,47 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			rules.GET("/:id", h.GetRule)
 			rules.GET("/all", h.GetRuleNames)
 			rules.GET("/", h.GetRules)
-			rules.POST("/", middleware.AuthMiddleware(), h.CreateRule)
-			rules.PUT("/:id", middleware.AuthMiddleware(), h.UpdateRule)
-			rules.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteRule)
+			rules.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.CreateRule,
+			)
+			rules.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.UpdateRule,
+			)
+			rules.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.DeleteRule,
+			)
 		}
 		categories := v2.Group("/categories")
 		{
 			categories.GET("/:id", h.GetCategory)
 			categories.GET("/", h.GetCategories)
-			categories.POST("/", middleware.AuthMiddleware(), h.CreateCategory)
-			categories.PUT("/:id", middleware.AuthMiddleware(), h.UpdateCategory)
-			categories.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteCategory)
+			categories.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.CreateCategory,
+			)
+			categories.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateCategory,
+			)
+			categories.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteCategory,
+			)
 		}
 		locations := v2.Group("/locations")
 		{
@@ -51,8 +103,18 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			locations.GET("/all", h.GetLocationNames)
 			locations.GET("/", h.GetLocations)
 			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
-			locations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateLocation)
-			locations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteLocation)
+			locations.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateLocation,
+			)
+			locations.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteLocation,
+			)
 			locations.GET("/types", h.GetAllLocationTypes)
 		}
 		organizations := v2.Group("/organizations")
@@ -60,9 +122,24 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			organizations.GET("/:id", h.GetOrganization)
 			organizations.GET("/all", h.GetOrganizationNames)
 			organizations.GET("/", h.GetOrganizations)
-			organizations.POST("/", middleware.AuthMiddleware(), h.CreateOrganization)
-			organizations.PUT("/:id", middleware.AuthMiddleware(), h.UpdateOrganization)
-			organizations.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteOrganization)
+			organizations.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.CreateOrganization,
+			)
+			organizations.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateOrganization,
+			)
+			organizations.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteOrganization,
+			)
 		}
 		jobs := v2.Group("/jobs")
 		{
@@ -71,8 +148,18 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/", h.GetJobs)
 			jobs.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedJobs)
 			jobs.POST("/", h.CreateJob)
-			jobs.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJob)
-			jobs.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJob)
+			jobs.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateJob,
+			)
+			jobs.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteJob,
+			)
 			jobs.GET("/cities", h.GetCities)
 			jobs.GET("/skills", h.GetJobSkills)
 			types := jobs.Group("/types")
@@ -90,9 +177,24 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			audiences.GET("/:id", h.GetAudience)
 			audiences.GET("/", h.GetAudiences)
-			audiences.POST("/", middleware.AuthMiddleware(), h.CreateAudience)
-			audiences.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAudience)
-			audiences.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAudience)
+			audiences.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.CreateAudience,
+			)
+			audiences.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateAudience,
+			)
+			audiences.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteAudience,
+			)
 		}
 		stats := v2.Group("/stats")
 		{
@@ -118,9 +220,19 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		images := v2.Group("/images/:path")
 		{
-			images.POST("", middleware.AuthMiddleware(), h.UploadImage)
+			images.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.UploadImage,
+			)
 			images.GET("/", middleware.AuthMiddleware(), h.GetImageURLs)
-			images.DELETE("/:imageName", middleware.AuthMiddleware(), h.DeleteImage)
+			images.DELETE(
+				"/:imageName", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.DeleteImage,
+			)
 		}
 		text := v2.Group("/text")
 		{
@@ -131,8 +243,18 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				content := service.Group("/:path")
 				{
 					content.GET("/", h.GetAllContentInPath)
-					content.PUT("/", middleware.AuthMiddleware(), h.UpdateContentInPath)
-					content.POST("/", middleware.AuthMiddleware(), h.CreateTextInService)
+					content.PUT(
+						"/", 
+						middleware.AuthMiddleware(), 
+						middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+						h.UpdateContentInPath,
+					)
+					content.POST(
+						"/", 
+						middleware.AuthMiddleware(), 
+						middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+						h.CreateTextInService,
+					)
 					language := content.Group("/:language")
 					{
 						language.GET("/", h.GetOneLanguage)
@@ -145,9 +267,24 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			alerts.GET("/", h.GetAllAlerts)
 			alerts.GET("/:service/:page", h.GetAlertByServiceAndPage)
 			alerts.GET("/id/:id", h.GetAlertByID)
-			alerts.POST("/", middleware.AuthMiddleware(), h.CreateAlert)
-			alerts.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAlert)
-			alerts.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAlert)
+			alerts.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.CreateAlert,
+			)
+			alerts.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.UpdateAlert,
+			)
+			alerts.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteAlert,
+			)
 		}
 		albums := v2.Group("/albums")
 		{
@@ -155,10 +292,30 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			albums.POST("/:id", middleware.AuthMiddleware(), h.UploadImagesToAlbum)
 			albums.GET("/", h.GetAlbums)
 			albums.GET("/:id", h.GetAlbum)
-			albums.PUT("/:id", middleware.AuthMiddleware(), h.UpdateAlbum)
-			albums.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteAlbum)
-			albums.DELETE("/:id/:imageName", middleware.AuthMiddleware(), h.DeleteAlbumImage)
-			albums.PUT("/:id/:imageName", middleware.AuthMiddleware(), h.SetAlbumCover)
+			albums.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateAlbum,
+			)
+			albums.DELETE(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteAlbum,
+			)
+			albums.DELETE(
+				"/:id/:imageName", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteAlbumImage,
+			)
+			albums.PUT(
+				"/:id/:imageName", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.SetAlbumCover,
+			)
 		}
 	}
 }

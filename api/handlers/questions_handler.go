@@ -32,7 +32,7 @@ func (h *Handler) PutQuestions(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, updatedQuestions)
 }
 
@@ -46,12 +46,12 @@ func (h *Handler) PutQuestions(c *gin.Context) {
 // @Router       /api/v2/questions/{id} [delete]
 func (h *Handler) DeleteQuestion(c *gin.Context) {
 	id := c.Param("id")
-	
+
 	questionId, err := h.Services.Questions.DeleteQuestion(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{"id": questionId})
 }

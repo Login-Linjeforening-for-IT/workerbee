@@ -49,13 +49,15 @@ func RateLimitMiddleware(requestsPerMinute int) gin.HandlerFunc {
 		now := time.Now()
 		cutoff := now.Add(-1 * time.Minute)
 
-		validRequests := make([]time.Time, 0)
+		writeIdx := 0
 		for _, t := range limitTracker.requests {
 			if t.After(cutoff) {
-				validRequests = append(validRequests, t)
+				limitTracker.requests[writeIdx] = t
+				writeIdx++
 			}
 		}
-		limitTracker.requests = validRequests
+
+		limitTracker.requests = limitTracker.requests[:writeIdx]
 
 		if len(limitTracker.requests) >= requestsPerMinute {
 			internal.HandleError(c, internal.ErrTooManyRequests)
@@ -70,19 +72,20 @@ func RateLimitMiddleware(requestsPerMinute int) gin.HandlerFunc {
 }
 
 func cleanupOldEntries() {
-	ticker := time.NewTicker(10 * time.Minute)
+	ticker := time.NewTicker(5 * time.Minute)
 	defer ticker.Stop()
 
 	for range ticker.C {
-		mapMutex.Lock()
 		now := time.Now()
-		cutoff := now.Add(-10 * time.Minute)
+		cutoff := now.Add(-5 * time.Minute)
 
+		usersToDelete := make([]string, 0)
+
+		mapMutex.Lock()
 		for userID, tracker := range rateLimitMap {
 			tracker.mutex.Lock()
-
 			if len(tracker.requests) == 0 {
-				delete(rateLimitMap, userID)
+				usersToDelete = append(usersToDelete, userID)
 			} else {
 				allOld := true
 				for _, t := range tracker.requests {
@@ -92,10 +95,14 @@ func cleanupOldEntries() {
 					}
 				}
 				if allOld {
-					delete(rateLimitMap, userID)
+					usersToDelete = append(usersToDelete, userID)
 				}
 			}
 			tracker.mutex.Unlock()
+		}
+
+		for _, userID := range usersToDelete {
+			delete(rateLimitMap, userID)
 		}
 		mapMutex.Unlock()
 	}

@@ -69,7 +69,7 @@ func ParseCSVToSlice[T any](s string) ([]T, error) {
 
 		var v T
 		if _, ok := any(v).(string); ok {
-			v = any(part).(T) 
+			v = any(part).(T)
 		} else {
 			_, err := fmt.Sscan(part, &v)
 			if err != nil {

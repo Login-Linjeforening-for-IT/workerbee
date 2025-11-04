@@ -69,7 +69,7 @@ func (r *questionrepositories) PutQuestions(formID string, questions []models.Qu
 func (r *questionrepositories) DeleteQuestion(id string) (int, error) {
 	var questionId int
 
-		sqlBytes, err := os.ReadFile("./db/forms/questions/delete_option.sql")
+	sqlBytes, err := os.ReadFile("./db/forms/questions/delete_option.sql")
 	if err != nil {
 		return 0, err
 	}

@@ -70,41 +70,41 @@ type EventName struct {
 }
 
 func (e Event) MarshalJSON() ([]byte, error) {
-    type Alias Event
-    
-    aux := &struct {
-        *Alias
-        Location     *Location      `json:"location"`
-        Rule         *Rule          `json:"rule"`
-        Audience     *Audience      `json:"audience"`
-        Organization *Organization  `json:"organization"`
-    }{
-        Alias: (*Alias)(&e),
-    }
-    
-    if e.Location != nil && e.Location.ID == nil {
-        aux.Location = nil
-    } else {
-        aux.Location = e.Location
-    }
-    
-    if e.Rule != nil && e.Rule.ID == nil {
-        aux.Rule = nil
-    } else {
-        aux.Rule = e.Rule
-    }
-    
-    if e.Audience != nil && e.Audience.ID == nil {
-        aux.Audience = nil
-    } else {
-        aux.Audience = e.Audience
-    }
-    
-    if e.Organization != nil && e.Organization.ID == nil {
-        aux.Organization = nil
-    } else {
-        aux.Organization = e.Organization
-    }
-    
-    return json.Marshal(aux)
+	type Alias Event
+
+	aux := &struct {
+		*Alias
+		Location     *Location     `json:"location"`
+		Rule         *Rule         `json:"rule"`
+		Audience     *Audience     `json:"audience"`
+		Organization *Organization `json:"organization"`
+	}{
+		Alias: (*Alias)(&e),
+	}
+
+	if e.Location != nil && e.Location.ID == nil {
+		aux.Location = nil
+	} else {
+		aux.Location = e.Location
+	}
+
+	if e.Rule != nil && e.Rule.ID == nil {
+		aux.Rule = nil
+	} else {
+		aux.Rule = e.Rule
+	}
+
+	if e.Audience != nil && e.Audience.ID == nil {
+		aux.Audience = nil
+	} else {
+		aux.Audience = e.Audience
+	}
+
+	if e.Organization != nil && e.Organization.ID == nil {
+		aux.Organization = nil
+	} else {
+		aux.Organization = e.Organization
+	}
+
+	return json.Marshal(aux)
 }

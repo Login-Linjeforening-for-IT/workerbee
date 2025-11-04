@@ -46,7 +46,7 @@ func (a AlbumWithImages) MarshalJSON() ([]byte, error) {
 	aux := &struct {
 		*Alias
 		Event *EventAlbum `json:"event"`
-	} {
+	}{
 		Alias: (*Alias)(&a),
 	}
 

@@ -5,19 +5,18 @@ import (
 )
 
 type Submission struct {
-	ID          int         `db:"id" json:"id"`
-	SubmittedAt time.Time   `db:"submitted_at" json:"submitted_at"`
-	UpdatedAt   time.Time   `db:"updated_at" json:"updated_at"`
-	User        *User       `db:"user" json:"user"`
+	ID          int                  `db:"id" json:"id"`
+	SubmittedAt time.Time            `db:"submitted_at" json:"submitted_at"`
+	UpdatedAt   time.Time            `db:"updated_at" json:"updated_at"`
+	User        *User                `db:"user" json:"user"`
 	Questions   []QuestionWithAnswer `db:"questions" json:"questions"`
 }
 
 type Answer struct {
-	ID             int              `db:"id" json:"id"`
-	AnswerText     *string          `db:"answer_text" json:"answer_text"`
-	SelectedOptions []int           `db:"selected_options" json:"selected_options"`
+	ID              int     `db:"id" json:"id"`
+	AnswerText      *string `db:"answer_text" json:"answer_text"`
+	SelectedOptions []int   `db:"selected_options" json:"selected_options"`
 }
-
 
 type QuestionWithAnswer struct {
 	ID                  int              `db:"id" json:"id"`

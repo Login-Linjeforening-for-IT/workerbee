@@ -445,7 +445,6 @@ func (r *jobsrepositories) GetOneJobType(id string) (models.JobType, error) {
 	)
 }
 
-
 func (r *jobsrepositories) CreateJobType(jobType models.JobType) (models.JobType, error) {
 	return db.AddOneRow(
 		r.db,

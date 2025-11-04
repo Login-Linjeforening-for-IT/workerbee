@@ -16,19 +16,19 @@ import (
 // @Failure      500  {object}  error
 // @Router       /api/v2/forms/submissions/{id} [get]
 func (h *Handler) GetSubmission(c *gin.Context) {
-       formID := c.Param("id")
-       submissionID := c.Param("submission_id")
-	   
-       submission, err := h.Services.Submissions.GetSubmission(formID, submissionID)
-       if err != nil {
-	       c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	       return
-       }
-       
-	   if submission == nil {
-	       c.JSON(http.StatusNotFound, gin.H{"error": "Submission not found"})
-	       return
-       }
-       
-	   c.JSON(http.StatusOK, submission)
+	formID := c.Param("id")
+	submissionID := c.Param("submission_id")
+
+	submission, err := h.Services.Submissions.GetSubmission(formID, submissionID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if submission == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Submission not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, submission)
 }

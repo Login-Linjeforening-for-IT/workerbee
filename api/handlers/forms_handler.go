@@ -23,12 +23,12 @@ func (h *Handler) GetForm(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	if form == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Form not found"})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, form)
 }
 

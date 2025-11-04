@@ -1,11 +1,11 @@
 package db
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
 	"workerbee/internal"
-	"database/sql"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"

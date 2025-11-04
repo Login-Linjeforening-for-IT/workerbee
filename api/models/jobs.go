@@ -77,4 +77,3 @@ type JobWithTotalCount struct {
 	Job
 	TotalCount int `db:"total_count"`
 }
-

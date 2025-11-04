@@ -35,7 +35,6 @@ func (h *Handler) GetLocations(c *gin.Context) {
 	sort := c.DefaultQuery("sort", "asc")
 	orderBy := c.DefaultQuery("order_by", "id")
 
-
 	locs, err := h.Services.Locations.GetLocations(search, limit, offset, orderBy, sort, types)
 	if internal.HandleError(c, err) {
 		return
@@ -43,13 +42,13 @@ func (h *Handler) GetLocations(c *gin.Context) {
 
 	if len(locs) == 0 {
 		c.JSON(http.StatusOK, gin.H{
-			"locations": locs,
-			"total_count":     0,
+			"locations":   locs,
+			"total_count": 0,
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"locations": locs,
-			"total_count":     locs[0].TotalCount,
+			"locations":   locs,
+			"total_count": locs[0].TotalCount,
 		})
 	}
 }

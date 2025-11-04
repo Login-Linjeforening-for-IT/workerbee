@@ -7,13 +7,14 @@ import (
 )
 
 var (
-	Port                 string
-	Host                 string
-	DB_url               string
-	DO_URL               string
-	DO_access_key_id     string
-	DO_secret_access_key string
-	StartTime            time.Time
+	Port                     string
+	Host                     string
+	DB_url                   string
+	DO_URL                   string
+	DO_access_key_id         string
+	DO_secret_access_key     string
+	StartTime                time.Time
+	AllowedRequestsPerMinute int
 )
 
 func GetEnv(key, fallback string) string {
@@ -38,4 +39,9 @@ func Init() {
 	DO_access_key_id = GetEnv("DO_ACCESS_KEY_ID", "")
 	DO_secret_access_key = GetEnv("DO_SECRET_ACCESS_KEY", "")
 	StartTime = time.Now()
+	RateLimitRoofStr := GetEnv("ALLOWED_PROTECTED_REQUESTS", "25")
+	_, err := fmt.Sscanf(RateLimitRoofStr, "%d", &AllowedRequestsPerMinute)
+	if err != nil || AllowedRequestsPerMinute <= 0 {
+		AllowedRequestsPerMinute = 25
+	}
 }
