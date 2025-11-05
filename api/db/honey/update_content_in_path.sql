@@ -1,7 +1,8 @@
 UPDATE honey
 SET 
-    text = $1
-WHERE 
-    service = $2
-    AND page = $3
-    AND language = $4;
+    text = :text,
+    service = :service,
+    language = :language,
+    page = :page
+WHERE id = :id
+RETURNING *;

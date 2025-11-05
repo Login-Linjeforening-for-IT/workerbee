@@ -2,7 +2,7 @@ package services
 
 import (
 	"encoding/json"
-	"slices"
+	"strconv"
 	"strings"
 	"workerbee/internal"
 	"workerbee/models"
@@ -22,30 +22,10 @@ func NewHoneyService(repo repositories.HoneyRepository) *HoneyService {
 	return &HoneyService{repo: repo}
 }
 
-func (s *HoneyService) CreateTextInService(
-	service, path, language string,
-	content map[string]map[string]string,
-) (map[string]any, error) {
-	if !strings.HasPrefix(path, "/") {
-		path = "/" + path
-	}
-
-	if len(content) < 1 {
-		return nil, internal.ErrInvalid
-	}
-
-	for lang := range content {
-		if !slices.Contains(validLanguages, lang) {
-			return nil, internal.ErrInvalid
-		}
-	}
-
-	err := validateHoneyContent(content)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.repo.CreateTextInService(service, path, language, content)
+func (s *HoneyService) CreateHoney(
+	content models.CreateHoney,
+) (models.CreateHoney, error) {
+	return s.repo.CreateTextInService(content)
 }
 
 func (s *HoneyService) GetTextServices() ([]string, error) {
@@ -78,27 +58,15 @@ func (s *HoneyService) GetAllContentInPath(service, path string) (map[string]map
 	return result, nil
 }
 
-func (s *HoneyService) UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error) {
-	if !strings.HasPrefix(path, "/") {
-		path = "/" + path
-	}
-
-	if len(content) != 2 {
-		return nil, internal.ErrInvalid
-	}
-
-	for lang := range content {
-		if !slices.Contains(validLanguages, lang) {
-			return nil, internal.ErrInvalid
-		}
-	}
-
-	err := validateHoneyContent(content)
+func (s *HoneyService) UpdateContentInPath(id_str string, content models.CreateHoney) (models.CreateHoney, error) {
+	id, err := strconv.Atoi(id_str)
 	if err != nil {
-		return nil, err
+		return models.CreateHoney{}, internal.ErrInvalid
 	}
 
-	return s.repo.UpdateContentInPath(service, path, content)
+	content.ID = id
+
+	return s.repo.UpdateContentInPath(content)
 }
 
 func (s *HoneyService) GetOneLanguage(service, path, language string) (models.LanguageContentResponse, error) {
@@ -130,27 +98,4 @@ func (s *HoneyService) GetOneLanguage(service, path, language string) (models.La
 
 func (s *HoneyService) DeleteHoney(id string) (int, error) {
 	return s.repo.DeleteHoney(id)
-}
-
-func validateHoneyContent(content map[string]map[string]string) error {
-	enFields := make(map[string]bool)
-	noFields := make(map[string]bool)
-
-	for field := range content["en"] {
-		enFields[field] = true
-	}
-	for field := range content["no"] {
-		noFields[field] = true
-	}
-
-	if len(enFields) != len(noFields) {
-		return internal.ErrInvalid
-	}
-
-	for field := range enFields {
-		if !noFields[field] {
-			return internal.ErrInvalid
-		}
-	}
-	return nil
 }

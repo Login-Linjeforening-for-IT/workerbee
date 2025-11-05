@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"workerbee/internal"
+	"workerbee/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,21 +22,17 @@ import (
 // @Failure      400        {object}  error
 // @Failure      500        {object}  error
 // @Router       /api/v2/honey/{service}/content/{path}/{language} [post]
-func (h *Handler) CreateTextInService(c *gin.Context) {
-	service := c.Param("service")
-	path := c.Param("path")
-	language := c.Param("language")
-
-	if len(path) > 0 && path[0] == '/' {
-		path = path[1:]
-	}
-
-	var content map[string]map[string]string
+func (h *Handler) CreateHoney(c *gin.Context) {
+	var content models.CreateHoney
 	if err := c.ShouldBindJSON(&content); internal.HandleError(c, err) {
 		return
 	}
 
-	response, err := h.Services.Honey.CreateTextInService(service, path, language, content)
+	if internal.HandleValidationError(c, content, *h.Services.Validate) {
+		return	
+	}
+
+	response, err := h.Services.Honey.CreateHoney(content)
 	if internal.HandleError(c, err) {
 		return
 	}
@@ -157,20 +154,19 @@ func (h *Handler) GetOneLanguage(c *gin.Context) {
 // @Failure      400        {object}  error
 // @Failure      500        {object}  error
 // @Router       /api/v2/honey/{service}/content/{path} [put]
-func (h *Handler) UpdateContentInPath(c *gin.Context) {
-	service := c.Param("service")
-	path := c.Param("path")
+func (h *Handler) UpdateHoney(c *gin.Context) {
+	id := c.Param("id")
 
-	if len(path) > 0 && path[0] == '/' {
-		path = path[1:]
-	}
-
-	var content map[string]map[string]string
+	var content models.CreateHoney
 	if err := c.ShouldBindJSON(&content); internal.HandleError(c, err) {
 		return
 	}
 
-	resp, err := h.Services.Honey.UpdateContentInPath(service, path, content)
+	if internal.HandleValidationError(c, content, *h.Services.Validate) {
+		return	
+	}
+
+	resp, err := h.Services.Honey.UpdateContentInPath(id, content)
 	if internal.HandleError(c, err) {
 		return
 	}

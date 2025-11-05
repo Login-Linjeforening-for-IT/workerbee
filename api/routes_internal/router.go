@@ -230,7 +230,23 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		honey := v2.Group("/honey")
 		{
-			honey.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteHoney)
+			honey.POST(
+				"/", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				h.CreateHoney,
+			)
+			honey.PUT(
+				"/:id", 
+				middleware.AuthMiddleware(), 
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateHoney,
+			)
+			honey.DELETE("/:id", 
+			middleware.AuthMiddleware(), 
+			middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+			h.DeleteHoney)
+
 		}
 		text := v2.Group("/text")
 		{
@@ -240,19 +256,6 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				service.GET("/", h.GetAllPathsInService)
 				content := service.Group("/:path")
 				{
-					content.GET("/", h.GetAllContentInPath)
-					content.PUT(
-						"/", 
-						middleware.AuthMiddleware(), 
-						middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
-						h.UpdateContentInPath,
-					)
-					content.POST(
-						"/", 
-						middleware.AuthMiddleware(), 
-						middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
-						h.CreateTextInService,
-					)
 					content.GET("/:language", h.GetOneLanguage)
 				}
 			}

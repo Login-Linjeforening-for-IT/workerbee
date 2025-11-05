@@ -16,11 +16,12 @@ type HoneyContent struct {
 	Text     string `db:"text"`
 }
 
-type LanguageContent struct {
-	Service  string `db:"service" json:"service"`
-	Page     string `db:"page" json:"page"`
-	Language string `db:"language" json:"language"`
-	Text     string `db:"text" json:"text"`
+type CreateHoney struct {
+	ID       int    `db:"id" json:"id"`
+	Service  string `db:"service" json:"service" validate:"required"`
+	Page     string `db:"page" json:"page" validate:"required"`
+	Language string `db:"language" json:"language" validate:"required,oneof=en no"`
+	Text     string `db:"text" json:"text" validate:"required"`
 }
 
 type LanguageContentResponse struct {

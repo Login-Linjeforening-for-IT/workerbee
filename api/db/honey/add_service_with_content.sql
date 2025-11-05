@@ -4,8 +4,9 @@ INSERT INTO honey (
     page,
     text
 ) VALUES (
-    $1,
-    $2,
-    $3,
-    $4
-);
+    :service,
+    :language,
+    :page,
+    :text
+)
+RETURNING *;

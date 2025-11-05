@@ -1,24 +1,20 @@
 package repositories
 
 import (
-	"encoding/json"
-	"errors"
 	"os"
 	"workerbee/db"
-	"workerbee/internal"
 	"workerbee/models"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 )
 
 type HoneyRepository interface {
-	CreateTextInService(service, path, language string, content map[string]map[string]string) (map[string]any, error)
+	CreateTextInService(content models.CreateHoney) (models.CreateHoney, error)
 	GetTextServices() ([]string, error)
 	GetAllPathsInService(service string) ([]models.PathLanguagesWithCount, error)
 	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
-	GetOneLanguage(service, path, language string) (models.LanguageContent, error)
-	UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error)
+	GetOneLanguage(service, path, language string) (models.CreateHoney, error)
+	UpdateContentInPath(content models.CreateHoney) (models.CreateHoney, error)
 	DeleteHoney(id string) (int, error)
 }
 
@@ -31,52 +27,13 @@ func NewHoneyRepository(db *sqlx.DB) HoneyRepository {
 }
 
 func (r *honeyRepository) CreateTextInService(
-	service, path, language string,
-	content map[string]map[string]string,
-) (map[string]any, error) {
-	var pqErr *pq.Error
-	sqlBytes, err := os.ReadFile("./db/honey/add_service_with_content.sql")
-	if err != nil {
-		return nil, err
-	}
-
-	tx, err := r.db.Beginx()
-	if err != nil {
-		return nil, err
-	}
-
-	defer tx.Rollback()
-
-	var languages []string
-
-	for language, fields := range content {
-		contentJSON, err := json.Marshal(fields)
-		if err != nil {
-			return nil, err
-		}
-
-		_, err = tx.Exec(string(sqlBytes), service, language, path, string(contentJSON))
-		if err != nil {
-			if errors.As(err, &pqErr) && pqErr.Code == "23505" {
-				return nil, internal.ErrConflict
-			}
-			return nil, err
-		}
-
-		languages = append(languages, language)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
-	resp := make(map[string]any)
-	resp["status"] = "success"
-	resp["service"] = service
-	resp["path"] = path
-	resp["created"] = languages
-
-	return resp, nil
+	content models.CreateHoney,
+) (models.CreateHoney, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/honey/add_service_with_content.sql",
+		content,
+	)
 }
 
 func (r *honeyRepository) GetTextServices() ([]string, error) {
@@ -118,58 +75,28 @@ func (r *honeyRepository) GetAllContentInPath(service, path string) ([]models.Ho
 	return result, nil
 }
 
-func (r *honeyRepository) GetOneLanguage(service, path, language string) (models.LanguageContent, error) {
-	result, err := db.ExecuteOneRow[models.LanguageContent](
+func (r *honeyRepository) GetOneLanguage(service, path, language string) (models.CreateHoney, error) {
+	result, err := db.ExecuteOneRow[models.CreateHoney](
 		r.db,
 		"./db/honey/get_info_for_one_language.sql",
 		service, path, language,
 	)
 	if err != nil {
-		return models.LanguageContent{}, err
+		return models.CreateHoney{}, err
 	}
 	return result, nil
 }
 
-func (r *honeyRepository) UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error) {
-	sqlBytes, err := os.ReadFile("./db/honey/update_content_in_path.sql")
+func (r *honeyRepository) UpdateContentInPath(content models.CreateHoney) (models.CreateHoney, error) {
+	updatedContent, err := db.AddOneRow(
+		r.db,
+		"./db/honey/update_content_in_path.sql",
+		content,
+	)
 	if err != nil {
-		return nil, err
+		return models.CreateHoney{}, err
 	}
-
-	tx, err := r.db.Beginx()
-	if err != nil {
-		return nil, err
-	}
-
-	defer tx.Rollback()
-
-	var languages []string
-
-	for language, fields := range content {
-		contentJSON, err := json.Marshal(fields)
-		if err != nil {
-			return nil, err
-		}
-
-		_, err = tx.Exec(string(sqlBytes), string(contentJSON), service, path, language)
-		if err != nil {
-			return nil, err
-		}
-
-		languages = append(languages, language)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
-	resp := make(map[string]any)
-	resp["status"] = "success"
-	resp["service"] = service
-	resp["path"] = path
-	resp["updated"] = languages
-
-	return resp, nil
+	return updatedContent, nil
 }
 
 func (r *honeyRepository) DeleteHoney(id string) (int, error) {
