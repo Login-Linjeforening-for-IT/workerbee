@@ -311,5 +311,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				h.SetAlbumCover,
 			)
 		}
+		calendar := v2.Group("/calendar")
+		{
+			calendar.GET("/", h.GetCalendar)
+		}
 	}
 }

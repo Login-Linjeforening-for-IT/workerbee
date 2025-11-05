@@ -3,16 +3,16 @@ module workerbee
 go 1.24.7
 
 require (
+	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.10.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
+	golang.org/x/sync v0.17.0
 )
 
 require (
-	github.com/disintegration/imaging v1.6.2 // indirect
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
 	golang.org/x/mod v0.28.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
 )
 
 require (
@@ -43,6 +43,7 @@ require (
 
 require (
 	github.com/MarceloPetrucio/go-scalar-api-reference v0.0.0-20240521013641-ce5d2efe0e06
+	github.com/arran4/golang-ical v0.3.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.5
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect

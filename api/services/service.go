@@ -23,6 +23,7 @@ type Services struct {
 	Honey         *HoneyService
 	Alerts        *AlertService
 	Albums        *AlbumService
+	Calendar      *CalendarService
 }
 
 func NewServices(repos *repositories.Repositories) *Services {
@@ -42,6 +43,7 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Honey:         NewHoneyService(repos.Honey),
 		Alerts:        NewAlertService(repos.Alerts),
 		Albums:        NewAlbumService(repos.Albums),
+		Calendar:      NewCalendarService(repos.Calendar),
 		Validate:      validator.New(),
 	}
 }
