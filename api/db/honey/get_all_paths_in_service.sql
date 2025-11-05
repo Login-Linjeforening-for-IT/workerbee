@@ -1,7 +1,9 @@
 SELECT 
+    h.id,
     h.page,
-    array_agg(h.language ORDER BY h.language) AS languages
+    h.language,
+    COUNT(*) OVER() AS total_count
 FROM honey h
 WHERE h.service = $1
-GROUP BY h.page
+GROUP BY h.id
 ORDER BY h.page;

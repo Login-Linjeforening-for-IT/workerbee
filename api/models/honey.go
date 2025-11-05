@@ -1,10 +1,14 @@
 package models
 
-import "github.com/lib/pq"
-
 type PathLanguages struct {
-	Page      string         `db:"page"`
-	Languages pq.StringArray `db:"languages"`
+	ID        int    `db:"id" json:"id"`
+	Page      string `db:"page" json:"page"`
+	Languages string `db:"language" json:"language"`
+}
+
+type PathLanguagesWithCount struct {
+	PathLanguages
+	TotalCount int `db:"total_count" json:"total_count"`
 }
 
 type HoneyContent struct {

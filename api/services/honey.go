@@ -52,17 +52,8 @@ func (s *HoneyService) GetTextServices() ([]string, error) {
 	return s.repo.GetTextServices()
 }
 
-func (s *HoneyService) GetAllPathsInService(service string) (map[string][]string, error) {
-	rows, err := s.repo.GetAllPathsInService(service)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make(map[string][]string)
-	for _, row := range rows {
-		result[row.Page] = row.Languages
-	}
-	return result, nil
+func (s *HoneyService) GetAllPathsInService(service string) ([]models.PathLanguagesWithCount, error) {
+	return s.repo.GetAllPathsInService(service)
 }
 
 func (s *HoneyService) GetAllContentInPath(service, path string) (map[string]map[string]string, error) {
@@ -135,6 +126,10 @@ func (s *HoneyService) GetOneLanguage(service, path, language string) (models.La
 		Language: row.Language,
 		Text:     formattedText,
 	}, nil
+}
+
+func (s *HoneyService) DeleteHoney(id string) (int, error) {
+	return s.repo.DeleteHoney(id)
 }
 
 func validateHoneyContent(content map[string]map[string]string) error {

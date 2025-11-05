@@ -77,7 +77,17 @@ func (h *Handler) GetAllPathsInService(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, paths)
+	if len(paths) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"honeys":      paths,
+			"total_count": 0,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"honeys":      paths,
+			"total_count": paths[0].TotalCount,
+		})
+	}
 }
 
 // GetAllContentInPath godoc
@@ -166,4 +176,17 @@ func (h *Handler) UpdateContentInPath(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
+}
+
+func (h *Handler) DeleteHoney(c *gin.Context) {
+	id := c.Param("id")
+
+	honeyID, err := h.Services.Honey.DeleteHoney(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id": honeyID,
+	})
 }

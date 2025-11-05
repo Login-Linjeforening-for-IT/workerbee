@@ -1,0 +1,2 @@
+DELETE FROM honey WHERE id = $1
+RETURNING id;

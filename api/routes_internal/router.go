@@ -228,6 +228,10 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				h.DeleteImage,
 			)
 		}
+		honey := v2.Group("/honey")
+		{
+			honey.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteHoney)
+		}
 		text := v2.Group("/text")
 		{
 			text.GET("/", h.GetTextServices)
@@ -249,12 +253,10 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 						middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
 						h.CreateTextInService,
 					)
-					language := content.Group("/:language")
-					{
-						language.GET("/", h.GetOneLanguage)
-					}
+					content.GET("/:language", h.GetOneLanguage)
 				}
 			}
+
 		}
 		alerts := v2.Group("/alerts")
 		{

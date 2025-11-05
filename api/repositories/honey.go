@@ -15,10 +15,11 @@ import (
 type HoneyRepository interface {
 	CreateTextInService(service, path, language string, content map[string]map[string]string) (map[string]any, error)
 	GetTextServices() ([]string, error)
-	GetAllPathsInService(service string) ([]models.PathLanguages, error)
+	GetAllPathsInService(service string) ([]models.PathLanguagesWithCount, error)
 	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
 	GetOneLanguage(service, path, language string) (models.LanguageContent, error)
 	UpdateContentInPath(service, path string, content map[string]map[string]string) (map[string]any, error)
+	DeleteHoney(id string) (int, error)
 }
 
 type honeyRepository struct {
@@ -89,13 +90,13 @@ func (r *honeyRepository) GetTextServices() ([]string, error) {
 	return response, nil
 }
 
-func (r *honeyRepository) GetAllPathsInService(service string) ([]models.PathLanguages, error) {
+func (r *honeyRepository) GetAllPathsInService(service string) ([]models.PathLanguagesWithCount, error) {
 	sqlBytes, err := os.ReadFile("./db/honey/get_all_paths_in_service.sql")
 	if err != nil {
 		return nil, err
 	}
 
-	var result []models.PathLanguages
+	var result []models.PathLanguagesWithCount
 	err = r.db.Select(&result, string(sqlBytes), service)
 	if err != nil {
 		return nil, err
@@ -169,4 +170,16 @@ func (r *honeyRepository) UpdateContentInPath(service, path string, content map[
 	resp["updated"] = languages
 
 	return resp, nil
+}
+
+func (r *honeyRepository) DeleteHoney(id string) (int, error) {
+	honeyID, err := db.ExecuteOneRow[int](
+		r.db,
+		"./db/honey/delete_honey.sql",
+		id,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return honeyID, nil
 }
