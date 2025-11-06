@@ -96,6 +96,15 @@ func (s *HoneyService) GetOneLanguage(service, path, language string) (models.La
 	}, nil
 }
 
+func (s *HoneyService) GetHoney(id_str string) (models.CreateHoney, error) {
+	id, err := strconv.Atoi(id_str)
+	if err != nil {
+		return models.CreateHoney{}, internal.ErrInvalid
+	}
+
+	return s.repo.GetHoney(id)
+}
+
 func (s *HoneyService) DeleteHoney(id string) (int, error) {
 	return s.repo.DeleteHoney(id)
 }

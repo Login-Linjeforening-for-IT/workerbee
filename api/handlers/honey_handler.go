@@ -141,6 +141,26 @@ func (h *Handler) GetOneLanguage(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetHoney godoc
+// @Summary      Get honey by ID
+// @Description  Retrieves a honey entry by its ID
+// @Tags         honey
+// @Produce      json
+// @Param        id   path      int  true  "Honey ID"
+// @Success      200  {object}  models.CreateHoney
+// @Failure      400  {object}  error
+// @Router       /api/v2/honey/{id} [get]
+func (h *Handler) GetHoney(c *gin.Context) {
+	id := c.Param("id")
+
+	honey, err := h.Services.Honey.GetHoney(id)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, honey)
+}
+
 // UpdateContentInPath godoc
 // @Summary      Update content in a specified path
 // @Description  Updates text content in the specified path of a text service.

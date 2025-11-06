@@ -14,6 +14,7 @@ type HoneyRepository interface {
 	GetAllPathsInService(service string) ([]models.PathLanguagesWithCount, error)
 	GetAllContentInPath(service, path string) ([]models.HoneyContent, error)
 	GetOneLanguage(service, path, language string) (models.CreateHoney, error)
+	GetHoney(id int) (models.CreateHoney, error)
 	UpdateContentInPath(content models.CreateHoney) (models.CreateHoney, error)
 	DeleteHoney(id string) (int, error)
 }
@@ -80,6 +81,18 @@ func (r *honeyRepository) GetOneLanguage(service, path, language string) (models
 		r.db,
 		"./db/honey/get_info_for_one_language.sql",
 		service, path, language,
+	)
+	if err != nil {
+		return models.CreateHoney{}, err
+	}
+	return result, nil
+}
+
+func (r *honeyRepository) GetHoney(id int) (models.CreateHoney, error) {
+	result, err := db.ExecuteOneRow[models.CreateHoney](
+		r.db,
+		"./db/honey/get_one_honey.sql",
+		id,
 	)
 	if err != nil {
 		return models.CreateHoney{}, err
