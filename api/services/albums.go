@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"log"
 	"mime/multipart"
 	"strconv"
 	"time"
@@ -45,7 +44,14 @@ func (as *AlbumService) CreateAlbum(ctx context.Context, body models.CreateAlbum
 }
 
 func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
-	return as.repo.UploadImagesToAlbum(ctx, id, files)
+	err := as.repo.UploadImagesToAlbum(ctx, id, files)
+	if err != nil {
+		return err
+	}
+
+	as.cache.DeletePattern(ctx, "albums:*")
+
+	return nil
 }
 
 func (as *AlbumService) GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error) {
@@ -79,10 +85,21 @@ func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str,
 	}
 
 	cacheKey := internal.AlbumsKey(orderBySanitized, sortSanitized, search, limit, offset)
+	var albums []models.AlbumsWithTotalCount
 
-	log.Println(cacheKey)
+	err = as.cache.GetJSON(ctx, cacheKey, &albums)
+	if err == nil {
+		return albums, nil
+	}
 
-	return as.repo.GetAlbums(ctx, orderBySanitized, sortSanitized, search, limit, offset)
+	albums, err = as.repo.GetAlbums(ctx, orderBySanitized, sortSanitized, search, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	as.cache.Set(ctx, cacheKey, albums, 5*time.Minute)
+
+	return albums, nil
 }
 
 func (as *AlbumService) UpdateAlbum(ctx context.Context, id string, body models.CreateAlbum) (models.CreateAlbum, error) {
@@ -92,18 +109,46 @@ func (as *AlbumService) UpdateAlbum(ctx context.Context, id string, body models.
 	}
 
 	body.ID = idInt
-	return as.repo.UpdateAlbum(ctx, body)
+	album, err := as.repo.UpdateAlbum(ctx, body)
+	if err != nil {
+		return models.CreateAlbum{}, err
+	}
+
+	as.cache.DeletePattern(ctx, "albums:*")
+
+	return album, nil
 }
 
 func (as *AlbumService) DeleteAlbum(ctx context.Context, id string) (int, error) {
-	return as.repo.DeleteAlbum(ctx, id)
+	respID, err := as.repo.DeleteAlbum(ctx, id)
+	if err != nil {
+		return 0, err
+	}
+
+	as.cache.DeletePattern(ctx, "albums:*")
+
+	return respID, nil
 }
 
 func (as *AlbumService) DeleteAlbumImage(ctx context.Context, id string, imageName string) error {
 	path := internal.ALBUM_PATH + id + "/" + imageName
-	return as.repo.DeleteAlbumImage(ctx, path, id)
+	err := as.repo.DeleteAlbumImage(ctx, path, id)
+	if err != nil {
+		return err
+	}
+
+	as.cache.DeletePattern(ctx, "albums:*")
+
+	return nil
 }
 
 func (as *AlbumService) SetAlbumCover(ctx context.Context, id string, imageName string) error {
-	return as.repo.SetAlbumCover(ctx, id, imageName)
+	err := as.repo.SetAlbumCover(ctx, id, imageName)
+	if err != nil {
+		return err
+	}
+
+	as.cache.DeletePattern(ctx, "albums:*")
+
+	return nil
 }

@@ -49,12 +49,12 @@ func (h *Handler) RootHandler(c *gin.Context) {
     // Render tree
     var output strings.Builder
     output.WriteString(".\n")
-    renderTree(root, "", true, &output)
+    renderTree(root, "", &output)
 
     c.String(http.StatusOK, output.String())
 }
 
-func renderTree(node *TreeNode, prefix string, isLast bool, output *strings.Builder) {
+func renderTree(node *TreeNode, prefix string, output *strings.Builder) {
     // Get sorted children
     keys := make([]string, 0, len(node.children))
     for k := range node.children {
@@ -90,7 +90,7 @@ func renderTree(node *TreeNode, prefix string, isLast bool, output *strings.Buil
             } else {
                 newPrefix = prefix + "│   "
             }
-            renderTree(child, newPrefix, false, output)
+            renderTree(child, newPrefix, output)
         }
     }
 }
