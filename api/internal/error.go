@@ -29,6 +29,7 @@ var (
 	ErrInvalidLocationType    = errors.New("invalid location type does not exist in enum")
 	ErrInvalidJobType         = errors.New("invalid job type does not exist in enum")
 	ErrTooManyRequests        = errors.New("too many requests")
+	ErrCacheUnavailable       = errors.New("cache unavailable")
 	ErrS3ClientNotInitialized = errors.New("s3 client not initialized")
 	ErrorMap                  = map[error]struct {
 		Status  int

@@ -7,6 +7,8 @@ services:
     depends_on:
       postgres: 
         condition: service_healthy
+      redis:
+        condition: service_healthy
     env_file:
       - .env
   
@@ -25,7 +27,12 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 10s
-
-
+  redis:
+    image: redis:latest
+    container_name: workerbee-redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
 volumes:
   postgres_data:

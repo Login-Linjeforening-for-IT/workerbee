@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"log"
 	"mime/multipart"
 	"strconv"
+	"time"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -19,17 +21,27 @@ var allowedSortColumnsAlbums = map[string]string{
 }
 
 type AlbumService struct {
-	repo repositories.AlbumsRepository
+	repo  repositories.AlbumsRepository
+	cache *CacheService
 }
 
-func NewAlbumService(repo repositories.AlbumsRepository) *AlbumService {
+func NewAlbumService(repo repositories.AlbumsRepository, cache *CacheService) *AlbumService {
 	return &AlbumService{
-		repo: repo,
+		repo:  repo,
+		cache: cache,
 	}
 }
 
 func (as *AlbumService) CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error) {
-	return as.repo.CreateAlbum(ctx, body)
+	album, err := as.repo.CreateAlbum(ctx, body)
+	if err != nil {
+		return models.CreateAlbum{}, err
+	}
+
+	pattern := "albums:*"
+	as.cache.DeletePattern(ctx, pattern)
+
+	return album, nil
 }
 
 func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
@@ -37,7 +49,22 @@ func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, file
 }
 
 func (as *AlbumService) GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error) {
-	return as.repo.GetAlbum(ctx, id)
+	var album models.AlbumWithImages
+
+	cacheKey := internal.AlbumKey(id)
+
+	err := as.cache.GetJSON(ctx, cacheKey, &album)
+	if err == nil {
+		return album, nil
+	}
+
+	album, err = as.repo.GetAlbum(ctx, id)
+	if err != nil {
+		return models.AlbumWithImages{}, err
+	}
+
+	as.cache.Set(ctx, cacheKey, album, 5*time.Minute)
+	return album, nil
 }
 
 func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str, offset_str, search string) ([]models.AlbumsWithTotalCount, error) {
@@ -50,6 +77,10 @@ func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str,
 	if err != nil {
 		return nil, internal.ErrInvalid
 	}
+
+	cacheKey := internal.AlbumsKey(orderBySanitized, sortSanitized, search, limit, offset)
+
+	log.Println(cacheKey)
 
 	return as.repo.GetAlbums(ctx, orderBySanitized, sortSanitized, search, limit, offset)
 }

@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -14,6 +15,9 @@ var (
 	DO_access_key_id         string
 	DO_secret_access_key     string
 	StartTime                time.Time
+	RedisAddr                string
+	RedisPassword            string
+	RedisDB                  int
 	AllowedRequestsPerMinute int
 )
 
@@ -24,7 +28,17 @@ func GetEnv(key, fallback string) string {
 	return fallback
 }
 
+func GetEnvAsInt(name string, defaultVal int) int {
+	if valueStr, exists := os.LookupEnv(name); exists {
+		if value, err := strconv.Atoi(valueStr); err == nil {
+			return value
+		}
+	}
+	return defaultVal
+}
+
 func Init() {
+	var err error
 	Port = GetEnv("PORT", "8080")
 	Host = GetEnv("HOST", "0.0.0.0")
 
@@ -38,9 +52,13 @@ func Init() {
 	DO_URL = GetEnv("DO_URL", "")
 	DO_access_key_id = GetEnv("DO_ACCESS_KEY_ID", "")
 	DO_secret_access_key = GetEnv("DO_SECRET_ACCESS_KEY", "")
+	RedisAddr = GetEnv("REDIS_ADDR", "localhost:6379")
+	RedisPassword = GetEnv("REDIS_PASSWORD", "")
+	RedisDB = GetEnvAsInt("REDIS_DB", 0)
+
 	StartTime = time.Now()
 	RateLimitRoofStr := GetEnv("ALLOWED_PROTECTED_REQUESTS", "25")
-	_, err := fmt.Sscanf(RateLimitRoofStr, "%d", &AllowedRequestsPerMinute)
+	_, err = fmt.Sscanf(RateLimitRoofStr, "%d", &AllowedRequestsPerMinute)
 	if err != nil || AllowedRequestsPerMinute <= 0 {
 		AllowedRequestsPerMinute = 25
 	}

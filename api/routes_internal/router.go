@@ -10,8 +10,11 @@ import (
 )
 
 func Route(c *gin.Engine, h *handlers.Handler) {
+	c.GET("/", h.RootHandler)
+	c.GET("/api", h.RootHandler)
 	v2 := c.Group(internal.BASE_PATH)
 	{
+		v2.GET("/", h.RootHandler)
 		v2.GET("/ping", handlers.PingHandler)
 		v2.GET("/docs", handlers.GetDocs)
 		v2.GET("/status", handlers.GetStatus)
@@ -23,21 +26,21 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedEvents)
 			events.GET("/", h.GetEvents)
 			events.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateEvent,
 			)
 			events.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/:id",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateEvent,
 			)
 			events.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/:id",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteEvent,
 			)
 			events.GET("/categories", h.GetEventCategories)
@@ -50,21 +53,21 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			rules.GET("/all", h.GetRuleNames)
 			rules.GET("/", h.GetRules)
 			rules.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateRule,
 			)
 			rules.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/:id",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateRule,
 			)
 			rules.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/:id",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteRule,
 			)
 		}
@@ -73,20 +76,20 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			categories.GET("/:id", h.GetCategory)
 			categories.GET("/", h.GetCategories)
 			categories.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
+				"/",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateCategory,
 			)
 			categories.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateCategory,
 			)
 			categories.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteCategory,
 			)
@@ -98,14 +101,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			locations.GET("/", h.GetLocations)
 			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
 			locations.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateLocation,
 			)
 			locations.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteLocation,
 			)
@@ -117,20 +120,20 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			organizations.GET("/all", h.GetOrganizationNames)
 			organizations.GET("/", h.GetOrganizations)
 			organizations.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
+				"/",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateOrganization,
 			)
 			organizations.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateOrganization,
 			)
 			organizations.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteOrganization,
 			)
@@ -143,14 +146,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedJobs)
 			jobs.POST("/", h.CreateJob)
 			jobs.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateJob,
 			)
 			jobs.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteJob,
 			)
@@ -172,20 +175,20 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			audiences.GET("/:id", h.GetAudience)
 			audiences.GET("/", h.GetAudiences)
 			audiences.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
+				"/",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateAudience,
 			)
 			audiences.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateAudience,
 			)
 			audiences.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteAudience,
 			)
@@ -215,16 +218,16 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		images := v2.Group("/images/:path")
 		{
 			images.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UploadImage,
 			)
 			images.GET("/", middleware.AuthMiddleware(), h.GetImageURLs)
 			images.DELETE(
-				"/:imageName", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/:imageName",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteImage,
 			)
 		}
@@ -232,14 +235,14 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			honey.GET("/:id", h.GetHoney)
 			honey.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateHoney,
 			)
 			honey.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateHoney,
 			)
@@ -271,20 +274,20 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			alerts.GET("/:service", h.GetAlertByServiceAndPage)
 			alerts.GET("/id/:id", h.GetAlertByID)
 			alerts.POST(
-				"/", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateAlert,
 			)
 			alerts.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
-				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute), 
+				"/:id",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateAlert,
 			)
 			alerts.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteAlert,
 			)
@@ -296,26 +299,26 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			albums.GET("/", h.GetAlbums)
 			albums.GET("/:id", h.GetAlbum)
 			albums.PUT(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UpdateAlbum,
 			)
 			albums.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteAlbum,
 			)
 			albums.DELETE(
-				"/:id/:imageName", 
-				middleware.AuthMiddleware(), 
+				"/:id/:imageName",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteAlbumImage,
 			)
 			albums.PUT(
-				"/:id/:imageName", 
-				middleware.AuthMiddleware(), 
+				"/:id/:imageName",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.SetAlbumCover,
 			)

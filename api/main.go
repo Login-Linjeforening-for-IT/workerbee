@@ -26,16 +26,21 @@ func main() {
 	db := client.Init()
 	do := client.DOInit()
 
+	redis := client.RedisInit()
+
 	// Repos
 	repos := repositories.NewRepositories(db, do)
 
 	// Services
-	svcs := services.NewServices(repos)
-
-	// handler container
-	h := &handlers.Handler{Services: svcs}
+	svcs := services.NewServices(repos, redis)
 
 	router := gin.New()
+
+	// handler container
+	h := &handlers.Handler{
+		Services: svcs,
+		Router:   router,
+	}
 
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
