@@ -55,7 +55,7 @@ type JobType struct {
 
 type JobTypeWithTotalCount struct {
 	JobType
-	TotalCount int `db:"total_count" json:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 type JobSkills struct {
@@ -65,15 +65,15 @@ type JobSkills struct {
 
 type CitiesWithTotalCount struct {
 	Cities
-	TotalCount int `db:"total_count" json:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 type CitiesResponse struct {
-	Jobs       []CitiesWithTotalCount `json:"cities"`
+	Cities     []CitiesWithTotalCount `json:"cities"`
 	TotalCount int                    `json:"total_count"`
 }
 
 type JobWithTotalCount struct {
 	Job
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }

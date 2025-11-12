@@ -31,14 +31,7 @@ func (s *AlertService) CreateAlert(alert models.Alert) (models.Alert, error) {
 		alert.Page = "/" + alert.Page
 	}
 
-	alert, err := s.repo.CreateAlert(alert)
-	if err != nil {
-		return models.Alert{}, err
-	}
-
-
-
-	return alert, nil
+	return s.repo.CreateAlert(alert)
 }
 
 func (s *AlertService) GetAllAlerts(search, limit_str, offset_str, orderBy, sort string) ([]models.AlertWithTotalCount, error) {

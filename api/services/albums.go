@@ -4,7 +4,6 @@ import (
 	"context"
 	"mime/multipart"
 	"strconv"
-	"time"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -20,57 +19,25 @@ var allowedSortColumnsAlbums = map[string]string{
 }
 
 type AlbumService struct {
-	repo  repositories.AlbumsRepository
-	cache *CacheService
+	repo repositories.AlbumsRepository
 }
 
-func NewAlbumService(repo repositories.AlbumsRepository, cache *CacheService) *AlbumService {
+func NewAlbumService(repo repositories.AlbumsRepository) *AlbumService {
 	return &AlbumService{
-		repo:  repo,
-		cache: cache,
+		repo: repo,
 	}
 }
 
 func (as *AlbumService) CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error) {
-	album, err := as.repo.CreateAlbum(ctx, body)
-	if err != nil {
-		return models.CreateAlbum{}, err
-	}
-
-	pattern := "albums:*"
-	as.cache.DeletePattern(ctx, pattern)
-
-	return album, nil
+	return as.repo.CreateAlbum(ctx, body)
 }
 
 func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
-	err := as.repo.UploadImagesToAlbum(ctx, id, files)
-	if err != nil {
-		return err
-	}
-
-	as.cache.DeletePattern(ctx, "albums:*")
-
-	return nil
+	return as.repo.UploadImagesToAlbum(ctx, id, files)
 }
 
 func (as *AlbumService) GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error) {
-	var album models.AlbumWithImages
-
-	cacheKey := internal.AlbumKey(id)
-
-	err := as.cache.GetJSON(ctx, cacheKey, &album)
-	if err == nil {
-		return album, nil
-	}
-
-	album, err = as.repo.GetAlbum(ctx, id)
-	if err != nil {
-		return models.AlbumWithImages{}, err
-	}
-
-	as.cache.Set(ctx, cacheKey, album, 5*time.Minute)
-	return album, nil
+	return as.repo.GetAlbum(ctx, id)
 }
 
 func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str, offset_str, search string) ([]models.AlbumsWithTotalCount, error) {
@@ -84,22 +51,7 @@ func (as *AlbumService) GetAlbums(ctx context.Context, orderBy, sort, limit_str,
 		return nil, internal.ErrInvalid
 	}
 
-	cacheKey := internal.AlbumsKey(orderBySanitized, sortSanitized, search, limit, offset)
-	var albums []models.AlbumsWithTotalCount
-
-	err = as.cache.GetJSON(ctx, cacheKey, &albums)
-	if err == nil {
-		return albums, nil
-	}
-
-	albums, err = as.repo.GetAlbums(ctx, orderBySanitized, sortSanitized, search, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-
-	as.cache.Set(ctx, cacheKey, albums, 5*time.Minute)
-
-	return albums, nil
+	return as.repo.GetAlbums(ctx, orderBySanitized, sortSanitized, search, limit, offset)
 }
 
 func (as *AlbumService) UpdateAlbum(ctx context.Context, id string, body models.CreateAlbum) (models.CreateAlbum, error) {
@@ -109,46 +61,18 @@ func (as *AlbumService) UpdateAlbum(ctx context.Context, id string, body models.
 	}
 
 	body.ID = idInt
-	album, err := as.repo.UpdateAlbum(ctx, body)
-	if err != nil {
-		return models.CreateAlbum{}, err
-	}
-
-	as.cache.DeletePattern(ctx, "albums:*")
-
-	return album, nil
+	return as.repo.UpdateAlbum(ctx, body)
 }
 
 func (as *AlbumService) DeleteAlbum(ctx context.Context, id string) (int, error) {
-	respID, err := as.repo.DeleteAlbum(ctx, id)
-	if err != nil {
-		return 0, err
-	}
-
-	as.cache.DeletePattern(ctx, "albums:*")
-
-	return respID, nil
+	return as.repo.DeleteAlbum(ctx, id)
 }
 
 func (as *AlbumService) DeleteAlbumImage(ctx context.Context, id string, imageName string) error {
 	path := internal.ALBUM_PATH + id + "/" + imageName
-	err := as.repo.DeleteAlbumImage(ctx, path, id)
-	if err != nil {
-		return err
-	}
-
-	as.cache.DeletePattern(ctx, "albums:*")
-
-	return nil
+	return as.repo.DeleteAlbumImage(ctx, path, id)
 }
 
 func (as *AlbumService) SetAlbumCover(ctx context.Context, id string, imageName string) error {
-	err := as.repo.SetAlbumCover(ctx, id, imageName)
-	if err != nil {
-		return err
-	}
-
-	as.cache.DeletePattern(ctx, "albums:*")
-
-	return nil
+	return as.repo.SetAlbumCover(ctx, id, imageName)
 }

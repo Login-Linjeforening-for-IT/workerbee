@@ -16,7 +16,7 @@ type Rule struct {
 
 type RuleWithTotalCount struct {
 	Rule
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 type RulesResponse struct {

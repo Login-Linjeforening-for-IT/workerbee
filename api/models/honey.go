@@ -8,7 +8,7 @@ type PathLanguages struct {
 
 type PathLanguagesWithCount struct {
 	PathLanguages
-	TotalCount int `db:"total_count" json:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 type HoneyContent struct {

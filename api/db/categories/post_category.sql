@@ -8,3 +8,4 @@ VALUES (
     :name_en, 
     :color
 )
+RETURNING *;

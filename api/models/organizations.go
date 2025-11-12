@@ -21,12 +21,12 @@ type Organization struct {
 
 type OrganizationWithTotalCount struct {
 	Organization
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 type OrganizationsResponse struct {
 	Organizations []OrganizationWithTotalCount `json:"organizations"`
-	TotalCount    int                          `json:"total_count"`
+	TotalCount    int                          `json:"-"`
 }
 
 type OrganizationNames struct {

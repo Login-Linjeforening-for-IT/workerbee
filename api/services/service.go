@@ -4,7 +4,6 @@ import (
 	"workerbee/repositories"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/redis/go-redis/v9"
 )
 
 type Services struct {
@@ -27,9 +26,7 @@ type Services struct {
 	Calendar      *CalendarService
 }
 
-func NewServices(repos *repositories.Repositories, redis *redis.Client) *Services {
-	cache := NewCacheService(redis)
-
+func NewServices(repos *repositories.Repositories) *Services {
 	return &Services{
 		Audiences:     NewAudienceService(repos.Audiences),
 		Categories:    NewCategoryService(repos.Categories),
@@ -45,7 +42,7 @@ func NewServices(repos *repositories.Repositories, redis *redis.Client) *Service
 		ImageService:  NewImageService(repos.Images),
 		Honey:         NewHoneyService(repos.Honey),
 		Alerts:        NewAlertService(repos.Alerts),
-		Albums:        NewAlbumService(repos.Albums, cache),
+		Albums:        NewAlbumService(repos.Albums),
 		Calendar:      NewCalendarService(repos.Calendar),
 		Validate:      validator.New(),
 	}

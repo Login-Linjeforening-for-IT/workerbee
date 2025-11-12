@@ -56,7 +56,7 @@ type NewEvent struct {
 
 type EventWithTotalCount struct {
 	Event
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 type EventCategory struct {

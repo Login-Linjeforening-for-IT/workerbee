@@ -26,13 +26,11 @@ func main() {
 	db := client.Init()
 	do := client.DOInit()
 
-	redis := client.RedisInit()
-
 	// Repos
 	repos := repositories.NewRepositories(db, do)
 
 	// Services
-	svcs := services.NewServices(repos, redis)
+	svcs := services.NewServices(repos)
 
 	router := gin.New()
 

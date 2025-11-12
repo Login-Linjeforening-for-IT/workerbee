@@ -16,5 +16,5 @@ type Alert struct {
 
 type AlertWithTotalCount struct {
 	Alert
-	TotalCount int `db:"total_count" json:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }

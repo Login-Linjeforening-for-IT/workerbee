@@ -4,7 +4,7 @@ SET name_no = :name_no,
     description_no = :description_no,
     description_en = :description_en,
     event_id = :event_id,
-    year = :year
+    year = :year,
     updated_at = NOW()
 WHERE id = :id
 RETURNING *;

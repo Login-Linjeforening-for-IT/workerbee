@@ -12,5 +12,5 @@ type Audience struct {
 
 type AudienceWithTotalCount struct {
 	Audience
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }

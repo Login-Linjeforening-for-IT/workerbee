@@ -13,5 +13,5 @@ type Category struct {
 
 type CategoryWithTotalCount struct {
 	Category
-	TotalCount int `db:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }

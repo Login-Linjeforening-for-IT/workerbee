@@ -18,7 +18,7 @@ type Album struct {
 
 type CreateAlbum struct {
 	Album
-	EventID *int `db:"event_id" json:"event_id,omitempty"`
+	EventID *int `db:"event_id" json:"event_id"`
 }
 
 type AlbumWithImages struct {
@@ -37,7 +37,7 @@ type EventAlbum struct {
 
 type AlbumsWithTotalCount struct {
 	AlbumWithImages
-	TotalCount int `db:"total_count" json:"total_count"`
+	TotalCount int `db:"total_count" json:"-"`
 }
 
 func (a AlbumWithImages) MarshalJSON() ([]byte, error) {
