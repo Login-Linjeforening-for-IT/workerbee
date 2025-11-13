@@ -14,6 +14,7 @@ import (
 	"image/png"
 
 	"github.com/chai2010/webp"
+	"github.com/disintegration/imaging"
 )
 
 var validPaths = []string{
@@ -21,9 +22,6 @@ var validPaths = []string{
 	"jobs",
 	"organizations",
 }
-
-var maxImageSize = int64(1000000)
-var imageRatio = 2.5
 
 type ImageService struct {
 	repo repositories.ImageRepository
@@ -42,10 +40,6 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 
 	if !strings.HasSuffix(path, "/") {
 		path += "/"
-	}
-
-	if file.Size > maxImageSize {
-		return "", internal.ErrImageTooLarge
 	}
 
 	src, err := file.Open()
@@ -67,23 +61,54 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 		return "", err
 	}
 
-	bounds := img.Bounds()
-	width := bounds.Dx()
-	height := bounds.Dy()
-	ratio := float64(width) / float64(height)
-	if ratio > imageRatio {
-		return "", internal.ErrInvalidImageRatio
+	width, height := img.Bounds().Dx(), img.Bounds().Dy()
+
+	newWidth, newHeight := internal.DownscaleImage(width, height)
+
+	if newWidth != width || newHeight != height {
+		img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
 	}
 
-	buf := new(bytes.Buffer)
-	err = webp.Encode(buf, img, &webp.Options{Lossless: false, Quality: 80})
-	if err != nil {
-		return "", err
+	quality := 80
+	var buf bytes.Buffer
+
+	for quality >= 40 {
+		buf.Reset()
+		err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: 80})
+		if err != nil {
+			return "", err
+		}
+
+		if buf.Len() <= int(internal.MaxImageSize) {
+			break
+		}
+		quality -= 10
+	}
+
+	for buf.Len() > int(internal.MaxImageSize) {
+		bounds := img.Bounds()
+		width := bounds.Dx()
+		height := bounds.Dy()
+
+		newWidth := int(float64(width) * .9)
+		newHeight := int(float64(height) * .9)
+
+		if newWidth < 100 || newHeight < 100 {
+			break
+		}
+
+		img = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
+
+		buf.Reset()
+		err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: 75})
+		if err != nil {
+			return "", err
+		}
 	}
 
 	key := internal.IMG_PATH + path + strings.Split(file.Filename, ".")[0] + ".webp"
 
-	err = is.repo.UploadImage(ctx, key, "image/webp", buf)
+	err = is.repo.UploadImage(ctx, key, "image/webp", &buf)
 	if err != nil {
 		return "", err
 	}

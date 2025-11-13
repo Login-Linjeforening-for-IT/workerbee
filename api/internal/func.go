@@ -6,6 +6,19 @@ import (
 	"strings"
 )
 
+func DownscaleImage(width, height int) (int, int) {
+	if width > MaxDimension || height > MaxDimension {
+		if width >= height {
+			ratio := float64(MaxDimension) / float64(width)
+			return MaxDimension, int(float64(height) * ratio)
+		} else {
+			ratio := float64(MaxDimension) / float64(height)
+			return int(float64(width) * ratio), MaxDimension
+		}
+	}
+	return width, height
+}
+
 func ParseENAndNOArray(en, no []string) []map[string]string {
 	var categories []map[string]string
 	for i := range en {

@@ -30,6 +30,3 @@ The application uses the following environment variables. These can be set in a 
 | DO_URL                   | (required)      | DigitalOcean Spaces endpoint URL.                |
 | DO_SECRET_ACCESS_KEY     | (required)      | DigitalOcean Spaces secret access key.           |
 | DO_ACCESS_KEY_ID         | (required)      | DigitalOcean Spaces access key ID.               |
-| REDIS_ADDR               | `localhost:6379`| Address for the Redis instance.                  |
-| REDIS_PASSWORD           | (required)      | Password for the Redis instance.                 |
-| REDIS_DB                 | `0`             | Database number for the Redis instance.          |

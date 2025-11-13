@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"image"
-	"io"
 	"mime/multipart"
 	"path/filepath"
 	"strconv"
@@ -86,39 +85,14 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 			}
 			defer src.Close()
 
-			config, _, err := image.DecodeConfig(src)
-			if err != nil {
-				results <- uploadResult{err: err}
-				return
-			}
-
-			width, height := config.Width, config.Height
-
-			// Step 2: compute resize if needed
-			var newWidth, newHeight int
-			if width > maxDimension || height > maxDimension {
-				if width > height {
-					newWidth = maxDimension
-					newHeight = int(float64(height) * float64(maxDimension) / float64(width))
-				} else {
-					newHeight = maxDimension
-					newWidth = int(float64(width) * float64(maxDimension) / float64(height))
-				}
-			} else {
-				newWidth, newHeight = width, height
-			}
-
-			// Step 3: rewind file and decode full image
-			if _, err := src.Seek(0, io.SeekStart); err != nil {
-				results <- uploadResult{err: err}
-				return
-			}
-
 			img, _, err := image.Decode(src)
 			if err != nil {
 				results <- uploadResult{err: err}
 				return
 			}
+
+			width, height := img.Bounds().Dx(), img.Bounds().Dy()
+			newWidth, newHeight := internal.DownscaleImage(width, height)
 
 			if newWidth != width || newHeight != height {
 				img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
@@ -443,13 +417,13 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 	}
 
 	_, err = ar.DO.PutObjectAcl(ctx, &s3.PutObjectAclInput{
-        Bucket: aws.String(ar.Bucket),
-        Key:    aws.String(coverPath),
-        ACL:    types.ObjectCannedACLPublicRead,
-    })
-    if err != nil {
-        return err
-    }
+		Bucket: aws.String(ar.Bucket),
+		Key:    aws.String(coverPath),
+		ACL:    types.ObjectCannedACLPublicRead,
+	})
+	if err != nil {
+		return err
+	}
 
 	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(ar.Bucket),
