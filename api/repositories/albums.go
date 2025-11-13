@@ -70,7 +70,7 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 	}
 
 	results := make(chan uploadResult, len(files))
-	semaphore := semaphore.NewWeighted(100)
+	semaphore := semaphore.NewWeighted(20)
 
 	for _, file := range files {
 		if err := semaphore.Acquire(ctx, 1); err != nil {
@@ -437,11 +437,19 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 		Bucket:     aws.String(ar.Bucket),
 		CopySource: aws.String(ar.Bucket + "/" + path),
 		Key:        aws.String(coverPath),
-		ACL:        types.ObjectCannedACLPublicRead,
 	})
 	if err != nil {
 		return err
 	}
+
+	_, err = ar.DO.PutObjectAcl(ctx, &s3.PutObjectAclInput{
+        Bucket: aws.String(ar.Bucket),
+        Key:    aws.String(coverPath),
+        ACL:    types.ObjectCannedACLPublicRead,
+    })
+    if err != nil {
+        return err
+    }
 
 	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(ar.Bucket),
