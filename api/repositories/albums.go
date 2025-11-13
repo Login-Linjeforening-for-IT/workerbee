@@ -7,14 +7,16 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"image"
-	"image/jpeg"
+	"io"
 	"mime/multipart"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
 
+	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"golang.org/x/sync/semaphore"
 
@@ -84,7 +86,33 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 			}
 			defer src.Close()
 
-			filename := f.Filename
+			config, _, err := image.DecodeConfig(src)
+			if err != nil {
+				results <- uploadResult{err: err}
+				return
+			}
+
+			width, height := config.Width, config.Height
+
+			// Step 2: compute resize if needed
+			var newWidth, newHeight int
+			if width > maxDimension || height > maxDimension {
+				if width > height {
+					newWidth = maxDimension
+					newHeight = int(float64(height) * float64(maxDimension) / float64(width))
+				} else {
+					newHeight = maxDimension
+					newWidth = int(float64(width) * float64(maxDimension) / float64(height))
+				}
+			} else {
+				newWidth, newHeight = width, height
+			}
+
+			// Step 3: rewind file and decode full image
+			if _, err := src.Seek(0, io.SeekStart); err != nil {
+				results <- uploadResult{err: err}
+				return
+			}
 
 			img, _, err := image.Decode(src)
 			if err != nil {
@@ -92,20 +120,8 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 				return
 			}
 
-			bounds := img.Bounds()
-			width := bounds.Dx()
-			height := bounds.Dy()
-
-			if width > maxDimension || height > maxDimension {
-				if width > height {
-					newWidth := maxDimension
-					newHeight := int(float64(height) * float64(maxDimension) / float64(width))
-					img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
-				} else {
-					newHeight := maxDimension
-					newWidth := int(float64(width) * float64(maxDimension) / float64(height))
-					img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
-				}
+			if newWidth != width || newHeight != height {
+				img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
 			}
 
 			quality := 85
@@ -113,7 +129,7 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 
 			for quality >= 20 {
 				buf.Reset()
-				err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: quality})
+				err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: float32(quality)})
 				if err != nil {
 					results <- uploadResult{err: err}
 					return
@@ -141,7 +157,7 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 				img = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
 
 				buf.Reset()
-				err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 75})
+				err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: 75})
 				if err != nil {
 					results <- uploadResult{err: err}
 					return
@@ -152,14 +168,7 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 				uploadPath += "/"
 			}
 
-			lowerFilename := strings.ToLower(filename)
-			if !strings.HasSuffix(lowerFilename, ".jpg") && !strings.HasSuffix(lowerFilename, ".jpeg") {
-				if idx := strings.LastIndex(filename, "."); idx != -1 {
-					filename = filename[:idx] + ".jpg"
-				} else {
-					filename = filename + ".jpg"
-				}
-			}
+			filename := strings.TrimSuffix(f.Filename, filepath.Ext(f.Filename)) + ".webp"
 
 			randomBytes := make([]byte, 6)
 			_, err = rand.Read(randomBytes)
@@ -172,7 +181,7 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 
 			key := internal.ALBUM_PATH + uploadPath + "img_" + hex.EncodeToString(hash[:4]) + "_" + filename
 
-			contentType := "image/jpeg"
+			contentType := "image/webp"
 
 			_, err = ar.DO.PutObject(ctx, &s3.PutObjectInput{
 				Bucket:      aws.String(ar.Bucket),
@@ -181,6 +190,9 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 				ACL:         types.ObjectCannedACLPublicRead,
 				ContentType: aws.String(contentType),
 			})
+
+			img = nil
+			buf.Reset()
 
 			results <- uploadResult{err: err}
 		}(file)
