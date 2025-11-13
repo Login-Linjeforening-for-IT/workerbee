@@ -30,6 +30,7 @@ var (
 	ErrInvalidJobType         = errors.New("invalid job type does not exist in enum")
 	ErrTooManyRequests        = errors.New("too many requests")
 	ErrCacheUnavailable       = errors.New("cache unavailable")
+	ErrUnknownImageFormat     = errors.New("unknown image format")
 	ErrS3ClientNotInitialized = errors.New("s3 client not initialized")
 	ErrorMap                  = map[error]struct {
 		Status  int
@@ -55,6 +56,7 @@ var (
 		ErrInvalidImageRatio:      {Status: http.StatusBadRequest, Message: "invalid image aspect ratio, max 2.5"},
 		ErrS3ClientNotInitialized: {Status: http.StatusInternalServerError, Message: "s3 client not initialized"},
 		ErrConflict:               {Status: http.StatusConflict, Message: "resource already exists"},
+		ErrUnknownImageFormat:     {Status: http.StatusBadRequest, Message: "unknown image format please use jpg or png"},
 	}
 )
 

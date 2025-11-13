@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"image"
 	"mime/multipart"
@@ -9,7 +10,10 @@ import (
 	"workerbee/internal"
 	"workerbee/repositories"
 
-	_ "image/jpeg"
+	"image/jpeg"
+	"image/png"
+
+	"github.com/chai2010/webp"
 )
 
 var validPaths = []string{
@@ -18,7 +22,7 @@ var validPaths = []string{
 	"organizations",
 }
 
-var maxImageSizeMB = int64(1000000)
+var maxImageSize = int64(1000000)
 var imageRatio = 2.5
 
 type ImageService struct {
@@ -36,44 +40,55 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 		return "", internal.ErrInvalidImagePath
 	}
 
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
+	}
+
+	if file.Size > maxImageSize {
+		return "", internal.ErrImageTooLarge
+	}
+
 	src, err := file.Open()
 	if err != nil {
 		return "", err
 	}
 	defer src.Close()
 
-	img, format, err := image.Decode(src)
+	var img image.Image
+	filename := strings.ToLower(file.Filename)
+	if strings.HasSuffix(filename, ".png") {
+		img, err = png.Decode(src)
+	} else if strings.HasSuffix(filename, ".jpg") || strings.HasSuffix(filename, ".jpeg") {
+		img, err = jpeg.Decode(src)
+	} else {
+		return "", internal.ErrUnknownImageFormat
+	}
 	if err != nil {
 		return "", err
 	}
-
-	src.Seek(0, 0)
-
-	contentType := "image/" + format
 
 	bounds := img.Bounds()
 	width := bounds.Dx()
 	height := bounds.Dy()
-
 	ratio := float64(width) / float64(height)
-	if ratio != imageRatio {
+	if ratio > imageRatio {
 		return "", internal.ErrInvalidImageRatio
 	}
 
-	if file.Size > maxImageSizeMB {
-		return "", internal.ErrImageTooLarge
-	}
-
-	if !strings.HasSuffix(path, "/") {
-		path += "/"
-	}
-	key := internal.IMG_PATH + path + file.Filename
-
-	err = is.repo.UploadImage(ctx, key, contentType, src)
+	buf := new(bytes.Buffer)
+	err = webp.Encode(buf, img, &webp.Options{Lossless: false, Quality: 80})
 	if err != nil {
 		return "", err
 	}
-	return file.Filename, nil
+
+	key := internal.IMG_PATH + path + strings.Split(file.Filename, ".")[0] + ".webp"
+
+	err = is.repo.UploadImage(ctx, key, "image/webp", buf)
+	if err != nil {
+		return "", err
+	}
+
+	return key, nil
 }
 
 func (is *ImageService) GetImagesInPath(ctx context.Context, path string) ([]string, error) {

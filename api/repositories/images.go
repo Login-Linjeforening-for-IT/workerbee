@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"mime/multipart"
+	"io"
 	"strings"
 	"workerbee/internal"
 
@@ -13,7 +13,7 @@ import (
 )
 
 type ImageRepository interface {
-	UploadImage(ctx context.Context, key, contentType string, src multipart.File) error
+	UploadImage(ctx context.Context, key, contentType string, src io.Reader) error
 	GetImagesInPath(ctx context.Context, prefix string) ([]string, error)
 	DeleteImage(ctx context.Context, key string) error
 }
@@ -32,7 +32,7 @@ func NewImageRepository(db *sqlx.DB, do *s3.Client) ImageRepository {
 	}
 }
 
-func (ir *imageRepository) UploadImage(ctx context.Context, key, contentType string, src multipart.File) error {
+func (ir *imageRepository) UploadImage(ctx context.Context, key, contentType string, src io.Reader) error {
 	_, err := ir.DO.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(ir.Bucket),
 		Key:         aws.String(key),

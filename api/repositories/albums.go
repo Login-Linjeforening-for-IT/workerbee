@@ -425,6 +425,7 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 		Bucket:     aws.String(ar.Bucket),
 		CopySource: aws.String(ar.Bucket + "/" + path),
 		Key:        aws.String(coverPath),
+		ACL:        types.ObjectCannedACLPublicRead,
 	})
 	if err != nil {
 		return err

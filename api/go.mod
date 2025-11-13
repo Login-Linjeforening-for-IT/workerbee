@@ -11,11 +11,12 @@ require (
 )
 
 require (
+	github.com/chai2010/webp v1.4.0 // indirect
 	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.54.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
-	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/mod v0.28.0 // indirect
 )
 

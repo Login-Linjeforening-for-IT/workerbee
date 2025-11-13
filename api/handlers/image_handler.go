@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"workerbee/internal"
 
@@ -26,10 +24,7 @@ import (
 func (h *Handler) UploadImage(c *gin.Context) {
 	path := c.Param("path")
 
-	fmt.Println("Content-Type:", c.Request.Header.Get("Content-Type"))
-
 	file, err := c.FormFile("image")
-	log.Println(err)
 	if err != nil {
 		internal.HandleError(c, err)
 		return
