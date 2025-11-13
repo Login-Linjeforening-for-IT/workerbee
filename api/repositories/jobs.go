@@ -14,7 +14,7 @@ import (
 type Jobsrepositories interface {
 	CreateJob(job models.NewJob) (models.NewJob, error)
 	GetJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error)
-	GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error)
+	GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string, historical bool) ([]models.JobWithTotalCount, error)
 	GetJob(id string) (models.Job, error)
 	GetJobProtected(id string) (models.Job, error)
 	GetJobsCities() ([]models.Cities, error)
@@ -174,7 +174,7 @@ func (r *jobsrepositories) GetJobs(limit, offset int, search, orderBy, sort stri
 	return jobs, nil
 }
 
-func (r *jobsrepositories) GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string) ([]models.JobWithTotalCount, error) {
+func (r *jobsrepositories) GetProtectedJobs(limit, offset int, search, orderBy, sort string, jobTypes []int, skills, cities []string, historical bool) ([]models.JobWithTotalCount, error) {
 	jobs, err := db.FetchAllElements[models.JobWithTotalCount](
 		r.db,
 		"./db/jobs/get_protected_jobs.sql",
@@ -182,6 +182,7 @@ func (r *jobsrepositories) GetProtectedJobs(limit, offset int, search, orderBy, 
 		limit,
 		offset,
 		search,
+		historical,
 		pq.Array(jobTypes),
 		pq.Array(skills),
 		pq.Array(cities),

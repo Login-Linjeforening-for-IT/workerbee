@@ -3,16 +3,13 @@ package services
 import (
 	"context"
 	"image"
-	"math"
 	"mime/multipart"
 	"slices"
 	"strings"
 	"workerbee/internal"
 	"workerbee/repositories"
 
-	_ "image/gif"
 	_ "image/jpeg"
-	_ "image/png"
 )
 
 var validPaths = []string{
@@ -59,7 +56,7 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	height := bounds.Dy()
 
 	ratio := float64(width) / float64(height)
-	if math.Abs(ratio-imageRatio) > 0.01 {
+	if ratio != imageRatio {
 		return "", internal.ErrInvalidImageRatio
 	}
 

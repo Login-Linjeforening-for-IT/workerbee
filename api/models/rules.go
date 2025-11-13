@@ -19,11 +19,6 @@ type RuleWithTotalCount struct {
 	TotalCount int `db:"total_count" json:"-"`
 }
 
-type RulesResponse struct {
-	Rules      []Rule `json:"rules"`
-	TotalCount int    `json:"total_count"`
-}
-
 type RuleNames struct {
 	ID     int    `db:"id" json:"id"`
 	NameEn string `db:"name_en" json:"name_en"`

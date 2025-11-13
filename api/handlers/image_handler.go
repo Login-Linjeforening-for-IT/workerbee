@@ -1,10 +1,14 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
+
+	_ "image/jpeg"
 )
 
 // UploadImage godoc
@@ -18,12 +22,16 @@ import (
 // @Success      200    {object}  map[string]string
 // @Failure      400    {object}  error
 // @Failure      500    {object}  error
-// @Router       /api/v2/images/upload/{path} [post]
+// @Router       /api/v2/images/{path} [post]
 func (h *Handler) UploadImage(c *gin.Context) {
 	path := c.Param("path")
 
+	fmt.Println("Content-Type:", c.Request.Header.Get("Content-Type"))
+
 	file, err := c.FormFile("image")
-	if internal.HandleError(c, err) {
+	log.Println(err)
+	if err != nil {
+		internal.HandleError(c, err)
 		return
 	}
 

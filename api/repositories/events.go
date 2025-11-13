@@ -11,7 +11,7 @@ import (
 
 type Eventrepositories interface {
 	GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error)
-	GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error)
+	GetEvents(limit, offset int, search, orderBy, sort string, categories, audiences []int) ([]models.EventWithTotalCount, error)
 	GetEvent(id string) (models.Event, error)
 	GetProtectedEvent(id string) (models.Event, error)
 	GetEventCategories() ([]models.EventCategory, error)
@@ -58,7 +58,7 @@ func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderB
 	return events, nil
 }
 
-func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error) {
+func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort string, categories, audiences []int) ([]models.EventWithTotalCount, error) {
 	events, err := db.FetchAllElements[models.EventWithTotalCount](
 		r.db,
 		"./db/events/get_events.sql",
@@ -66,7 +66,6 @@ func (r *eventRepositories) GetEvents(limit, offset int, search, orderBy, sort s
 		limit,
 		offset,
 		search,
-		historical,
 		pq.Array(categories),
 		pq.Array(audiences),
 	)

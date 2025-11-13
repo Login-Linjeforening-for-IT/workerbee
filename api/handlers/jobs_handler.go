@@ -108,8 +108,9 @@ func (h *Handler) GetProtectedJobs(c *gin.Context) {
 	offset := c.DefaultQuery("offset", "0")
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "asc")
+	historical := c.DefaultQuery("historical", "false")
 
-	jobs, err := h.Services.Jobs.GetProtectedJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities)
+	jobs, err := h.Services.Jobs.GetProtectedJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities, historical)
 	if internal.HandleError(c, err) {
 		return
 	}

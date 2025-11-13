@@ -694,7 +694,7 @@ VALUES
   'An exciting opportunity for recent graduates to develop software.', 
   'Som Junior Software Developer vil du være med på utvikling av applikasjoner og programvare.', 
   'As a Junior Software Developer, you will be involved in the development of applications and software.', 
-  1, now(), '2026-03-31','https://www.example.com/banner.jpg', 
+  1, now(), now(),'https://www.example.com/banner.jpg', 
   1, 'https://www.uio.no/job-apply', now(), now()),
 (true, true, 'Markedsføringskoordinator', 'Marketing Coordinator', 'Markedsføringsspesialist', 
   'Marketing Specialist', 'Bli en del av vårt markedsføringsteam og jobb med spennende prosjekter.', 

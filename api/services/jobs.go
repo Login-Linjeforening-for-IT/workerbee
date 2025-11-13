@@ -51,7 +51,7 @@ func (s *JobsService) CreateJob(job models.NewJob) (models.NewJob, error) {
 	return newJob, err
 }
 
-func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
+func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities, historical_str string) ([]models.JobWithTotalCount, error) {
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
 	if ok != nil {
 		return nil, internal.ErrInvalid
@@ -77,7 +77,12 @@ func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, s
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetProtectedJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
+	historical, err := strconv.ParseBool(historical_str)
+	if err != nil {
+		return nil, internal.ErrInvalid
+	}
+
+	return s.repo.GetProtectedJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice, historical)
 }
 
 func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {

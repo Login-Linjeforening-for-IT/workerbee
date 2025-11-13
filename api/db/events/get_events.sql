@@ -88,29 +88,26 @@ LEFT JOIN locations AS l ON e.location_id = l.id
 LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id
 LEFT JOIN rules AS r ON e.rule_id = r.id
-WHERE (
-        $2::bool
-        OR (
-            (
-                e.time_end IS NOT NULL
-                AND e.time_end > now()
-            )
-            OR (e.time_start > now() - interval '1 day')
+WHERE 
+    (
+        e.time_publish <= now()
+    )
+    AND (
+        (
+            e.time_end IS NOT NULL
+            AND e.time_end > now()
         )
+        OR (e.time_start > now() - interval '1 day')
     )
     AND (
         $1 = ''
         OR to_json(e)::text ILIKE '%' || $1 || '%'
     )
     AND (
+        cardinality($2::int[]) = 0
+        OR e.category_id = ANY($2::int[])
+    )
+    AND (
         cardinality($3::int[]) = 0
-        OR e.category_id = ANY($3::int[])
+        OR e.audience_id = ANY($3::int[])
     )
-    AND (
-        cardinality($4::int[]) = 0
-        OR e.audience_id = ANY($4::int[])
-    )
-    AND (
-        e.time_publish <= now()
-    )
-    AND e.visible = true

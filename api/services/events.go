@@ -76,14 +76,9 @@ func (s *EventService) GetEventAudiences() ([]models.Audience, error) {
 	return audiences, nil
 }
 
-func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str, audiences_str string) ([]models.EventWithTotalCount, error) {
+func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, categories_str, audiences_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
-		return nil, internal.ErrInvalid
-	}
-
-	historicalBool, err := strconv.ParseBool(historical)
-	if err != nil {
 		return nil, internal.ErrInvalid
 	}
 
@@ -102,7 +97,7 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, h
 		return nil, internal.ErrInvalid
 	}
 
-	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories, audiences)
+	return s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), categories, audiences)
 }
 
 func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str, audiences_str string) ([]models.EventWithTotalCount, error) {

@@ -57,15 +57,23 @@ WHERE (
     $1 = '' OR to_json(ja)::text ILIKE '%' || $1 || '%'
     )
     AND (
-        cardinality($2::int[]) = 0
-        OR ja.job_type_id = ANY($2::int[])
+        $2::bool
+        OR (
+            (
+                ja.time_expire IS NOT NULL
+                AND ja.time_expire > now()
+            )
+        )
     )
     AND (
-        cardinality($3::text[]) = 0
-        OR skill_agg.skills::text[] && $3::text[]
+        cardinality($3::int[]) = 0
+        OR ja.job_type_id = ANY($3::int[])
     )
     AND (
         cardinality($4::text[]) = 0
-        OR city_agg.cities::text[] && $4::text[]
+        OR skill_agg.skills::text[] && $4::text[]
     )
-    AND ja.time_expire >= now()
+    AND (
+        cardinality($5::text[]) = 0
+        OR city_agg.cities::text[] && $5::text[]
+    )
