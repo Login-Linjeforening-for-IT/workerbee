@@ -25,9 +25,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const maxAlbumImageSize = int64(700000)
-const maxDimension = 2560
-
 type AlbumsRepository interface {
 	CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
 	UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error
@@ -109,14 +106,14 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 					return
 				}
 
-				if buf.Len() <= int(maxAlbumImageSize) {
+				if buf.Len() <= int(internal.MaxAlbumImageSize) {
 					break
 				}
 
 				quality -= 10
 			}
 
-			for buf.Len() > int(maxAlbumImageSize) {
+			for buf.Len() > int(internal.MaxAlbumImageSize) {
 				bounds := img.Bounds()
 				width := bounds.Dx()
 				height := bounds.Dy()

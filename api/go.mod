@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/chai2010/webp v1.4.0 // indirect
+	github.com/chai2010/webp v1.4.0
 	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.54.0 // indirect
