@@ -93,11 +93,7 @@ WHERE
         e.time_publish <= now()
     )
     AND (
-        (
-            e.time_end IS NOT NULL
-            AND e.time_end > now()
-        )
-        OR (e.time_start > now() - interval '1 day')
+        e.time_end > now()
     )
     AND (
         $1 = ''
