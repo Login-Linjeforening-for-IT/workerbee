@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"os"
+	"time"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -57,9 +58,20 @@ func (r *eventRepositories) CreateMultipleEvents(event models.NewEvent, repeatUn
 		return models.NewEvent{}, err
 	}
 	defer stmt.Close()
-	
+
 	start := event.TimeStart.Time
 	end := event.TimeEnd.Time
+
+	var signupRelease *time.Time
+	var signupDeadline *time.Time
+
+	if event.TimeSignupRelease != nil {
+		signupRelease = &event.TimeSignupRelease.Time
+	}
+
+	if event.TimeSignupDeadline != nil {
+		signupDeadline = &event.TimeSignupDeadline.Time
+	}
 
 	for {
 		if start.After(repeatUntil.Time) {
@@ -69,6 +81,18 @@ func (r *eventRepositories) CreateMultipleEvents(event models.NewEvent, repeatUn
 		newEvent := event
 		newEvent.TimeStart = internal.LocalTime{Time: start}
 		newEvent.TimeEnd = internal.LocalTime{Time: end}
+
+		if signupRelease != nil {
+			newEvent.TimeSignupRelease = &internal.LocalTime{Time: *signupRelease}
+		} else {
+			newEvent.TimeSignupRelease = nil
+		}
+
+		if signupDeadline != nil {
+			newEvent.TimeSignupDeadline = &internal.LocalTime{Time: *signupDeadline}
+		} else {
+			newEvent.TimeSignupDeadline = nil
+		}
 
 		var id int
 		rows, err := stmt.Queryx(newEvent)
@@ -82,17 +106,31 @@ func (r *eventRepositories) CreateMultipleEvents(event models.NewEvent, repeatUn
 		}
 		rows.Close()
 
+		var deltaDays, offset int
 		switch repeatType {
 		case "weekly":
-			start = start.AddDate(0, 0, 7)
-			end = end.AddDate(0, 0, 7)
+			deltaDays = 7
+			offset = 0
 		case "biweekly":
-			start = start.AddDate(0, 0, 14)
-			end = end.AddDate(0, 0, 14)
+			deltaDays = 14
+			offset = 7
 		default:
 			return models.NewEvent{}, internal.ErrInvalid
 		}
+
+		// The next signup and deadlines are shifted to be right after the previous event and before the next event
+		if signupRelease != nil {
+			*signupRelease = end.AddDate(0, 0, 1+offset) // ✅ correct (def not ai generated)
+		}
+
+		start = start.AddDate(0, 0, deltaDays)
+		end = end.AddDate(0, 0, deltaDays)
+
+		if signupDeadline != nil {
+			*signupDeadline = (*signupDeadline).AddDate(0, 0, deltaDays) // ✅ correct (def not ai generated)
+		}
 	}
+
 	if err := tx.Commit(); err != nil {
 		return models.NewEvent{}, err
 	}
