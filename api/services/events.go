@@ -21,6 +21,11 @@ var allowedSortColumnsEvents = map[string]string{
 	"full":         "e.full",
 }
 
+var allowedRepeatTypes = []string{
+	"weekly",
+	"biweekly",
+}
+
 type EventService struct {
 	repo repositories.Eventrepositories
 }
@@ -29,16 +34,37 @@ func NewEventService(repo repositories.Eventrepositories) *EventService {
 	return &EventService{repo: repo}
 }
 
-func (s *EventService) CreateEvent(body models.NewEvent) (models.NewEvent, error) {
+func (s *EventService) CreateEvent(body models.NewEvent, repeatUntil_str, repeatType string) (models.NewEvent, error) {
+	var date internal.Date
 	allowedTimeTypes, err := s.GetAllTimeTypes()
 	if err != nil {
 		return models.NewEvent{}, err
+	}
+
+	if repeatType != "" {
+		if !slices.Contains(allowedRepeatTypes, repeatType) {
+			return models.NewEvent{}, internal.ErrInvalid
+		}
+	}
+
+	if repeatUntil_str != "" {
+		err = date.Set(repeatUntil_str)
+		if err != nil {
+			return models.NewEvent{}, internal.ErrInvalid
+		}
+	}
+	
+	if !date.IsZero() && date.Before(internal.Now()) {
+		return models.NewEvent{}, internal.ErrInvalid
 	}
 
 	if !slices.Contains(allowedTimeTypes, body.TimeType) {
 		return models.NewEvent{}, internal.ErrInvalidTimeType
 	}
 
+	if repeatType != "" && !date.IsZero() {
+		return s.repo.CreateMultipleEvents(body, date, repeatType)
+	}
 	return s.repo.CreateEvent(body)
 }
 

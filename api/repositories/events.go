@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"os"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -18,6 +19,7 @@ type Eventrepositories interface {
 	DeleteEvent(id string) (int, error)
 	UpdateOneEvent(id int, event models.NewEvent) (models.NewEvent, error)
 	CreateEvent(event models.NewEvent) (models.NewEvent, error)
+	CreateMultipleEvents(event models.NewEvent, repeatUntil internal.Date, repeatType string) (models.NewEvent, error)
 	GetEventAudiences() ([]models.Audience, error)
 	GetAllTimeTypes() (string, error)
 	GetEventNames() ([]models.EventName, error)
@@ -37,6 +39,64 @@ func (r *eventRepositories) CreateEvent(event models.NewEvent) (models.NewEvent,
 		"./db/events/post_event.sql",
 		event,
 	)
+}
+
+func (r *eventRepositories) CreateMultipleEvents(event models.NewEvent, repeatUntil internal.Date, repeatType string) (models.NewEvent, error) {
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+	defer tx.Rollback()
+
+	sqlBytes, err := os.ReadFile("./db/events/create_event_return_id.sql")
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+	stmt, err := tx.PrepareNamed(string(sqlBytes))
+	if err != nil {
+		return models.NewEvent{}, err
+	}
+	defer stmt.Close()
+	
+	start := event.TimeStart.Time
+	end := event.TimeEnd.Time
+
+	for {
+		if start.After(repeatUntil.Time) {
+			break
+		}
+
+		newEvent := event
+		newEvent.TimeStart = internal.LocalTime{Time: start}
+		newEvent.TimeEnd = internal.LocalTime{Time: end}
+
+		var id int
+		rows, err := stmt.Queryx(newEvent)
+		if err != nil {
+			return models.NewEvent{}, err
+		}
+		if rows.Next() {
+			if err := rows.Scan(&id); err != nil {
+				return models.NewEvent{}, err
+			}
+		}
+		rows.Close()
+
+		switch repeatType {
+		case "weekly":
+			start = start.AddDate(0, 0, 7)
+			end = end.AddDate(0, 0, 7)
+		case "biweekly":
+			start = start.AddDate(0, 0, 14)
+			end = end.AddDate(0, 0, 14)
+		default:
+			return models.NewEvent{}, internal.ErrInvalid
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return models.NewEvent{}, err
+	}
+	return event, nil
 }
 
 func (r *eventRepositories) GetProtectedEvents(limit, offset int, search, orderBy, sort string, historical bool, categories, audiences []int) ([]models.EventWithTotalCount, error) {

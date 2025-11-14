@@ -22,6 +22,9 @@ import (
 func (h *Handler) CreateEvent(c *gin.Context) {
 	var event models.NewEvent
 
+	repeatUntil := c.DefaultQuery("repeat_until", "")
+	repeatType := c.DefaultQuery("repeat_type", "")
+
 	if err := c.ShouldBindBodyWithJSON(&event); internal.HandleError(c, err) {
 		return
 	}
@@ -30,7 +33,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 		return
 	}
 
-	event, err := h.Services.Events.CreateEvent(event)
+	event, err := h.Services.Events.CreateEvent(event, repeatUntil, repeatType)
 	if internal.HandleError(c, err) {
 		return
 	}

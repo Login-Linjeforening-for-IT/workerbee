@@ -22,6 +22,31 @@ type Date struct {
 	time.Time
 }
 
+func Now() Date {
+	return Date{Time: time.Now().In(osloLoc)}
+}
+
+func (d *Date) Set(s string) error {
+	parsed, err := time.ParseInLocation("2006-01-02", s, osloLoc)
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+func (d *Date) Before(u Date) bool {
+	return d.Time.Before(u.Time)
+}
+
+func (d *Date) After(u Date) bool {
+	return d.Time.After(u.Time)
+}
+
+func (d *Date) Equal(u Date) bool {
+	return d.Time.Equal(u.Time)
+}
+
 // --- JSON ---
 
 func (t Date) MarshalJSON() ([]byte, error) {
