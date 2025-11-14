@@ -66,15 +66,15 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	newWidth, newHeight := internal.DownscaleImage(width, height)
 
 	if newWidth != width || newHeight != height {
-		img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
+		img = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
 	}
 
-	quality := 80
+	quality := 85
 	var buf bytes.Buffer
 
-	for quality >= 40 {
+	for quality >= 50 {
 		buf.Reset()
-		err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: 80})
+		err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: float32(quality)})
 		if err != nil {
 			return "", err
 		}

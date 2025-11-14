@@ -98,7 +98,7 @@ func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, 
 			quality := 85
 			var buf bytes.Buffer
 
-			for quality >= 20 {
+			for quality >= 40 {
 				buf.Reset()
 				err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: float32(quality)})
 				if err != nil {
