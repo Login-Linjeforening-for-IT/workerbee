@@ -25,6 +25,18 @@ type LocalTime struct {
 	time.Time
 }
 
+func (d *LocalTime) Before(u LocalTime) bool {
+	return d.Time.Before(u.Time)
+}
+
+func (d *LocalTime) After(u LocalTime) bool {
+	return d.Time.After(u.Time)
+}
+
+func (d *LocalTime) Equal(u LocalTime) bool {
+	return d.Time.Equal(u.Time)
+}
+
 // --- JSON ---
 
 func (t LocalTime) MarshalJSON() ([]byte, error) {

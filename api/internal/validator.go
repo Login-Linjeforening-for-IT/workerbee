@@ -1,51 +1,82 @@
 package internal
 
-import "github.com/go-playground/validator/v10"
+import (
+	"reflect"
+
+	"github.com/go-playground/validator/v10"
+)
 
 func LocalTimeBeforeField(fl validator.FieldLevel) bool {
-	// Get the field and the other field to compare
 	field := fl.Field()
 	param := fl.Param()
 
-	// Get the other field by name
 	otherField := fl.Parent().FieldByName(param)
 	if !otherField.IsValid() {
-		fl.Param()
 		return false
 	}
 
-	t1, ok1 := field.Interface().(LocalTime)
-	t2, ok2 := otherField.Interface().(LocalTime)
+	var t1, t2 LocalTime
 
-	if !ok1 || !ok2 {
-		return false
+	if field.Kind() == reflect.Pointer {
+		if field.IsNil() {
+			return true
+		}
+		t1 = field.Elem().Interface().(LocalTime)
+	} else {
+		t1 = field.Interface().(LocalTime)
 	}
 
-	// Check if Start < End
-	return t1.Before(t2.Time)
+	if otherField.Kind() == reflect.Pointer {
+		if otherField.IsNil() {
+			return true
+		}
+		t2 = otherField.Elem().Interface().(LocalTime)
+	} else {
+		t2 = otherField.Interface().(LocalTime)
+	}
+
+	// Save some context in Param
+	// This can be used in HandleValidationError
+	fl.Param()
+
+	return t1.Before(t2)
 }
 
 func LocalTimeAfterField(fl validator.FieldLevel) bool {
 	// Get the field and the other field to compare
 	field := fl.Field()
-	param := fl.Param()
+	param := fl.Param() // normally the other field name
 
-	// Get the other field by name
 	otherField := fl.Parent().FieldByName(param)
 	if !otherField.IsValid() {
-		fl.Param()
 		return false
 	}
 
-	t1, ok1 := field.Interface().(LocalTime)
-	t2, ok2 := otherField.Interface().(LocalTime)
+	var t1, t2 LocalTime
 
-	if !ok1 || !ok2 {
-		return false
+	if field.Kind() == reflect.Pointer {
+		if field.IsNil() {
+			return true
+		}
+		t1 = field.Elem().Interface().(LocalTime)
+	} else {
+		t1 = field.Interface().(LocalTime)
 	}
 
-	// Check if Start < End
-	return t1.After(t2.Time)
+	if otherField.Kind() == reflect.Pointer {
+		if otherField.IsNil() {
+			return true
+		}
+		t2 = otherField.Elem().Interface().(LocalTime)
+	} else {
+		t2 = otherField.Interface().(LocalTime)
+	}
+
+	// Save some context in Param
+	// This can be used in HandleValidationError
+	fl.Param()
+
+	return t1.After(t2)
 }
 
 func SetUpValidator() *validator.Validate {
