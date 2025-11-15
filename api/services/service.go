@@ -1,6 +1,7 @@
 package services
 
 import (
+	"workerbee/internal"
 	"workerbee/repositories"
 
 	"github.com/go-playground/validator/v10"
@@ -44,6 +45,6 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Alerts:        NewAlertService(repos.Alerts),
 		Albums:        NewAlbumService(repos.Albums),
 		Calendar:      NewCalendarService(repos.Calendar),
-		Validate:      validator.New(),
+		Validate:      internal.SetUpValidator(),
 	}
 }

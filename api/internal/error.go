@@ -60,6 +60,7 @@ var (
 	}
 )
 
+
 func HandleError(c *gin.Context, err error) bool {
 	if err == nil {
 		return false
