@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"slices"
 	"strings"
@@ -78,6 +79,10 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("user", respStruct.Sub)
+
+		fmt.Printf("[Protected] username=%s\n",
+			respStruct.Nickname,
+		)
 
 		c.Next()
 	}
