@@ -20,8 +20,8 @@ type BaseJob struct {
 	DescriptionShortEn string             `db:"description_short_en" json:"description_short_en"`
 	DescriptionLongNo  string             `db:"description_long_no" json:"description_long_no"`
 	DescriptionLongEn  string             `db:"description_long_en" json:"description_long_en"`
-	TimePublish        internal.LocalTime `db:"time_publish" json:"time_publish"`
-	TimeExpire         internal.LocalTime `db:"time_expire" json:"time_expire"`
+	TimePublish        internal.LocalTime `db:"time_publish" json:"time_publish" validate:"required,beforeField=TimeExpire"`
+	TimeExpire         internal.LocalTime `db:"time_expire" json:"time_expire" validate:"required,afterField=TimePublish"`
 	BannerImage        *string            `db:"banner_image" json:"banner_image,omitempty"`
 	ApplicationURL     *string            `db:"application_url" json:"application_url,omitempty"`
 	CreatedAt          internal.LocalTime `db:"created_at" json:"created_at"`

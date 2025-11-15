@@ -16,10 +16,10 @@ type EventBase struct {
 	InformationalEn    *string             `db:"informational_en" json:"informational_en,omitempty"`
 	TimeType           string              `db:"time_type" json:"time_type,omitempty"`
 	TimeStart          internal.LocalTime  `db:"time_start" json:"time_start" validate:"required,beforeField=TimeEnd"`
-	TimeEnd            internal.LocalTime  `db:"time_end" json:"time_end" validate:"required"`
-	TimePublish        internal.LocalTime  `db:"time_publish" json:"time_publish" validate:"required"`
+	TimeEnd            internal.LocalTime  `db:"time_end" json:"time_end" validate:"required,afterField=TimeStart"`
+	TimePublish        internal.LocalTime  `db:"time_publish" json:"time_publish" validate:"required,beforeField=TimeStart"`
 	TimeSignupRelease  *internal.LocalTime `db:"time_signup_release" json:"time_signup_release,omitempty" validate:"omitempty,beforeField=TimeSignupDeadline"`
-	TimeSignupDeadline *internal.LocalTime `db:"time_signup_deadline" json:"time_signup_deadline,omitempty"`
+	TimeSignupDeadline *internal.LocalTime `db:"time_signup_deadline" json:"time_signup_deadline,omitempty" validate:"omitempty,afterField=TimeSignupRelease"`
 	Canceled           bool                `db:"canceled" json:"canceled"`
 	Digital            bool                `db:"digital" json:"digital"`
 	Highlight          bool                `db:"highlight" json:"highlight"`
