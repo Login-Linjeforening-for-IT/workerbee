@@ -219,19 +219,20 @@ ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON 
 -- Insert default values
 INSERT INTO "audiences" ("name_en", "name_no")
 VALUES
-('Students', 'students'),
+('Login', 'Login'),
+('Active members', 'Aktive medlemmer'),
+('Students', 'Studenter'),
+('Open', 'Åpen'),
+('Bachelor', 'Bachelor'),
+('Master', 'Master'),
+('PhD', 'PhD'),
 ('First semester', 'Første semester'),
 ('Second semester', 'Andre semester'),
 ('Third semester', 'Tredje semester'),
 ('Fourth semester', 'Fjerde semester'),
 ('Fifth semester', 'Femte semester'),
 ('Sixth semester', 'Sjette semester'),
-('Seventh semester', 'Sjuende semester'),
-('Login', 'Login'),
-('Open', 'Åpen'),
-('Bachelor', 'Bachelor'),
-('Master', 'Master'),
-('PhD', 'PhD');
+('Seventh semester', 'Sjuende semester');
 
 INSERT INTO "categories" ("name_en", "name_no", "color")
 VALUES
