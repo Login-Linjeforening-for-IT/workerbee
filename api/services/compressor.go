@@ -86,7 +86,7 @@ func (cs *CompressorService) CompressAllAlbums(ctx context.Context) error {
 	if !cs.isRunning.CompareAndSwap(false, true) {
 		return nil
 	}
-	
+
 	defer cs.isRunning.Store(false)
 
 	images, err := cs.imageRepo.GetImagesInPath(ctx, internal.ALBUM_PATH)
@@ -135,7 +135,7 @@ func (cs *CompressorService) CompressAllAlbums(ctx context.Context) error {
 }
 
 func (cs *CompressorService) compressImageStream(src io.Reader) (*bytes.Buffer, error) {
-	img, err := imaging.Decode(src)
+	img, err := imaging.Decode(src, imaging.AutoOrientation(true))
 	if err != nil {
 		return nil, err
 	}
