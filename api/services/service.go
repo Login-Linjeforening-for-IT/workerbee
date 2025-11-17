@@ -25,6 +25,7 @@ type Services struct {
 	Alerts        *AlertService
 	Albums        *AlbumService
 	Calendar      *CalendarService
+	Compressor    *CompressorService
 }
 
 func NewServices(repos *repositories.Repositories) *Services {
@@ -45,6 +46,7 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Alerts:        NewAlertService(repos.Alerts),
 		Albums:        NewAlbumService(repos.Albums),
 		Calendar:      NewCalendarService(repos.Calendar),
+		Compressor:    NewCompressorService(repos.Images, repos.Albums),
 		Validate:      internal.SetUpValidator(),
 	}
 }

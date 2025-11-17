@@ -126,6 +126,7 @@ func (ar *albumsRepository) GetAlbum(ctx context.Context, id string) (models.Alb
 	}
 
 	album.Images = images
+	album.ImageCount = len(images)
 
 	return album, nil
 }

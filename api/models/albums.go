@@ -24,8 +24,9 @@ type CreateAlbum struct {
 
 type AlbumWithImages struct {
 	Album
-	Event  *EventAlbum `db:"event" json:"event"`
-	Images []string    `json:"images"`
+	Event      *EventAlbum `db:"event" json:"event"`
+	Images     []string    `json:"images"`
+	ImageCount int         `db:"image_count" json:"image_count"`
 }
 
 type EventAlbum struct {

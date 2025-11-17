@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -62,8 +61,6 @@ func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	if internal.HandleError(c, err) {
 		return
 	}
-
-	log.Println(responses)
 
 	c.JSON(http.StatusOK, responses)
 }

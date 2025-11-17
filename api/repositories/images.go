@@ -16,6 +16,7 @@ type ImageRepository interface {
 	UploadImage(ctx context.Context, key, contentType string, src io.Reader) error
 	GetImagesInPath(ctx context.Context, prefix string) ([]string, error)
 	DeleteImage(ctx context.Context, key string) error
+	GetObject(ctx context.Context, key string) (io.ReadCloser, string, error)
 }
 
 type imageRepository struct {
@@ -30,6 +31,17 @@ func NewImageRepository(db *sqlx.DB, do *s3.Client) ImageRepository {
 		DO:     do,
 		Bucket: internal.BUCKET_NAME,
 	}
+}
+
+func (ir *imageRepository) GetObject(ctx context.Context, key string) (io.ReadCloser, string, error) {
+	output, err := ir.DO.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: aws.String(ir.Bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return nil, "", err
+	}
+	return output.Body, aws.ToString(output.ContentType), nil
 }
 
 func (ir *imageRepository) UploadImage(ctx context.Context, key, contentType string, src io.Reader) error {
