@@ -23,7 +23,6 @@ type CompressorService struct {
 func initCompressor(cmpr *CompressorService) {
 	ctx := context.Background()
 	go func() {
-		log.Println("Compressing started")
 		ticker := time.NewTicker(1 * time.Hour)
 
 		defer ticker.Stop()

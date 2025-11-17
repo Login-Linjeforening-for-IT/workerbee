@@ -188,6 +188,7 @@ func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search
 	for i := range albums {
 		albumID := strconv.Itoa(albums[i].ID)
 		albums[i].Images = images[albumID]
+		albums[i].ImageCount = len(images[albumID])
 	}
 
 	return albums, nil

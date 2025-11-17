@@ -247,8 +247,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				h.UpdateHoney,
 			)
 			honey.DELETE(
-				"/:id", 
-				middleware.AuthMiddleware(), 
+				"/:id",
+				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.DeleteHoney,
 			)
@@ -321,6 +321,11 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.SetAlbumCover,
+			)
+			albums.POST(
+				"/compress",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(1),
 			)
 		}
 		calendar := v2.Group("/calendar")
