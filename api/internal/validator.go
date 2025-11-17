@@ -19,7 +19,7 @@ func LocalTimeBeforeField(fl validator.FieldLevel) bool {
 
 	if field.Kind() == reflect.Pointer {
 		if field.IsNil() {
-			return true
+			return false
 		}
 		t1 = field.Elem().Interface().(LocalTime)
 	} else {
@@ -28,7 +28,7 @@ func LocalTimeBeforeField(fl validator.FieldLevel) bool {
 
 	if otherField.Kind() == reflect.Pointer {
 		if otherField.IsNil() {
-			return true
+			return false
 		}
 		t2 = otherField.Elem().Interface().(LocalTime)
 	} else {
@@ -56,7 +56,7 @@ func LocalTimeAfterField(fl validator.FieldLevel) bool {
 
 	if field.Kind() == reflect.Pointer {
 		if field.IsNil() {
-			return true
+			return false
 		}
 		t1 = field.Elem().Interface().(LocalTime)
 	} else {
@@ -65,7 +65,7 @@ func LocalTimeAfterField(fl validator.FieldLevel) bool {
 
 	if otherField.Kind() == reflect.Pointer {
 		if otherField.IsNil() {
-			return true
+			return false
 		}
 		t2 = otherField.Elem().Interface().(LocalTime)
 	} else {

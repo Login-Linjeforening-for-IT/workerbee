@@ -1,23 +1,16 @@
 package repositories
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	"image"
-	"mime/multipart"
-	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
-
-	"github.com/chai2010/webp"
-	"github.com/disintegration/imaging"
-	"golang.org/x/sync/semaphore"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -27,7 +20,7 @@ import (
 
 type AlbumsRepository interface {
 	CreateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
-	UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error
+	UploadImagesToAlbum(ctx context.Context, id string, uploads []models.UploadImages) ([]models.UploadPictureResponse, error)
 	GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error)
 	GetAlbums(ctx context.Context, orderBy, sort, search string, limit int, offset int) ([]models.AlbumsWithTotalCount, error)
 	UpdateAlbum(ctx context.Context, body models.CreateAlbum) (models.CreateAlbum, error)
@@ -38,14 +31,14 @@ type AlbumsRepository interface {
 
 type albumsRepository struct {
 	db     *sqlx.DB
-	DO     *s3.Client
+	do     *s3.Client
 	Bucket string
 }
 
 func NewAlbumsRepository(db *sqlx.DB, do *s3.Client) AlbumsRepository {
 	return &albumsRepository{
 		db:     db,
-		DO:     do,
+		do:     do,
 		Bucket: internal.BUCKET_NAME,
 	}
 }
@@ -58,130 +51,44 @@ func (ar *albumsRepository) CreateAlbum(ctx context.Context, body models.CreateA
 	)
 }
 
-func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
-	path := string(id) + "/"
+func (ar *albumsRepository) UploadImagesToAlbum(ctx context.Context, id string, uploads []models.UploadImages) ([]models.UploadPictureResponse, error) {
+	var responses []models.UploadPictureResponse
+	presignedClient := s3.NewPresignClient(ar.do)
 
-	type uploadResult struct {
-		err error
+	if !strings.HasSuffix(id, "/") {
+		id += "/"
 	}
 
-	results := make(chan uploadResult, len(files))
-	semaphore := semaphore.NewWeighted(20)
+	for _, upload := range uploads {
 
-	for _, file := range files {
-		if err := semaphore.Acquire(ctx, 1); err != nil {
-			return err
+		randomBytes := make([]byte, 6)
+		_, err := rand.Read(randomBytes)
+		if err != nil {
+			return nil, err
 		}
 
-		go func(f *multipart.FileHeader) {
-			defer semaphore.Release(1)
-			src, err := f.Open()
-			if err != nil {
-				results <- uploadResult{err: err}
-				return
-			}
-			defer src.Close()
+		hash := sha256.Sum256(randomBytes)
 
-			img, _, err := image.Decode(src)
-			if err != nil {
-				results <- uploadResult{err: err}
-				return
-			}
+		key := internal.ALBUM_PATH + id + "img_" + hex.EncodeToString(hash[:4]) + "_raw_" + upload.Filename
 
-			width, height := img.Bounds().Dx(), img.Bounds().Dy()
-			newWidth, newHeight := internal.DownscaleImage(width, height)
-
-			if newWidth != width || newHeight != height {
-				img = imaging.Resize(img, newWidth, newHeight, imaging.Box)
-			}
-
-			quality := 85
-			var buf bytes.Buffer
-
-			for quality >= 40 {
-				buf.Reset()
-				err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: float32(quality)})
-				if err != nil {
-					results <- uploadResult{err: err}
-					return
-				}
-
-				if buf.Len() <= int(internal.MaxAlbumImageSize) {
-					break
-				}
-
-				quality -= 10
-			}
-
-			for buf.Len() > int(internal.MaxAlbumImageSize) {
-				bounds := img.Bounds()
-				width := bounds.Dx()
-				height := bounds.Dy()
-
-				newWidth := int(float64(width) * .9)
-				newHeight := int(float64(height) * .9)
-
-				if newWidth < 100 || newHeight < 100 {
-					break
-				}
-
-				img = imaging.Resize(img, newWidth, newHeight, imaging.Lanczos)
-
-				buf.Reset()
-				err = webp.Encode(&buf, img, &webp.Options{Lossless: false, Quality: 75})
-				if err != nil {
-					results <- uploadResult{err: err}
-					return
-				}
-			}
-			uploadPath := path
-			if !strings.HasSuffix(uploadPath, "/") {
-				uploadPath += "/"
-			}
-
-			filename := strings.TrimSuffix(f.Filename, filepath.Ext(f.Filename)) + ".webp"
-
-			randomBytes := make([]byte, 6)
-			_, err = rand.Read(randomBytes)
-			if err != nil {
-				results <- uploadResult{err: err}
-				return
-			}
-
-			hash := sha256.Sum256(randomBytes)
-
-			key := internal.ALBUM_PATH + uploadPath + "img_" + hex.EncodeToString(hash[:4]) + "_" + filename
-
-			contentType := "image/webp"
-
-			_, err = ar.DO.PutObject(ctx, &s3.PutObjectInput{
-				Bucket:      aws.String(ar.Bucket),
-				Key:         aws.String(key),
-				Body:        bytes.NewReader(buf.Bytes()),
-				ACL:         types.ObjectCannedACLPublicRead,
-				ContentType: aws.String(contentType),
-			})
-
-			img = nil
-			buf.Reset()
-
-			results <- uploadResult{err: err}
-		}(file)
-	}
-	var errors []error
-	for range files {
-		result := <-results
-		if result.err != nil {
-			errors = append(errors, result.err)
+		presigned, err := presignedClient.PresignPutObject(ctx, &s3.PutObjectInput{
+			Bucket:      aws.String(ar.Bucket),
+			Key:         aws.String(key),
+			ContentType: aws.String(upload.Type),
+			ACL:         types.ObjectCannedACLPublicRead,
+		}, s3.WithPresignExpires(10*time.Minute))
+		if err != nil {
+			return nil, err
 		}
-	}
-	close(results)
 
-	if len(errors) > 0 {
-		return errors[0]
+		responses = append(responses, models.UploadPictureResponse{
+			URL:     presigned.URL,
+			Headers: presigned.SignedHeader,
+			Key:     key,
+		})
 	}
 
-	return nil
+	return responses, nil
 }
 
 func (ar *albumsRepository) GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error) {
@@ -198,7 +105,7 @@ func (ar *albumsRepository) GetAlbum(ctx context.Context, id string) (models.Alb
 	prefix := internal.ALBUM_PATH + path
 
 	var images []string
-	paginator := s3.NewListObjectsV2Paginator(ar.DO, &s3.ListObjectsV2Input{
+	paginator := s3.NewListObjectsV2Paginator(ar.do, &s3.ListObjectsV2Input{
 		Bucket: aws.String(ar.Bucket),
 		Prefix: aws.String(prefix),
 	})
@@ -242,7 +149,7 @@ func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search
 		neededAlbums[albumID] = true
 	}
 
-	paginator := s3.NewListObjectsV2Paginator(ar.DO, &s3.ListObjectsV2Input{
+	paginator := s3.NewListObjectsV2Paginator(ar.do, &s3.ListObjectsV2Input{
 		Bucket: aws.String(ar.Bucket),
 		Prefix: aws.String(internal.ALBUM_PATH),
 	})
@@ -308,7 +215,7 @@ func (ar *albumsRepository) DeleteAlbum(ctx context.Context, id string) (int, er
 	}
 
 	for {
-		listOutput, err := ar.DO.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+		listOutput, err := ar.do.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
 			Bucket:            aws.String(ar.Bucket),
 			Prefix:            aws.String(prefix),
 			ContinuationToken: continuationToken,
@@ -328,7 +235,7 @@ func (ar *albumsRepository) DeleteAlbum(ctx context.Context, id string) (int, er
 			})
 		}
 
-		_, err = ar.DO.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+		_, err = ar.do.DeleteObjects(ctx, &s3.DeleteObjectsInput{
 			Bucket: aws.String(ar.Bucket),
 			Delete: &types.Delete{
 				Objects: objectsToDelete,
@@ -358,7 +265,7 @@ func (ar *albumsRepository) DeleteAlbumImage(ctx context.Context, key, id string
 		return err
 	}
 
-	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
+	_, err = ar.do.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(ar.Bucket),
 		Key:    aws.String(key),
 	})
@@ -368,7 +275,7 @@ func (ar *albumsRepository) DeleteAlbumImage(ctx context.Context, key, id string
 func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageName string) error {
 	prefix := internal.ALBUM_PATH + id + "/"
 
-	listOutput, err := ar.DO.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+	listOutput, err := ar.do.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
 		Bucket:  aws.String(ar.Bucket),
 		Prefix:  aws.String(prefix + "coverimg_"),
 		MaxKeys: aws.Int32(1),
@@ -382,7 +289,7 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 		if strings.Contains(firstKey, "coverimg_") {
 			oldCoverName := strings.Replace(firstKey, "coverimg_", "img_", 1)
 
-			_, err = ar.DO.CopyObject(ctx, &s3.CopyObjectInput{
+			_, err = ar.do.CopyObject(ctx, &s3.CopyObjectInput{
 				Bucket:     aws.String(ar.Bucket),
 				CopySource: aws.String(ar.Bucket + "/" + firstKey),
 				Key:        aws.String(oldCoverName),
@@ -391,7 +298,7 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 				return err
 			}
 
-			_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
+			_, err = ar.do.DeleteObject(ctx, &s3.DeleteObjectInput{
 				Bucket: aws.String(ar.Bucket),
 				Key:    aws.String(firstKey),
 			})
@@ -404,7 +311,7 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 	path := internal.ALBUM_PATH + id + "/" + imageName
 	coverPath := internal.ALBUM_PATH + id + "/" + coverImageName
 
-	_, err = ar.DO.CopyObject(ctx, &s3.CopyObjectInput{
+	_, err = ar.do.CopyObject(ctx, &s3.CopyObjectInput{
 		Bucket:     aws.String(ar.Bucket),
 		CopySource: aws.String(ar.Bucket + "/" + path),
 		Key:        aws.String(coverPath),
@@ -413,7 +320,7 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 		return err
 	}
 
-	_, err = ar.DO.PutObjectAcl(ctx, &s3.PutObjectAclInput{
+	_, err = ar.do.PutObjectAcl(ctx, &s3.PutObjectAclInput{
 		Bucket: aws.String(ar.Bucket),
 		Key:    aws.String(coverPath),
 		ACL:    types.ObjectCannedACLPublicRead,
@@ -422,7 +329,7 @@ func (ar *albumsRepository) SetAlbumCover(ctx context.Context, id string, imageN
 		return err
 	}
 
-	_, err = ar.DO.DeleteObject(ctx, &s3.DeleteObjectInput{
+	_, err = ar.do.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(ar.Bucket),
 		Key:    aws.String(internal.ALBUM_PATH + id + "/" + imageName),
 	})

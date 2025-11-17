@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"mime/multipart"
 	"strconv"
 	"workerbee/internal"
 	"workerbee/models"
@@ -32,8 +31,8 @@ func (as *AlbumService) CreateAlbum(ctx context.Context, body models.CreateAlbum
 	return as.repo.CreateAlbum(ctx, body)
 }
 
-func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, files []*multipart.FileHeader) error {
-	return as.repo.UploadImagesToAlbum(ctx, id, files)
+func (as *AlbumService) UploadImagesToAlbum(ctx context.Context, id string, uploads []models.UploadImages) ([]models.UploadPictureResponse, error) {
+	return as.repo.UploadImagesToAlbum(ctx, id, uploads)
 }
 
 func (as *AlbumService) GetAlbum(ctx context.Context, id string) (models.AlbumWithImages, error) {

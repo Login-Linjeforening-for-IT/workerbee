@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"net/http"
 	"workerbee/internal"
 )
 
@@ -38,6 +39,17 @@ type EventAlbum struct {
 type AlbumsWithTotalCount struct {
 	AlbumWithImages
 	TotalCount int `db:"total_count" json:"-"`
+}
+
+type UploadImages struct {
+	Filename string `json:"filename" validate:"required"`
+	Type     string `json:"type" validate:"required"`
+}
+
+type UploadPictureResponse struct {
+	URL     string      `json:"url"`
+	Headers http.Header `json:"headers"`
+	Key     string      `json:"key"`
 }
 
 func (a AlbumWithImages) MarshalJSON() ([]byte, error) {

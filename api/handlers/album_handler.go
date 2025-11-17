@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -52,25 +53,19 @@ func (h *Handler) CreateAlbum(c *gin.Context) {
 func (h *Handler) UploadImagesToAlbum(c *gin.Context) {
 	id := c.Param("id")
 
-	form, err := c.MultipartForm()
+	var files []models.UploadImages
+	if err := c.ShouldBindBodyWithJSON(&files); internal.HandleError(c, err) {
+		return
+	}
+
+	responses, err := h.Services.Albums.UploadImagesToAlbum(c.Request.Context(), id, files)
 	if internal.HandleError(c, err) {
 		return
 	}
 
-	files := form.File["images"]
-	if len(files) == 0 {
-		internal.HandleError(c, internal.ErrNoImagesProvided)
-		return
-	}
+	log.Println(responses)
 
-	err = h.Services.Albums.UploadImagesToAlbum(c.Request.Context(), id, files)
-	if internal.HandleError(c, err) {
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"Success": "Images have been uploaded",
-	})
+	c.JSON(http.StatusOK, responses)
 }
 
 // GetAlbums godoc

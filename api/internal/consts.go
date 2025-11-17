@@ -9,7 +9,7 @@ const (
 	IMG_PATH                      = "img/"
 	ALBUM_PATH                    = "albums/"
 	PROTECTED_REQUESTS_PER_MINUTE = 25
-	MaxAlbumImageSize             = 3 << 20
+	MaxAlbumImageSize             = 1 << 20
 	MaxDimension                  = 6000
 	ImageRatio                    = 2.5
 	MaxImageSize                  = 5 << 10
