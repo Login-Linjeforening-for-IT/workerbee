@@ -326,6 +326,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				"/compress",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(1),
+				h.CompressAlbumImages,
 			)
 		}
 		calendar := v2.Group("/calendar")

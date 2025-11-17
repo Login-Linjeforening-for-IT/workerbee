@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"context"
+	"log"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -230,5 +232,19 @@ func (h *Handler) SetAlbumCover(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Album cover set successfully",
+	})
+}
+
+func (h *Handler) CompressAlbumImages(c *gin.Context) {
+	go func() {
+		bgCtx := context.Background()
+		err := h.Services.Compressor.CompressAllAlbums(bgCtx)
+		if err != nil {
+			log.Printf("Error compressing album images: %v", err)
+		}
+	}()
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"message": "Album image compression started",
 	})
 }

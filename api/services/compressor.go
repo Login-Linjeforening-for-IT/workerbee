@@ -7,6 +7,7 @@ import (
 	"log"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"time"
 	"workerbee/internal"
 	"workerbee/repositories"
@@ -16,6 +17,7 @@ import (
 )
 
 type CompressorService struct {
+	isRunning  atomic.Bool
 	imageRepo  repositories.ImageRepository
 	albumsRepo repositories.AlbumsRepository
 }
@@ -81,6 +83,12 @@ func compressedKeyFromRaw(rawKey string) string {
 }
 
 func (cs *CompressorService) CompressAllAlbums(ctx context.Context) error {
+	if !cs.isRunning.CompareAndSwap(false, true) {
+		return nil
+	}
+	
+	defer cs.isRunning.Store(false)
+
 	images, err := cs.imageRepo.GetImagesInPath(ctx, internal.ALBUM_PATH)
 	if err != nil {
 		return err
