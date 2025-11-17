@@ -155,6 +155,7 @@ func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search
 		Prefix: aws.String(internal.ALBUM_PATH),
 	})
 
+	counts := make(map[string]int)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
@@ -169,6 +170,8 @@ func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search
 			parts := strings.Split(*obj.Key, "/")
 			if len(parts) >= 2 {
 				albumID := parts[1]
+
+				counts[albumID]++
 
 				if !neededAlbums[albumID] {
 					continue
@@ -188,7 +191,7 @@ func (ar *albumsRepository) GetAlbums(ctx context.Context, orderBy, sort, search
 	for i := range albums {
 		albumID := strconv.Itoa(albums[i].ID)
 		albums[i].Images = images[albumID]
-		albums[i].ImageCount = len(images[albumID])
+		albums[i].ImageCount = counts[albumID]
 	}
 
 	return albums, nil
