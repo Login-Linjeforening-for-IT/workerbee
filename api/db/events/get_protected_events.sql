@@ -90,12 +90,12 @@ LEFT JOIN cities ON l.city_id = cities.id
 LEFT JOIN rules AS r ON e.rule_id = r.id
 WHERE (
         $2::bool
-        OR (
-            (
-                e.time_end IS NOT NULL
-                AND e.time_end > now()
-            )
-            OR (e.time_start > now() - interval '1 day')
+        OR
+        (
+            e.time_publish <= now()
+        )
+        AND (
+            e.time_end > now()
         )
     )
     AND (
