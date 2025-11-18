@@ -18,6 +18,11 @@ sub vcl_recv {
 }
 
 sub vcl_backend_response {
+    if (beresp.status != 200) {
+        set beresp.ttl = 0s;
+        return (deliver);
+    }
+
     if (beresp.http.Surrogate-Key) {
         set beresp.http.X-Surrogate-Key = beresp.http.Surrogate-Key;
     }

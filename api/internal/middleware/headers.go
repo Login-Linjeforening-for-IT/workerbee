@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
+	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,8 +21,8 @@ var affectedKeys = map[string]struct {
 		nonModifying: []string{"jobs"},
 	},
 	"organizations": {
-		modifying:    []string{"organizations"},
-		nonModifying: []string{"organizations", "jobs"},
+		modifying:    []string{"organizations", "jobs"},
+		nonModifying: []string{"organizations"},
 	},
 	// add more paths here
 }
@@ -28,11 +30,31 @@ var affectedKeys = map[string]struct {
 // SetSurrogatePurgeHeader sets the Surrogate-Purge header for cache purging.
 func SetHeaders() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		trimmed := strings.Split(c.Request.URL.Path, "/")
+		routePattern := c.FullPath()
+		if routePattern == "" {
+			c.Next()
+			return
+		}
 
-		prefix := trimmed[2]
+		parts := strings.Split(strings.Trim(routePattern, "/"), "/")
+		resource := ""
+		for _, p := range parts {
+			if p != "" && !strings.Contains(internal.BASE_PATH, p) { // take first non-dynamic part after base path
+				resource = p
+				break
+			}
+		}
 
-		affectedKeys := getAffectedKeys(prefix, c.Request.Method)
+		affectedKeys := getAffectedKeys(resource, c.Request.Method)
+
+		var affectedKeysList = make([]string, 0, len(c.Params))
+		for _, param := range c.Params {
+			affectedKeysList = append(affectedKeysList, fmt.Sprintf("%s:%s", resource, param.Value))
+		}
+
+		if len(affectedKeysList) > 0 {
+			affectedKeys = affectedKeysList
+		}
 
 		setSurrogateHeader(c, affectedKeys...)
 
