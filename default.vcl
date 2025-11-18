@@ -6,7 +6,11 @@ backend default {
 }
 
 sub vcl_recv {
-    if (req.http.Authorization || req.method != "GET") {
+    if (req.http.Authorization) {
+        return (pass);
+    }
+
+    if (req.method != "GET" && req.method != "HEAD") {
         return (pass);
     }
 
@@ -14,7 +18,23 @@ sub vcl_recv {
 }
 
 sub vcl_backend_response {
-    
+    if (beresp.http.Surrogate-Key) {
+        set beresp.http.X-Surrogate-Key = beresp.http.Surrogate-Key;
+    }
+
+    if (bereq.method == "POST" || bereq.method == "PUT" || bereq.method == "DELETE") {
+        if (beresp.http.Surrogate-Key) {
+            ban("obj.http.X-Surrogate-Key ~ " + beresp.http.Surrogate-Key);
+        }
+    }
+
+    if (bereq.method == "GET" || bereq.method == "HEAD") {
+        set beresp.ttl = 1h;
+    } else {
+        set beresp.ttl = 0s;
+
+
+    }
 }
 
 sub vcl_deliver {

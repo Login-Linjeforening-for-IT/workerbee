@@ -70,6 +70,8 @@ func (h *Handler) GetJobs(c *gin.Context) {
 		return
 	}
 
+	SetSurrogatePurgeHeader(c, "jobs")
+
 	if len(jobs) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"jobs":        jobs,

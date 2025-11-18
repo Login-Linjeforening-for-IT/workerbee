@@ -67,6 +67,11 @@ func (h *Handler) UpdateOrganization(c *gin.Context) {
 		return
 	}
 
+	SetSurrogatePurgeHeader(c,
+		"organizations",
+		"jobs",
+	)
+
 	c.JSON(http.StatusOK, orgResponse)
 }
 
@@ -94,6 +99,10 @@ func (h *Handler) GetOrganizations(c *gin.Context) {
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	SetSurrogatePurgeHeader(c,
+		"organizations",
+	)
 
 	if len(orgs) == 0 {
 		c.JSON(http.StatusOK, gin.H{

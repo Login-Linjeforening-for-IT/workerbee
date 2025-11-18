@@ -7,7 +7,6 @@ import (
 )
 
 type Handler struct {
-	Cmpr int
 	Services *services.Services
 	Router   *gin.Engine
 }
