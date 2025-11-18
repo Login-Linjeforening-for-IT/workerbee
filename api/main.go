@@ -43,6 +43,7 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(middleware.CORS())
+	router.Use(middleware.SetHeaders())
 
 	routes_internal.Route(router, h)
 

@@ -18,7 +18,7 @@ import (
 // @Success      201           {object}  models.Organization
 // @Failure      400           {object}  error
 // @Failure      500           {object}  error
-// @Router       /api/v2/organizations [post]	
+// @Router       /api/v2/organizations [post]
 func (h *Handler) CreateOrganization(c *gin.Context) {
 	var org models.Organization
 
@@ -142,7 +142,7 @@ func (h *Handler) GetOrganizationNames(c *gin.Context) {
 // @Param        id   path      string  true  "Organization ID"
 // @Success      200  {object}  models.Organization
 // @Failure      500  {object}  error
-// @Router       /api/v2/organizations/{id} [get]	
+// @Router       /api/v2/organizations/{id} [get]
 func (h *Handler) GetOrganization(c *gin.Context) {
 	id := c.Param("id")
 
