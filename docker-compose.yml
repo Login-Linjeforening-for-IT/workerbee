@@ -2,8 +2,6 @@ services:
   workerbee:
     container_name: "workerbee"
     build: ./
-    ports:
-      - "8080:8080"
     depends_on:
       postgres: 
         condition: service_healthy
@@ -25,5 +23,15 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 10s
+  varnish:
+    image: varnish:7
+    container_name: workerbee-varnish
+    ports:
+      - "80:80"
+    volumes:
+      - ./default.vcl:/etc/varnish/default.vcl
+    command: ["varnishd", "-F", "-f", "/etc/varnish/default.vcl", "-s", "malloc,512m"]
+    depends_on:
+      - workerbee
 volumes:
   postgres_data:
