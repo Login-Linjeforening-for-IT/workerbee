@@ -2,6 +2,7 @@ services:
   workerbee:
     container_name: "workerbee"
     build: ./
+    restart: always
     ports:
       - "8080:8080"
     depends_on:
