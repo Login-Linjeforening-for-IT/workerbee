@@ -4,13 +4,13 @@ services:
     build: ./
     restart: always
     ports:
-      - "8080:8080"
+      - "8500:8080"
     depends_on:
       postgres: 
         condition: service_healthy
     env_file:
       - .env
-  
+
   postgres:
     image: postgres:17
     container_name: workerbee-database
