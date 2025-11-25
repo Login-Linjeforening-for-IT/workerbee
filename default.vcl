@@ -2,7 +2,7 @@ vcl 4.0;
 
 backend default {
     .host = "workerbee";
-    .port = "8080";
+    .port = "8081";
 }
 
 sub vcl_recv {
@@ -25,6 +25,10 @@ sub vcl_backend_response {
 
     if (beresp.http.Surrogate-Key) {
         set beresp.http.X-Surrogate-Key = beresp.http.Surrogate-Key;
+    }
+
+    if (beresp.http.Content-Type ~ "application/json") {
+        set beresp.http.Content-Type = "application/json; charset=utf-8";
     }
 
     if (bereq.method == "POST" || bereq.method == "PUT" || bereq.method == "DELETE") {
