@@ -39,11 +39,11 @@ func GetEnvAsInt(name string, defaultVal int) int {
 
 func Init() {
 	var err error
-	Port = GetEnv("PORT", "8080")
+	Port = GetEnv("PORT", "8081")
 	Host = GetEnv("HOST", "0.0.0.0")
 
 	user := GetEnv("POSTGRES_USER", "admin")
-	password := GetEnv("POSTGRES_PASSWORD", "admin")
+	password := GetEnv("POSTGRES_PASSWORD", "")
 	port := GetEnv("POSTGRES_PORT", "5432")
 	db_name := GetEnv("POSTGRES_DB", "db")
 	db_host := GetEnv("POSTGRES_HOST", "localhost")

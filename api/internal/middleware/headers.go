@@ -24,6 +24,26 @@ var affectedKeys = map[string]struct {
 		modifying:    []string{"organizations", "jobs"},
 		nonModifying: []string{"organizations"},
 	},
+	"rules": {
+		modifying:    []string{"rules", "events"},
+		nonModifying: []string{"rules"},
+	},
+	"audiences": {
+		modifying:    []string{"audiences", "jobs", "events"},
+		nonModifying: []string{"audiences"},
+	},
+	"locations": {
+		modifying:    []string{"locations", "jobs", "events"},
+		nonModifying: []string{"locations"},
+	},
+	"albums": {
+		modifying:    []string{"albums"},
+		nonModifying: []string{"albums"},
+	},
+	"alerts": {
+		modifying:    []string{"alerts"},
+		nonModifying: []string{"alerts"},
+	},
 	// add more paths here
 }
 
@@ -39,7 +59,7 @@ func SetHeaders() gin.HandlerFunc {
 		parts := strings.Split(strings.Trim(routePattern, "/"), "/")
 		resource := ""
 		for _, p := range parts {
-			if p != "" && !strings.Contains(internal.BASE_PATH, p) { // take first non-dynamic part after base path
+			if p != "" && !strings.Contains(internal.BASE_PATH, p) {
 				resource = p
 				break
 			}
