@@ -17,23 +17,23 @@ var affectedKeys = map[string]struct {
 	nonModifying []string
 }{
 	"jobs": {
-		modifying:    []string{"jobs"},
+		modifying:    []string{"jobs", "stats"},
 		nonModifying: []string{"jobs"},
 	},
 	"organizations": {
-		modifying:    []string{"organizations", "jobs"},
+		modifying:    []string{"organizations", "jobs", "stats", "events"},
 		nonModifying: []string{"organizations"},
 	},
 	"rules": {
-		modifying:    []string{"rules", "events"},
+		modifying:    []string{"rules", "events", "stats"},
 		nonModifying: []string{"rules"},
 	},
 	"audiences": {
-		modifying:    []string{"audiences", "jobs", "events"},
+		modifying:    []string{"audiences", "jobs", "events", "stats"},
 		nonModifying: []string{"audiences"},
 	},
 	"locations": {
-		modifying:    []string{"locations", "jobs", "events"},
+		modifying:    []string{"locations", "jobs", "events", "stats"},
 		nonModifying: []string{"locations"},
 	},
 	"albums": {
@@ -44,7 +44,26 @@ var affectedKeys = map[string]struct {
 		modifying:    []string{"alerts"},
 		nonModifying: []string{"alerts"},
 	},
-	// add more paths here
+	"stats": {
+		modifying:    []string{"stats"},
+		nonModifying: []string{"stats"},
+	},
+	"events": {
+		modifying:    []string{"events", "stats", "categories", "audiences", "locations", "rules", "organizations"},
+		nonModifying: []string{"events"},
+	},
+	"categories": {
+		modifying:    []string{"categories", "events", "stats", "jobs"},
+		nonModifying: []string{"categories"},
+	},
+	"honeys": {
+		modifying:    []string{"honeys", "stats"},
+		nonModifying: []string{"honeys"},
+	},
+	"text": {
+		modifying:    []string{"text", "stats"},
+		nonModifying: []string{"text"},
+	},
 }
 
 // SetSurrogatePurgeHeader sets the Surrogate-Purge header for cache purging.
@@ -73,7 +92,7 @@ func SetHeaders() gin.HandlerFunc {
 		}
 
 		if len(affectedKeysList) > 0 {
-			affectedKeys = affectedKeysList
+			affectedKeys = append(affectedKeys, affectedKeysList...)
 		}
 
 		setSurrogateHeader(c, affectedKeys...)
