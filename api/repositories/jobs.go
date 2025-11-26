@@ -400,9 +400,9 @@ func (r *jobsrepositories) UpdateJob(job models.NewJob) (models.NewJob, error) {
 }
 
 func (r *jobsrepositories) DeleteJob(id string) (int, error) {
-	jobId, err := db.ExecuteOneRow[int](r.db, "./db/jobs/delete_job.sql", id)
+	jobId, err := db.DeleteOneRow[int](r.db, "./db/jobs/delete_job.sql", id)
 	if err != nil {
-		return 0, internal.ErrInvalid
+		return 0, err
 	}
 
 	return jobId, nil

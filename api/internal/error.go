@@ -17,6 +17,7 @@ var (
 	ErrNoImagesProvided       = errors.New("no images provided")
 	ErrNotFound               = errors.New("could not find id")
 	ErrNoRow                  = errors.New("no row found")
+	ErrUnableToDelete         = errors.New("unable to delete resource")
 	ErrInvalid                = errors.New("invalid user data")
 	ErrInvalidImagePath       = errors.New("invalid image path")
 	ErrImageTooLarge          = errors.New("image size exceeds maximum limit")
@@ -57,9 +58,9 @@ var (
 		ErrS3ClientNotInitialized: {Status: http.StatusInternalServerError, Message: "s3 client not initialized"},
 		ErrConflict:               {Status: http.StatusConflict, Message: "resource already exists"},
 		ErrUnknownImageFormat:     {Status: http.StatusBadRequest, Message: "unknown image format please use jpg or png"},
+		ErrUnableToDelete:         {Status: http.StatusBadRequest, Message: "unable to delete resource, either too old or invalid ID"},
 	}
 )
-
 
 func HandleError(c *gin.Context, err error) bool {
 	if err == nil {

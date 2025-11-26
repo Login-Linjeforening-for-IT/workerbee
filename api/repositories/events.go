@@ -210,9 +210,9 @@ func (r *eventRepositories) UpdateOneEvent(id int, event models.NewEvent) (model
 }
 
 func (r *eventRepositories) DeleteEvent(id string) (int, error) {
-	eventId, err := db.ExecuteOneRow[int](r.db, "./db/events/delete_event.sql", id)
+	eventId, err := db.DeleteOneRow[int](r.db, "./db/events/delete_event.sql", id)
 	if err != nil {
-		return 0, internal.ErrInvalid
+		return 0, err
 	}
 	return eventId, nil
 }

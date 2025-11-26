@@ -110,6 +110,25 @@ func ExecuteOneRow[T any](db *sqlx.DB, sqlPath string, args ...any) (T, error) {
 	return result, nil
 }
 
+func DeleteOneRow[t any](db *sqlx.DB, sqlPath string, args ...any) (t, error) {
+	var result t
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return result, err
+	}
+
+	err = db.Get(&result, string(sqlBytes), args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return result, internal.ErrUnableToDelete
+		}
+		return result, err
+	}
+
+	return result, nil
+}
+
 func AddOneRow[T any](db *sqlx.DB, sqlPath string, body T) (T, error) {
 	var pqErr *pq.Error
 	var result T

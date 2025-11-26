@@ -696,7 +696,7 @@ VALUES
   'Som Junior Software Developer vil du være med på utvikling av applikasjoner og programvare.', 
   'As a Junior Software Developer, you will be involved in the development of applications and software.', 
   1, now(), now(),'https://www.example.com/banner.jpg', 
-  1, 'https://www.uio.no/job-apply', now(), now()),
+  1, 'https://www.uio.no/job-apply', now(), now() - interval '4 days'),
 (true, true, 'Markedsføringskoordinator', 'Marketing Coordinator', 'Markedsføringsspesialist', 
   'Marketing Specialist', 'Bli en del av vårt markedsføringsteam og jobb med spennende prosjekter.', 
   'Join our marketing team and work on exciting projects.', 
@@ -757,7 +757,7 @@ VALUES
  'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
  '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
  false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
- NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 1, 1, now(), now()),
+ NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 1, 1, now()- interval '3 days', now()),
 
 (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
  'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
