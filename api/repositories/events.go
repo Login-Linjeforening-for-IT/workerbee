@@ -73,8 +73,17 @@ func (r *eventRepositories) CreateMultipleEvents(event models.NewEvent, repeatUn
 		signupDeadline = &event.TimeSignupDeadline.Time
 	}
 
+	// Ensure repeatUntil.Time is set to the end of the day (23:59:59)
+	repeatUntilEndOfDay := time.Date(
+		repeatUntil.Time.Year(),
+		repeatUntil.Time.Month(),
+		repeatUntil.Time.Day(),
+		23, 59, 59, 0,
+		repeatUntil.Time.Location(),
+	)
+
 	for {
-		if start.After(repeatUntil.Time) {
+		if start.After(repeatUntilEndOfDay) {
 			break
 		}
 
