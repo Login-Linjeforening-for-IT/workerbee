@@ -12,7 +12,7 @@ services:
       - .env
   postgres:
     image: postgres:17
-    container_name: workerbee-database
+    container_name: workerbee_database
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
