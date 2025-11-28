@@ -1,6 +1,7 @@
 services:
   workerbee:
     container_name: workerbee
+    image: workerbee
     build: ./
     restart: always
     ports:
@@ -25,5 +26,6 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 10s
+
 volumes:
   postgres_data:
