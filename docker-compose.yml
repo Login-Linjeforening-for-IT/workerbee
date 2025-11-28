@@ -1,6 +1,6 @@
 services:
   workerbee:
-    container_name: "workerbee"
+    container_name: workerbee
     build: ./
     restart: always
     ports:
