@@ -6,10 +6,6 @@ backend default {
 }
 
 sub vcl_recv {
-    if (req.http.Authorization) {
-        return (pass);
-    }
-
     if (req.method != "GET" && req.method != "HEAD") {
         return (pass);
     }
@@ -21,6 +17,10 @@ sub vcl_backend_response {
     if (beresp.status != 200) {
         set beresp.ttl = 0s;
         return (deliver);
+    }
+
+    if (bereq.http.Authorization) {
+        set beresp.http.Vary = "Authorization";
     }
 
     if (beresp.http.Surrogate-Key) {
