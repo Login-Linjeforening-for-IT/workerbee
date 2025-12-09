@@ -11,6 +11,10 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    mem_limit: 1g
+    cpus: "2.0"
+
+
   postgres:
     image: postgres:17
     container_name: workerbee_database
@@ -26,5 +30,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 10s
+    mem_limit: 1g
+    cpus: "2.0"
+
 volumes:
   postgres_data:
