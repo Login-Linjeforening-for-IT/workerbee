@@ -7,7 +7,7 @@ services:
     ports:
       - "8500:8080"
     depends_on:
-      postgres: 
+      workerbee_database: 
         condition: service_healthy
     env_file:
       - .env
@@ -15,7 +15,7 @@ services:
     cpus: "2.0"
 
 
-  postgres:
+  workerbee_database:
     image: postgres:18
     container_name: workerbee_database
     restart: always
