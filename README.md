@@ -20,12 +20,12 @@ The application uses the following environment variables. These can be set in a 
 
 | Variable                 | Default Value   | Description                                      |
 |--------------------------|-----------------|--------------------------------------------------|
-| POSTGRES_PASSWORD        | (required)      | Password for the PostgreSQL database.            |
+| DB_PASSWORD        | (required)      | Password for the PostgreSQL database.            |
 | INIT_SQL_FILE            | `./db/init.sql` | Path to the SQL file to initialize the database. |
-| POSTGRES_USER            | (required)      | Username for the PostgreSQL database.            |
-| POSTGRES_DB              | (required)      | Name of the PostgreSQL database.                 |
-| POSTGRES_HOST            | (required)      | Hostname for the PostgreSQL database.            |
-| POSTGRES_PORT            | (optional)      | Port for the PostgreSQL database.                |
+| DB_USER            | (required)      | Username for the PostgreSQL database.            |
+| DB              | (required)      | Name of the PostgreSQL database.                 |
+| DB_HOST            | (required)      | Hostname for the PostgreSQL database.            |
+| DB_PORT            | (optional)      | Port for the PostgreSQL database.                |
 | PORT                     | (optional)      | Port for the API server to listen on.            |
 | DO_URL                   | (required)      | DigitalOcean Spaces endpoint URL.                |
 | DO_SECRET_ACCESS_KEY     | (required)      | DigitalOcean Spaces secret access key.           |

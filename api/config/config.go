@@ -42,12 +42,11 @@ func Init() {
 	Port = GetEnv("PORT", "8081")
 	Host = GetEnv("HOST", "0.0.0.0")
 
-	user := GetEnv("POSTGRES_USER", "admin")
-	password := GetEnv("POSTGRES_PASSWORD", "")
-	port := GetEnv("POSTGRES_PORT", "5432")
-	db_name := GetEnv("POSTGRES_DB", "db")
-	db_host := GetEnv("POSTGRES_HOST", "localhost")
-
+	user := GetEnv("DB_USER", "workerbee")
+	password := GetEnv("DB_PASSWORD", "")
+	port := GetEnv("DB_PORT", "5432")
+	db_name := GetEnv("DB", "workerbee")
+	db_host := GetEnv("DB_HOST", "localhost")
 	DB_url = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, db_host, port, db_name)
 	DO_URL = GetEnv("DO_URL", "")
 	DO_access_key_id = GetEnv("DO_ACCESS_KEY_ID", "")
