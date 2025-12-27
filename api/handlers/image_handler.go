@@ -35,7 +35,7 @@ func (h *Handler) UploadImage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, imageURL)
+	c.JSON(http.StatusOK, gin.H{"image": imageURL})
 }
 
 // GetImageURLs godoc
