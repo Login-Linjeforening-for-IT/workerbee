@@ -57,11 +57,11 @@ var affectedKeys = map[string]struct {
 		nonModifying: []string{"categories"},
 	},
 	"honeys": {
-		modifying:    []string{"honeys", "stats"},
+		modifying:    []string{"honeys", "stats", "text"},
 		nonModifying: []string{"honeys"},
 	},
 	"text": {
-		modifying:    []string{"text", "stats"},
+		modifying:    []string{"text", "stats", "honeys"},
 		nonModifying: []string{"text"},
 	},
 }

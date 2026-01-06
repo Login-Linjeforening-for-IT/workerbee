@@ -37,7 +37,7 @@ func (h *Handler) CreateHoney(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusCreated, response)
 }
 
 // GetTextServices godoc
