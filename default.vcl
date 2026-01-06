@@ -14,36 +14,34 @@ sub vcl_recv {
 }
 
 sub vcl_backend_response {
-    if (beresp.status != 200) {
-        set beresp.ttl = 0s;
-        return (deliver);
-    }
-
-    if (bereq.http.Authorization) {
-        set beresp.http.Vary = "Authorization";
-    }
-
     if (beresp.http.Surrogate-Key) {
         set beresp.http.X-Surrogate-Key = beresp.http.Surrogate-Key;
-    }
-
-    if (beresp.http.Content-Type ~ "application/json") {
-        set beresp.http.Content-Type = "application/json; charset=utf-8";
     }
 
     if (bereq.method == "POST" || bereq.method == "PUT" || bereq.method == "DELETE") {
         if (beresp.http.Surrogate-Key) {
             ban("obj.http.X-Surrogate-Key ~ " + beresp.http.Surrogate-Key);
         }
+        set beresp.ttl = 0s;
+        set beresp.uncacheable = true;
+        return (deliver);
     }
 
-    if (bereq.method == "GET" || bereq.method == "HEAD") {
+    if (beresp.status == 200 && (bereq.method == "GET" || bereq.method == "HEAD")) {
+        if (bereq.http.Authorization) {
+            set beresp.http.Vary = "Authorization";
+        }
+        
+        if (beresp.http.Content-Type ~ "application/json") {
+            set beresp.http.Content-Type = "application/json; charset=utf-8";
+        }
+        
         set beresp.ttl = 1h;
     } else {
         set beresp.ttl = 0s;
-
-
     }
+    
+    return (deliver);
 }
 
 sub vcl_deliver {
