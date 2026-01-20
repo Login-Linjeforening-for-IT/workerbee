@@ -85,34 +85,41 @@ func (s *JobsService) GetProtectedJobs(search, limit_str, offset_str, orderBy, s
 	return s.repo.GetProtectedJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice, historical)
 }
 
-func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, error) {
+func (s *JobsService) GetJobs(search, limit_str, offset_str, orderBy, sort, jobTypes, skills, cities string) ([]models.JobWithTotalCount, int, error) {
 
 	orderBySanitized, sortSanitized, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsJobs)
 	if ok != nil {
-		return nil, internal.ErrInvalid
+		return nil, 0, internal.ErrInvalid
 	}
 
 	jobTypesSlice, err := internal.ParseFromStringToSlice[int](jobTypes)
 	if err != nil {
-		return nil, internal.ErrInvalid
+		return nil, 0, internal.ErrInvalid
 	}
 
 	skillsSlice, err := internal.ParseFromStringToSlice[string](skills)
 	if err != nil {
-		return nil, internal.ErrInvalid
+		return nil, 0, internal.ErrInvalid
 	}
 
 	citiesSlice, err := internal.ParseFromStringToSlice[string](cities)
 	if err != nil {
-		return nil, internal.ErrInvalid
+		return nil, 0, internal.ErrInvalid
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
-		return nil, internal.ErrInvalid
+		return nil, 0, internal.ErrInvalid
 	}
 
-	return s.repo.GetJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
+	jobs, err := s.repo.GetJobs(limit, offset, search, orderBySanitized, strings.ToUpper(sortSanitized), jobTypesSlice, skillsSlice, citiesSlice)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	cacheTTL := s.GetNextPublishTime()
+
+	return jobs, cacheTTL, nil
 }
 
 func (s *JobsService) GetJob(id string) (models.Job, error) {
@@ -207,6 +214,14 @@ func (s *JobsService) UpdateJobType(id_str string, jobType models.JobType) (mode
 
 func (s *JobsService) DeleteJobType(id string) (int, error) {
 	return s.repo.DeleteJobType(id)
+}
+
+func (s *JobsService) GetNextPublishTime() int {
+	cacheTTL, err := s.repo.GetNextPublishTime()
+	if err != nil || cacheTTL == nil {
+		return 3600
+	}
+	return internal.ParseCacheControlHeader(cacheTTL)
 }
 
 func parseCitiesAndSkills(cities []string) ([]string, error) {

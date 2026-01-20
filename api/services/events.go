@@ -4,7 +4,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"time"
 	"workerbee/internal"
 	"workerbee/models"
 	"workerbee/repositories"
@@ -134,40 +133,33 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, c
 	return events, cacheTTL, nil
 }
 
-func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str, audiences_str string) ([]models.EventWithTotalCount, int, error) {
+func (s *EventService) GetProtectedEvents(search, limit_str, offset_str, orderBy, sort, historical, categories_str, audiences_str string) ([]models.EventWithTotalCount, error) {
 	sanitizedOrderBy, sanitizedSort, ok := internal.SanitizeSort(orderBy, sort, allowedSortColumnsEvents)
 	if ok != nil {
-		return nil, 0, internal.ErrInvalid
+		return nil, internal.ErrInvalid
 	}
 
 	historicalBool, err := strconv.ParseBool(historical)
 	if err != nil {
-		return nil, 0, internal.ErrInvalid
+		return nil, internal.ErrInvalid
 	}
 
 	offset, limit, err := internal.CalculateOffset(offset_str, limit_str)
 	if err != nil {
-		return nil, 0, internal.ErrInvalid
+		return nil, internal.ErrInvalid
 	}
 
 	categories, err := parseToArray(categories_str)
 	if err != nil {
-		return nil, 0, internal.ErrInvalid
+		return nil, internal.ErrInvalid
 	}
 
 	audiences, err := parseToArray(audiences_str)
 	if err != nil {
-		return nil, 0, internal.ErrInvalid
+		return nil, internal.ErrInvalid
 	}
 
-	events, err := s.repo.GetProtectedEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories, audiences)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	cacheTTL := s.CalculateCacheTTL()
-
-	return events, cacheTTL, nil
+	return s.repo.GetProtectedEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), historicalBool, categories, audiences)
 }
 
 func (s *EventService) GetEvent(id string) (models.Event, error) {
@@ -196,18 +188,7 @@ func (s *EventService) CalculateCacheTTL() int {
 		return 3600
 	}
 
-	now := time.Now()
-	secondsUntilPublish := int(nextPublishTime.Sub(now).Seconds())
-
-	if secondsUntilPublish < 60 {
-		return 60
-	}
-
-	if secondsUntilPublish > 3600 {
-		return 3600
-	}
-
-	return secondsUntilPublish
+	return internal.ParseCacheControlHeader(nextPublishTime)
 }
 
 func parseToArray(content string) ([]int, error) {

@@ -135,13 +135,10 @@ func (h *Handler) GetProtectedEvents(c *gin.Context) {
 	sort := c.DefaultQuery("sort", "asc")
 	historical := c.DefaultQuery("historical", "false")
 
-	events, cacheTTL, err := h.Services.Events.GetProtectedEvents(search, limit, offset, orderBy, sort, historical, categories, audiences)
+	events, err := h.Services.Events.GetProtectedEvents(search, limit, offset, orderBy, sort, historical, categories, audiences)
 	if internal.HandleError(c, err) {
 		return
 	}
-
-	c.Header("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheTTL))
-
 	if len(events) == 0 {
 		c.JSON(http.StatusOK, gin.H{
 			"events":      events,

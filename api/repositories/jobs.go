@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"os"
+	"time"
 	"workerbee/db"
 	"workerbee/internal"
 	"workerbee/models"
@@ -28,6 +29,7 @@ type Jobsrepositories interface {
 	CreateJobType(jobType models.JobType) (models.JobType, error)
 	UpdateJobType(jobType models.JobType) (models.JobType, error)
 	DeleteJobType(id string) (int, error)
+	GetNextPublishTime() (*time.Time, error)
 }
 
 type jobsrepositories struct {
@@ -468,4 +470,12 @@ func (r *jobsrepositories) DeleteJobType(id string) (int, error) {
 		"./db/jobs/job_type/delete_job_type.sql",
 		id,
 	)
+}
+
+func (r *jobsrepositories) GetNextPublishTime() (*time.Time, error) {
+	nextPublishTime, err := db.ExecuteOneRow[*time.Time](r.db, "./db/jobs/get_next_publish_time.sql")
+	if err != nil {
+		return nil, err
+	}
+	return nextPublishTime, nil
 }

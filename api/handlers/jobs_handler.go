@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -65,12 +66,11 @@ func (h *Handler) GetJobs(c *gin.Context) {
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "asc")
 
-	jobs, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities)
+	jobs, cacheTTL, err := h.Services.Jobs.GetJobs(search, limit, offset, orderBy, sort, jobTypes, skills, cities)
 	if internal.HandleError(c, err) {
 		return
 	}
-
-	SetSurrogatePurgeHeader(c, "jobs")
+	c.Header("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheTTL))
 
 	if len(jobs) == 0 {
 		c.JSON(http.StatusOK, gin.H{
@@ -266,7 +266,7 @@ func (h *Handler) GetActiveJobTypes(c *gin.Context) {
 // @Produce      json
 // @Success      200  {array}   models.JobSkills
 // @Failure      500  {object}  error
-// @Router       /api/v2/jobs/skills [get]	
+// @Router       /api/v2/jobs/skills [get]
 func (h *Handler) GetJobSkills(c *gin.Context) {
 	jobSkills, err := h.Services.Jobs.GetJobSkills()
 	if internal.HandleError(c, err) {

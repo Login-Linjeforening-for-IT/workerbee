@@ -4,7 +4,23 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 )
+
+func ParseCacheControlHeader(t *time.Time) int {
+	now := time.Now()
+	secondsUntilPublish := int(t.Sub(now).Seconds())
+
+	if secondsUntilPublish < 60 {
+		return 60
+	}
+
+	if secondsUntilPublish > 3600 {
+		return 3600
+	}
+
+	return secondsUntilPublish
+}
 
 func DownscaleImage(width, height int) (int, int) {
 	if width > MaxDimension || height > MaxDimension {
