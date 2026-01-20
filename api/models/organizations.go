@@ -31,5 +31,6 @@ type OrganizationsResponse struct {
 
 type OrganizationNames struct {
 	ID     int    `db:"id" json:"id"`
+	NameNo string `db:"name_no" json:"name_no"`
 	NameEn string `db:"name_en" json:"name_en"`
 }

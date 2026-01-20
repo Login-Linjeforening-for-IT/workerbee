@@ -122,9 +122,9 @@ func (h *Handler) GetOrganizations(c *gin.Context) {
 // @Description  Retrieves a list of all organization names.
 // @Tags         organizations
 // @Produce      json
-// @Success      200  {array}   string
+// @Success      200  {array}   models.OrganizationNames
 // @Failure      500  {object}  error
-// @Router       /api/v2/organizations/names [get]
+// @Router       /api/v2/organizations/all [get]
 func (h *Handler) GetOrganizationNames(c *gin.Context) {
 	orgNames, err := h.Services.Organizations.GetOrgNames()
 	if internal.HandleError(c, err) {
