@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"workerbee/internal"
 	"workerbee/models"
@@ -93,10 +94,12 @@ func (h *Handler) GetEvents(c *gin.Context) {
 	orderBy := c.DefaultQuery("order_by", "id")
 	sort := c.DefaultQuery("sort", "asc")
 
-	events, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, categories, audiences)
+	events, cacheTTL, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, categories, audiences)
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	c.Header("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheTTL))
 
 	if len(events) == 0 {
 		c.JSON(http.StatusOK, gin.H{
@@ -132,10 +135,12 @@ func (h *Handler) GetProtectedEvents(c *gin.Context) {
 	sort := c.DefaultQuery("sort", "asc")
 	historical := c.DefaultQuery("historical", "false")
 
-	events, err := h.Services.Events.GetProtectedEvents(search, limit, offset, orderBy, sort, historical, categories, audiences)
+	events, cacheTTL, err := h.Services.Events.GetProtectedEvents(search, limit, offset, orderBy, sort, historical, categories, audiences)
 	if internal.HandleError(c, err) {
 		return
 	}
+
+	c.Header("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheTTL))
 
 	if len(events) == 0 {
 		c.JSON(http.StatusOK, gin.H{

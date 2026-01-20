@@ -32,11 +32,10 @@ sub vcl_backend_response {
             set beresp.http.Vary = "Authorization";
         }
         
-        if (beresp.http.Content-Type ~ "application/json") {
-            set beresp.http.Content-Type = "application/json; charset=utf-8";
+        if (beresp.http.Cache-Control) {
+        } else {
+            set beresp.ttl = 1h;
         }
-        
-        set beresp.ttl = 1h;
     } else {
         set beresp.ttl = 0s;
     }

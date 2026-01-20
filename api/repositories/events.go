@@ -24,6 +24,7 @@ type Eventrepositories interface {
 	GetEventAudiences() ([]models.Audience, error)
 	GetAllTimeTypes() (string, error)
 	GetEventNames() ([]models.EventName, error)
+	GetNextPublishTime() (*time.Time, error)
 }
 
 type eventRepositories struct {
@@ -254,4 +255,12 @@ func (r *eventRepositories) GetEventNames() ([]models.EventName, error) {
 		return nil, err
 	}
 	return eventNames, nil
+}
+
+func (r *eventRepositories) GetNextPublishTime() (*time.Time, error) {
+	nextPublishTime, err := db.ExecuteOneRow[*time.Time](r.db, "./db/events/get_next_publish_time.sql")
+	if err != nil {
+		return nil, err
+	}
+	return nextPublishTime, nil
 }
