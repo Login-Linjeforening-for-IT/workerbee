@@ -32,8 +32,7 @@ sub vcl_backend_response {
             set beresp.http.Vary = "Authorization";
         }
         
-        if (beresp.http.Cache-Control) {
-        } else {
+        if (!beresp.http.Cache-Control) {
             set beresp.ttl = 1h;
         }
     } else {
