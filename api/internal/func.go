@@ -15,11 +15,7 @@ func ParseCacheControlHeader(t *time.Time) int {
 		return 60
 	}
 
-	if secondsUntilPublish > 3600 {
-		return 3600
-	}
-
-	return secondsUntilPublish
+	return secondsUntilPublish + 5
 }
 
 func DownscaleImage(width, height int) (int, int) {
