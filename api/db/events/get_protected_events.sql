@@ -18,7 +18,6 @@ SELECT
     e.digital,
     e.highlight,
     e.image_small,
-    e.image_small,
     e.image_banner,
     e.link_facebook,
     e.link_discord,
@@ -89,16 +88,12 @@ LEFT JOIN organizations AS o ON e.organization_id = o.id
 LEFT JOIN cities ON l.city_id = cities.id
 LEFT JOIN rules AS r ON e.rule_id = r.id
 WHERE (
-        $2::bool
-        OR
-        (
-            e.time_publish <= now()
-        )
-        AND (
-            e.time_end > now()
-        )
+    $2::bool
+    OR 
+    (
+        e.time_end > now()
     )
-    AND (
+    ) AND (
         $1 = ''
         OR to_json(e)::text ILIKE '%' || $1 || '%'
     )

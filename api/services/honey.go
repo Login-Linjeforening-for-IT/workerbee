@@ -70,30 +70,30 @@ func (s *HoneyService) UpdateContentInPath(id_str string, content models.CreateH
 }
 
 func (s *HoneyService) GetOneLanguage(service, path, language string) (models.LanguageContentResponse, error) {
-	if !strings.HasPrefix(path, "/") {
-		path = "/" + path
-	}
+    if !strings.HasPrefix(path, "/") {
+        path = "/" + path
+    }
 
-	row, err := s.repo.GetOneLanguage(service, path, language)
-	if err != nil {
-		return models.LanguageContentResponse{}, err
-	}
+    row, err := s.repo.GetOneLanguage(service, path, language)
+    if err != nil {
+        return models.LanguageContentResponse{}, err
+    }
 
-	formattedText := make(map[string]map[string]string)
-	var content map[string]string
+    formattedText := make(map[string]map[string]interface{})
+    var content map[string]interface{}
 
-	err = json.Unmarshal([]byte(row.Text), &content)
-	if err != nil {
-		return models.LanguageContentResponse{}, err
-	}
-	formattedText[row.Language] = content
+    err = json.Unmarshal([]byte(row.Text), &content)
+    if err != nil {
+        return models.LanguageContentResponse{}, err
+    }
+    formattedText[row.Language] = content
 
-	return models.LanguageContentResponse{
-		Service:  row.Service,
-		Page:     row.Page,
-		Language: row.Language,
-		Text:     formattedText,
-	}, nil
+    return models.LanguageContentResponse{
+        Service:  row.Service,
+        Page:     row.Page,
+        Language: row.Language,
+        Text:     formattedText,
+    }, nil
 }
 
 func (s *HoneyService) GetHoney(id_str string) (models.CreateHoney, error) {

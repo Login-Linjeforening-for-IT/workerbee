@@ -25,8 +25,8 @@ type CreateHoney struct {
 }
 
 type LanguageContentResponse struct {
-	Service  string                       `db:"service" json:"service"`
-	Page     string                       `db:"page" json:"page"`
-	Language string                       `db:"language" json:"language"`
-	Text     map[string]map[string]string `db:"text" json:"text"`
+    Service  string                          `db:"service" json:"service"`
+    Page     string                          `db:"page" json:"page"`
+    Language string                          `db:"language" json:"language"`
+    Text     map[string]map[string]interface{} `db:"text" json:"text"`
 }
