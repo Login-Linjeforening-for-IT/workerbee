@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"path/filepath"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,7 @@ func (h *Handler) UploadImage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"image": imageURL})
+	c.JSON(http.StatusOK, gin.H{"image": imageURL, "name": filepath.Base(imageURL)})
 }
 
 // GetImageURLs godoc
