@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"context"
 	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"mime/multipart"
 	"slices"
 	"strings"
 	"workerbee/internal"
 	"workerbee/repositories"
-
-	"image/jpeg"
-	"image/png"
 
 	"github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
@@ -48,15 +47,7 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 	}
 	defer src.Close()
 
-	var img image.Image
-	filename := strings.ToLower(file.Filename)
-	if strings.HasSuffix(filename, ".png") {
-		img, err = png.Decode(src)
-	} else if strings.HasSuffix(filename, ".jpg") || strings.HasSuffix(filename, ".jpeg") {
-		img, err = jpeg.Decode(src)
-	} else {
-		return "", internal.ErrUnknownImageFormat
-	}
+	img, _, err := image.Decode(src)
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +60,7 @@ func (is *ImageService) UploadImage(file *multipart.FileHeader, ctx context.Cont
 
 	ops := &webp.Options{
 		Lossless: false,
-		Quality:  80,
+		Quality:  90,
 	}
 
 	buf := new(bytes.Buffer)

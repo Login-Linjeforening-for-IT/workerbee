@@ -124,7 +124,7 @@ func (s *EventService) GetEvents(search, limit_str, offset_str, orderBy, sort, c
 	}
 
 	events, err := s.repo.GetEvents(limit, offset, search, sanitizedOrderBy, strings.ToUpper(sanitizedSort), categories, audiences)
-	if err != nil {
+	if err != nil{
 		return nil, 0, err
 	}
 
