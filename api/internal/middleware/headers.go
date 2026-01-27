@@ -64,6 +64,10 @@ var affectedKeys = map[string]struct {
 		modifying:    []string{"text", "stats", "honeys"},
 		nonModifying: []string{"text"},
 	},
+	"quotes": {
+		modifying:    []string{"quotes"},
+		nonModifying: []string{"quotes"},
+	},
 }
 
 // SetSurrogatePurgeHeader sets the Surrogate-Purge header for cache purging.

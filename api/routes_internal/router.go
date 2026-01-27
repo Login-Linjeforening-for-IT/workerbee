@@ -333,5 +333,15 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			calendar.GET("/", h.GetCalendar)
 		}
+		quotes := v2.Group("/quotes")
+		{
+			quotes.POST(
+				"/",
+				middleware.AuthMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.CreateQuote,
+			)
+			quotes.GET("/", h.GetQuotes)
+		}
 	}
 }

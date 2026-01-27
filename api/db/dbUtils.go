@@ -91,6 +91,30 @@ func FetchAllElements[T any](
 	return result, nil
 }
 
+func SelectWithLimitOffset[T any](db *sqlx.DB, sqlPath string, limit, offset int, args ...any) ([]T, error) {
+	var result []T
+
+	sqlBytes, err := os.ReadFile(sqlPath)
+	if err != nil {
+		return nil, err
+	}
+	// append limit and offset to args
+	args = append(args, limit, offset)
+
+	query := fmt.Sprintf("%s \nLIMIT $%d OFFSET $%d;",
+		string(sqlBytes),
+		len(args)-1,
+		len(args),
+	)
+
+	err = db.Select(&result, string(query), args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func ExecuteOneRow[T any](db *sqlx.DB, sqlPath string, args ...any) (T, error) {
 	var result T
 

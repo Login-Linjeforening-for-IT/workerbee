@@ -171,6 +171,15 @@ CREATE TABLE IF NOT EXISTS "albums" (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE quotes (
+    "id" SERIAL PRIMARY KEY,
+    "author" text NOT NULL,
+    "quoted" text NOT NULL,
+    "content" text NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX ON "albums" ("year");
 CREATE INDEX ON "albums" ("created_at");
 CREATE INDEX ON "albums" ("updated_at");

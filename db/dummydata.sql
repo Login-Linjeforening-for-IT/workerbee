@@ -317,6 +317,15 @@ CREATE TABLE answer_options (
     PRIMARY KEY ("answer_id", "option_id")
 );
 
+CREATE TABLE quotes (
+    "id" SERIAL PRIMARY KEY,
+    "author" text NOT NULL,
+    "quoted" text NOT NULL,
+    "content" text NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX ON "forms"("user_id");
 
 CREATE INDEX ON "questions"("form_id");
@@ -433,6 +442,12 @@ CREATE TRIGGER track_alerts_inserts
 ------------------
 -- Dummy Data
 ------------------
+
+INSERT INTO quotes(author, quoted, content) VALUES
+('Hermanius Elganius', 'Gjermund', 'Han er en innvikler.'),
+('Ole', 'Hoff', '9090 incase 5432 is in use.'),
+('Eirik', 'Riwa','Jeg blir fysisk sint av å se på kode.'),
+('Ole', 'Hoff', 'Eg tenker en pepperbiff, med flødegratinerde poteter og stekegrad på rååååååååååå');
 
 INSERT INTO alerts (service, page, title_en, title_no, description_en, description_no) VALUES
 ('beehive', '/events', 'Important Beehive Update', 'Viktig Beehive Oppdatering', 'This is an important message for Beehive users. Please read carefully.', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
