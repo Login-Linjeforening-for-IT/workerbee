@@ -1,0 +1,3 @@
+DELETE FROM quotes 
+WHERE id = $1
+RETURNING id;

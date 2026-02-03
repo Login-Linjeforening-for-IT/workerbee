@@ -23,6 +23,69 @@ type response struct {
 	Groups            []string `json:"groups"`
 }
 
+func QuoteMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.Request.Header.Get("Authorization")
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			internal.HandleError(c, internal.ErrUnauthorized)
+			c.Abort()
+			return
+		}
+
+		tokenParts := strings.Split(authHeader, " ")
+		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
+			internal.HandleError(c, internal.ErrUnauthorized)
+			c.Abort()
+			return
+		}
+
+		token := tokenParts[1]
+
+		req, err := http.NewRequest(http.MethodGet, internal.USERINFO_URL, nil)
+		if internal.HandleError(c, err) {
+			c.Abort()
+			return
+		}
+
+		req.Header.Set("Authorization", "Bearer "+token)
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if internal.HandleError(c, err) {
+			c.Abort()
+			return
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			internal.HandleError(c, internal.ErrUnauthorized)
+			c.Abort()
+			return
+		}
+
+		defer resp.Body.Close()
+
+		decoder := json.NewDecoder(resp.Body)
+		var respStruct response
+		if err := decoder.Decode(&respStruct); err != nil {
+			internal.HandleError(c, internal.ErrUnauthorized)
+			c.Abort()
+			return
+		}
+
+		if slices.Contains(respStruct.Groups, internal.ADMIN_GROUP) {
+			c.Set("admin", true)
+		}
+
+		c.Set("user_id", respStruct.Sub)
+
+		fmt.Printf("[Quotes] username=%s\n",
+			respStruct.Nickname,
+		)
+
+		c.Next()
+	}
+}
+
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.Request.Header.Get("Authorization")
@@ -56,7 +119,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if resp.StatusCode != 200 {
+		if resp.StatusCode != http.StatusOK {
 			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return
@@ -72,7 +135,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if !slices.Contains(respStruct.Groups, internal.QUEENBEE_GROUP) {
+		if !slices.Contains(respStruct.Groups, internal.ADMIN_GROUP) {
 			internal.HandleError(c, internal.ErrUnauthorized)
 			c.Abort()
 			return

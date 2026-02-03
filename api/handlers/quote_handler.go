@@ -48,3 +48,16 @@ func (h *Handler) GetQuotes(c *gin.Context) {
 		})
 	}
 }
+
+func (h *Handler) DeleteQuote(c *gin.Context) {
+	id := c.Param("id")
+	userID := c.GetString("user_id")
+	admin := c.GetBool("admin")
+
+	deletedQuoteID, err := h.Services.Quotes.DeleteQuote(id, userID, admin)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"id": deletedQuoteID})
+}

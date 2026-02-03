@@ -8,8 +8,10 @@ import (
 )
 
 type QuoteRepository interface {
+	GetQuote(id string) (models.BaseQuote, error)
 	CreateQuote(quote models.BaseQuote) (models.BaseQuote, error)
 	GetQuotes(limit, offset int) ([]models.QuoteWithTotalCount, error)
+	DeleteQuote(id string) (int, error)
 }
 
 type quoteRepository struct {
@@ -43,4 +45,17 @@ func (r *quoteRepository) GetQuotes(limit, offset int) ([]models.QuoteWithTotalC
 	}
 
 	return quotes, nil
+}
+
+func (r *quoteRepository) GetQuote(id string) (models.BaseQuote, error) {
+	return db.ExecuteOneRow[models.BaseQuote](
+		r.db,
+		"./db/quotes/get_quote_by_id.sql",
+		id,
+	)
+}
+
+func (r *quoteRepository) DeleteQuote(id string) (int, error) {
+	// Here you can implement the actual deletion logic, e.g., executing a DELETE SQL statement.
+	return 1, nil
 }
