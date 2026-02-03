@@ -337,7 +337,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			quotes.POST(
 				"/",
-				middleware.AuthMiddleware(),
+				middleware.QuoteMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateQuote,
 			)

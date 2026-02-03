@@ -1,4 +1,4 @@
 INSERT 
 INTO quotes (author, quoted, content)
 VALUES (:author, :quoted, :content)
-RETURNING *;
+RETURNING id, quoted, content, created_at, updated_at;

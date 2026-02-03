@@ -9,17 +9,19 @@ import (
 )
 
 func (h *Handler) CreateQuote(c *gin.Context) {
-	var quotes models.BaseQuote
+	var quote models.BaseQuote
 
-	if err := c.ShouldBindBodyWithJSON(&quotes); internal.HandleError(c, err) {
+	if err := c.ShouldBindBodyWithJSON(&quote); internal.HandleError(c, err) {
 		return
 	}
 
-	if err := h.Services.Validate.Struct(&quotes); internal.HandleError(c, err) {
+	quote.Author = c.GetString("user")
+
+	if internal.HandleValidationError(c, quote, *h.Services.Validate) {
 		return
 	}
 
-	createdQuote, err := h.Services.Quotes.CreateQuote(quotes)
+	createdQuote, err := h.Services.Quotes.CreateQuote(quote)
 	if internal.HandleError(c, err) {
 		return
 	}

@@ -76,7 +76,7 @@ func QuoteMiddleware() gin.HandlerFunc {
 			c.Set("admin", true)
 		}
 
-		c.Set("user_id", respStruct.Sub)
+		c.Set("user", respStruct.Sub)
 
 		fmt.Printf("[Quotes] username=%s\n",
 			respStruct.Nickname,
