@@ -53,7 +53,7 @@ func (h *Handler) GetQuotes(c *gin.Context) {
 
 func (h *Handler) DeleteQuote(c *gin.Context) {
 	id := c.Param("id")
-	userID := c.GetString("user_id")
+	userID := c.GetString("user")
 	admin := c.GetBool("admin")
 
 	deletedQuoteID, err := h.Services.Quotes.DeleteQuote(id, userID, admin)
@@ -62,4 +62,28 @@ func (h *Handler) DeleteQuote(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"id": deletedQuoteID})
+}
+
+func (h *Handler) UpdateQuote(c *gin.Context) {
+	var quote models.BaseQuote
+
+	id := c.Param("id")
+
+	if err := c.ShouldBindBodyWithJSON(&quote); internal.HandleError(c, err) {
+		return
+	}
+
+	quote.Author = c.GetString("user")
+	admin := c.GetBool("admin")
+
+	if internal.HandleValidationError(c, quote, *h.Services.Validate) {
+		return
+	}
+
+	updatedQuote, err := h.Services.Quotes.UpdateQuote(quote, id, admin)
+	if internal.HandleError(c, err) {
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedQuote)
 }

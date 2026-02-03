@@ -72,9 +72,6 @@ func QuoteMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if slices.Contains(respStruct.Groups, internal.ADMIN_GROUP) {
-			c.Set("admin", true)
-		}
 
 		c.Set("user", respStruct.Sub)
 

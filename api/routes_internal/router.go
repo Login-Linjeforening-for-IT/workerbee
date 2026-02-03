@@ -342,6 +342,18 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				h.CreateQuote,
 			)
 			quotes.GET("/", h.GetQuotes)
+			quotes.DELETE(
+				"/:id",
+				middleware.QuoteMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.DeleteQuote,
+			)
+			quotes.PUT(
+				"/:id",
+				middleware.QuoteMiddleware(),
+				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
+				h.UpdateQuote,
+			)
 		}
 	}
 }

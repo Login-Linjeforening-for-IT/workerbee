@@ -3,7 +3,7 @@ package models
 import "workerbee/internal"
 
 type BaseQuote struct {
-	ID        int                `db:"id" json:"id"`
+	ID        int                `db:"id" json:"id,omitempty"`
 	Author    string             `db:"author" json:"-"`
 	Quoted    string             `db:"quoted" json:"quoted"`
 	Content   string             `db:"content" json:"content"`

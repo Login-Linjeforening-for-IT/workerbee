@@ -11,6 +11,7 @@ type QuoteRepository interface {
 	GetQuote(id string) (models.BaseQuote, error)
 	CreateQuote(quote models.BaseQuote) (models.BaseQuote, error)
 	GetQuotes(limit, offset int) ([]models.QuoteWithTotalCount, error)
+	UpdateQuote(quote models.BaseQuote) (models.BaseQuote, error)
 	DeleteQuote(id string) (int, error)
 }
 
@@ -50,12 +51,25 @@ func (r *quoteRepository) GetQuotes(limit, offset int) ([]models.QuoteWithTotalC
 func (r *quoteRepository) GetQuote(id string) (models.BaseQuote, error) {
 	return db.ExecuteOneRow[models.BaseQuote](
 		r.db,
-		"./db/quotes/get_quote_by_id.sql",
+		"./db/quotes/get_quote.sql",
 		id,
 	)
 }
 
+func (r *quoteRepository) UpdateQuote(quote models.BaseQuote) (models.BaseQuote, error) {
+	return db.AddOneRow(
+		r.db,
+		"./db/quotes/put_quote.sql",
+		quote,
+		
+	)
+}
+
 func (r *quoteRepository) DeleteQuote(id string) (int, error) {
-	// Here you can implement the actual deletion logic, e.g., executing a DELETE SQL statement.
-	return 1, nil
+	deletedID, err := db.DeleteOneRow[int](
+		r.db,
+		"./db/quotes/delete_quote.sql",
+		id,
+	)
+	return deletedID, err
 }
