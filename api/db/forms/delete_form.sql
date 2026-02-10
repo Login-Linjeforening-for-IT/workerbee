@@ -1,1 +1,0 @@
-DELETE FROM forms WHERE id = $1 RETURNING id;

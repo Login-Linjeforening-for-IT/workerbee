@@ -40,6 +40,8 @@ definitions:
         $ref: '#/definitions/models.EventAlbum'
       id:
         type: integer
+      image_count:
+        type: integer
       images:
         items:
           type: string
@@ -65,6 +67,8 @@ definitions:
         $ref: '#/definitions/models.EventAlbum'
       id:
         type: integer
+      image_count:
+        type: integer
       images:
         items:
           type: string
@@ -73,8 +77,6 @@ definitions:
         type: string
       name_no:
         type: string
-      total_count:
-        type: integer
       updated_at:
         $ref: '#/definitions/internal.LocalTime'
       year:
@@ -182,6 +184,27 @@ definitions:
       year:
         type: integer
     type: object
+  models.CreateHoney:
+    properties:
+      id:
+        type: integer
+      language:
+        enum:
+        - en
+        - "no"
+        type: string
+      page:
+        type: string
+      service:
+        type: string
+      text:
+        type: string
+    required:
+    - language
+    - page
+    - service
+    - text
+    type: object
   models.Event:
     properties:
       audience:
@@ -271,59 +294,6 @@ definitions:
         $ref: '#/definitions/internal.LocalTime'
       time_start:
         $ref: '#/definitions/internal.LocalTime'
-    type: object
-  models.Form:
-    properties:
-      capacity:
-        type: integer
-      close_at:
-        $ref: '#/definitions/internal.LocalTime'
-      created_at:
-        $ref: '#/definitions/internal.LocalTime'
-      description:
-        type: string
-      id:
-        type: integer
-      open_at:
-        $ref: '#/definitions/internal.LocalTime'
-      title:
-        type: string
-      updated_at:
-        $ref: '#/definitions/internal.LocalTime'
-      user_id:
-        type: integer
-    type: object
-  models.FormWithTotalCount:
-    properties:
-      capacity:
-        type: integer
-      close_at:
-        $ref: '#/definitions/internal.LocalTime'
-      created_at:
-        $ref: '#/definitions/internal.LocalTime'
-      description:
-        type: string
-      id:
-        type: integer
-      open_at:
-        $ref: '#/definitions/internal.LocalTime'
-      title:
-        type: string
-      totalCount:
-        type: integer
-      updated_at:
-        $ref: '#/definitions/internal.LocalTime'
-      user_id:
-        type: integer
-    type: object
-  models.FormsResponse:
-    properties:
-      forms:
-        items:
-          $ref: '#/definitions/models.FormWithTotalCount'
-        type: array
-      total_count:
-        type: integer
     type: object
   models.JobSkills:
     properties:
@@ -548,6 +518,15 @@ definitions:
     - link_homepage
     - name_en
     - name_no
+    type: object
+  models.OrganizationNames:
+    properties:
+      id:
+        type: integer
+      name_en:
+        type: string
+      name_no:
+        type: string
     type: object
   models.Question:
     properties:
@@ -1560,57 +1539,6 @@ paths:
       summary: Get all time types
       tags:
       - events
-  /api/v2/forms:
-    get:
-      description: Returns a list of forms, supports search and pagination
-      parameters:
-      - description: Search string
-        in: query
-        name: search
-        type: string
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Offset
-        in: query
-        name: offset
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.FormsResponse'
-        "500":
-          description: Internal Server Error
-          schema: {}
-      summary: List forms
-      tags:
-      - forms
-    post:
-      consumes:
-      - application/json
-      description: Creates a new form
-      parameters:
-      - description: Form object
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/models.Form'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/models.Form'
-        "400":
-          description: Bad Request
-          schema: {}
-      summary: Create a new form
-      tags:
-      - forms
   /api/v2/forms/{form_id}/questions:
     put:
       consumes:
@@ -1645,76 +1573,6 @@ paths:
       summary: Update questions for a form
       tags:
       - questions
-  /api/v2/forms/{id}:
-    delete:
-      description: Deletes a form by ID
-      parameters:
-      - description: Form ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema: {}
-      summary: Delete a form
-      tags:
-      - forms
-    get:
-      description: Returns a form by its ID
-      parameters:
-      - description: Form ID
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Form'
-        "500":
-          description: Internal Server Error
-          schema: {}
-      summary: Get a single form
-      tags:
-      - forms
-    put:
-      consumes:
-      - application/json
-      description: Updates a form by ID
-      parameters:
-      - description: Form ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Form object
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/models.Form'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Form'
-        "400":
-          description: Bad Request
-          schema: {}
-      summary: Update a form
-      tags:
-      - forms
   /api/v2/forms/submissions/{id}:
     get:
       description: Returns a submission by its ID
@@ -1738,6 +1596,28 @@ paths:
       summary: Get a single submission
       tags:
       - submissions
+  /api/v2/honey/{id}:
+    get:
+      description: Retrieves a honey entry by its ID
+      parameters:
+      - description: Honey ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateHoney'
+        "400":
+          description: Bad Request
+          schema: {}
+      summary: Get honey by ID
+      tags:
+      - honey
   /api/v2/honey/{service}/content/{path}:
     get:
       description: Retrieves all text content available in the specified path of a
@@ -1961,39 +1841,6 @@ paths:
       summary: Get image URLs in a specified path in a digital ocean bucket
       tags:
       - images
-  /api/v2/images/{path}/{imageName}:
-    delete:
-      description: Deletes an image file from the specified path in the image service.
-      parameters:
-      - description: Path where the image is located
-        in: path
-        name: path
-        required: true
-        type: string
-      - description: Name of the image to delete
-        in: path
-        name: imageName
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "400":
-          description: Bad Request
-          schema: {}
-        "500":
-          description: Internal Server Error
-          schema: {}
-      summary: Delete an image from a specified path in a digital ocean bucket
-      tags:
-      - images
-  /api/v2/images/upload/{path}:
     post:
       consumes:
       - multipart/form-data
@@ -2025,6 +1872,38 @@ paths:
           description: Internal Server Error
           schema: {}
       summary: Upload an image to a specified path in a digital ocean bucket
+      tags:
+      - images
+  /api/v2/images/{path}/{imageName}:
+    delete:
+      description: Deletes an image file from the specified path in the image service.
+      parameters:
+      - description: Path where the image is located
+        in: path
+        name: path
+        required: true
+        type: string
+      - description: Name of the image to delete
+        in: path
+        name: imageName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Delete an image from a specified path in a digital ocean bucket
       tags:
       - images
   /api/v2/jobs:
@@ -2767,7 +2646,7 @@ paths:
       summary: Update an existing organization
       tags:
       - organizations
-  /api/v2/organizations/names:
+  /api/v2/organizations/all:
     get:
       description: Retrieves a list of all organization names.
       produces:
@@ -2777,7 +2656,7 @@ paths:
           description: OK
           schema:
             items:
-              type: string
+              $ref: '#/definitions/models.OrganizationNames'
             type: array
         "500":
           description: Internal Server Error

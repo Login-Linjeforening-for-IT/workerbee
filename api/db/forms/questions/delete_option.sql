@@ -1,1 +1,0 @@
-DELETE FROM question_options WHERE id = $1 RETURNING id;

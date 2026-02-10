@@ -13,7 +13,6 @@ type Services struct {
 	Events        *EventService
 	Locations     *LocationService
 	Organizations *OrganizationService
-	Forms         *FormService
 	Jobs          *JobsService
 	Questions     *QuestionService
 	Rules         *RuleService
@@ -34,7 +33,6 @@ func NewServices(repos *repositories.Repositories) *Services {
 		Audiences:     NewAudienceService(repos.Audiences),
 		Categories:    NewCategoryService(repos.Categories),
 		Events:        NewEventService(repos.Events),
-		Forms:         NewFormService(repos.Forms),
 		Jobs:          NewJobsService(repos.Jobs),
 		Questions:     NewQuestionService(repos.Questions),
 		Rules:         NewRuleService(repos.Rules),

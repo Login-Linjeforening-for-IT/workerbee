@@ -199,22 +199,6 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			stats.GET("/categories", h.GetMostActiveCategories)
 			stats.GET("/new-additions", h.GetNewAdditionsStats)
 		}
-		forms := v2.Group("/forms")
-		{
-			forms.GET("/:id", h.GetForm)
-			forms.GET("/", h.GetForms)
-			forms.POST("/", h.PostForm)
-			forms.PUT("/:id", h.PutForm)
-			forms.DELETE("/:id", h.DeleteForm)
-			submissions := forms.Group(":id/submissions")
-			{
-				submissions.GET("/:submission_id", h.GetSubmission)
-				submissions.GET("/", handlers.PingHandler)
-				submissions.POST("/", handlers.PingHandler)
-				submissions.PUT("/:submission_id", handlers.PingHandler)
-				submissions.DELETE("/:submission_id", handlers.PingHandler)
-			}
-		}
 		images := v2.Group("/images/:path")
 		{
 			images.POST(

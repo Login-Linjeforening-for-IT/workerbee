@@ -12,51 +12,6 @@ CREATE TYPE "location_type" AS ENUM (
     'digital'
 );
 
-CREATE TABLE "albums" (
-    id SERIAL PRIMARY KEY,
-    name_en TEXT NOT NULL,
-    name_no TEXT NOT NULL,
-    description_no TEXT NOT NULL,
-    description_en TEXT NOT NULL,
-    year INT NOT NULL,
-    event_id INT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE "alerts" (
-  id SERIAL PRIMARY KEY,
-  service TEXT NOT NULL,
-  page TEXT NOT NULL,
-  title_en TEXT NOT NULL,
-  title_no TEXT NOT NULL,
-  description_en TEXT NOT NULL,
-  description_no TEXT NOT NULL,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(service, page)
-);
-
-CREATE TABLE  "honey" (
-    id SERIAL PRIMARY KEY,
-    service TEXT NOT NULL,
-    language TEXT NOT NULL,
-    page TEXT NOT NULL,
-    text TEXT NOT NULL,
-    UNIQUE(service, page, language)
-);
-
-CREATE INDEX idx_honey_service_page ON honey(service, page);
-CREATE INDEX idx_honey_service ON honey(service);
-
-CREATE TABLE "job_types" (
-    "id" SERIAL PRIMARY KEY,
-    "name_en" varchar NOT NULL,
-    "name_no" varchar NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE "audiences" (
   "id" SERIAL PRIMARY KEY,
   "name_no" text NOT NULL,
@@ -70,6 +25,14 @@ CREATE TABLE "categories" (
     "name_en" varchar NOT NULL,
     "name_no" varchar NOT NULL,
     "color" varchar NOT NULL,
+    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "job_types" (
+    "id" SERIAL PRIMARY KEY,
+    "name_en" varchar NOT NULL,
+    "name_no" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -196,6 +159,27 @@ CREATE TABLE "skills" (
     "name" varchar NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS "albums" (
+    id SERIAL PRIMARY KEY,
+    name_no TEXT NOT NULL,
+    name_en TEXT NOT NULL,
+    description_no TEXT NOT NULL,
+    description_en TEXT NOT NULL,
+    year INT NOT NULL,
+    event_id INT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE quotes (
+    "id" SERIAL PRIMARY KEY,
+    "author" text NOT NULL,
+    "quoted" text NOT NULL,
+    "content" text NOT NULL,
+    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX ON "albums" ("year");
 CREATE INDEX ON "albums" ("created_at");
 CREATE INDEX ON "albums" ("updated_at");
@@ -207,7 +191,6 @@ CREATE INDEX ON "events" ("time_end");
 CREATE INDEX ON "events" ("updated_at");
 CREATE INDEX ON "events" ("created_at");
 
-CREATE INDEX ON "alerts" ("service");
 
 CREATE INDEX ON "rules" ("updated_at");
 CREATE INDEX ON "rules" ("created_at");
@@ -240,103 +223,81 @@ ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("i
 ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-
 ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
--- BeeFormed
-CREATE TYPE question_type_enum AS ENUM (
-    'single_choice',
-    'multiple_choice',
-    'text',
-    'number',
-    'date'
+
+-- Insert default values
+INSERT INTO "audiences" ("name_en", "name_no")
+VALUES
+('Login', 'Login'),
+('Active members', 'Aktive medlemmer'),
+('Students', 'Studenter'),
+('Open', 'Åpen'),
+('Bachelor', 'Bachelor'),
+('Master', 'Master'),
+('PhD', 'PhD'),
+('First semester', 'Første semester'),
+('Second semester', 'Andre semester'),
+('Third semester', 'Tredje semester'),
+('Fourth semester', 'Fjerde semester'),
+('Fifth semester', 'Femte semester'),
+('Sixth semester', 'Sjette semester'),
+('Seventh semester', 'Sjuende semester');
+
+INSERT INTO "categories" ("name_en", "name_no", "color")
+VALUES
+('Login', 'Login', '#fd8738'),
+('TekKom', 'TekKom', '#a206c9'),
+('CTFKom', 'CTFKom', '#2da62b'),
+('EvntKom', 'EvntKom', '#d62f43'),
+('PR', 'PR', '#ffff00'),
+('BedKom', 'BedKom', '#1f56c5'),
+('SatKom', 'SatKom', '#64ddd7'),
+('BroomBroom', 'BroomBroom', '#cd53d8'),
+('Pearlgroup', 'Perlegruppa', '#cd53d8'),
+('Bookclub', 'Bokklubb', '#cd53d8'),
+('Houseband', 'Husbandet', '#cd53d8'),
+('Social', 'Sosialt', '#d62f43'),
+('Cyberdays', 'Cyberdagene', 'linear-gradient(120deg, hsla(217, 100%, 50%, 1) 10%, hsla(186, 100%, 69%, 1) 100%)'),
+('Buddyweek', 'Fadderuka', '#fa75a6'),
+('Other', 'Andre', '#545b5f');
+
+INSERT INTO "job_types" ("name_en", "name_no") VALUES
+('Full Time', 'Fulltid'),
+('Part Time', 'Deltid'),
+('Internship', 'Praksisplass'),
+('Voluntairy', 'Verv'),
+('Summer', 'Sommer');
+
+-- Alerts
+
+CREATE TABLE "alerts" (
+  id SERIAL PRIMARY KEY,
+  service TEXT NOT NULL,
+  page TEXT NOT NULL,
+  title_en TEXT NOT NULL,
+  title_no TEXT NOT NULL,
+  description_en TEXT NOT NULL,
+  description_no TEXT NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(service, page)
 );
 
-CREATE TABLE users (
-    "id" SERIAL PRIMARY KEY,
-    "full_name" varchar UNIQUE NOT NULL,
-    "email" varchar UNIQUE NOT NULL,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
+CREATE INDEX idx_alerts_service ON "alerts"(service);
+
+-- Honey
+
+CREATE TABLE IF NOT EXISTS "honey" (
+    id SERIAL PRIMARY KEY,
+    service TEXT NOT NULL,
+    language TEXT NOT NULL,
+    page TEXT NOT NULL,
+    text TEXT NOT NULL,
+    UNIQUE(service, page, language)
 );
 
-CREATE TABLE forms (
-    "id" SERIAL PRIMARY KEY,
-    "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
-    "title" varchar NOT NULL,
-    "description" varchar NOT NULL,
-    "capacity" int,
-    "open_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "close_at" timestamp NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE questions (
-  "id" SERIAL PRIMARY KEY,
-  "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
-    "question_title" varchar NOT NULL,
-    "question_description" varchar NOT NULL,
-    "question_type" question_type_enum NOT NULL,
-    "required" boolean DEFAULT false,
-    "position" int NOT NULL,
-    "max" int,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE question_options (
-    "id" SERIAL PRIMARY KEY,
-    "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
-    "option_text" varchar NOT NULL,
-    "position" int NOT NULL,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE submissions (
-    "id" SERIAL PRIMARY KEY,
-    "form_id" int NOT NULL REFERENCES "forms"("id") ON DELETE CASCADE,
-    "user_id" int NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
-    "submitted_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE answers (
-    "id" SERIAL PRIMARY KEY,
-    "submission_id" int NOT NULL REFERENCES "submissions"("id") ON DELETE CASCADE,
-    "question_id" int NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
-    "option_id" int REFERENCES "question_options"("id"),
-    "answer_text" text,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE answer_options (
-    "answer_id" int NOT NULL REFERENCES "answers"("id") ON DELETE CASCADE,
-    "option_id" int NOT NULL REFERENCES "question_options"("id") ON DELETE CASCADE,
-    PRIMARY KEY ("answer_id", "option_id")
-);
-
-CREATE TABLE quotes (
-    "id" SERIAL PRIMARY KEY,
-    "author" text NOT NULL,
-    "quoted" text NOT NULL,
-    "content" text NOT NULL,
-    "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX ON "forms"("user_id");
-
-CREATE INDEX ON "questions"("form_id");
-CREATE INDEX ON "question_options"("question_id");
-
-CREATE INDEX ON "submissions"("form_id");
-CREATE INDEX ON "submissions"("user_id");
-
-CREATE INDEX ON "answers"("submission_id");
-CREATE INDEX ON "answers"("question_id");
-CREATE INDEX ON "answers"("option_id");
+CREATE INDEX idx_honey_service_page ON "honey"(service, page);
+CREATE INDEX idx_honey_service ON "honey"(service);
 
 CREATE TABLE daily_history (
     insert_date DATE NOT NULL PRIMARY KEY,
@@ -438,7 +399,6 @@ CREATE TRIGGER track_alerts_inserts
     AFTER INSERT ON alerts
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
-
 ------------------
 -- Dummy Data
 ------------------
@@ -806,137 +766,3 @@ VALUES
  '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
  false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
  NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 2, 5, now(), now());
-
--- BeeFormed Dummy Data: users, forms, questions, options, submissions, answers, answer_options
--- 10 submissions per form (one per user), and 10 answers per question.
-INSERT INTO users (full_name, email) VALUES
-('User One','user1@example.com'),
-('User Two','user2@example.com'),
-('User Three','user3@example.com'),
-('User Four','user4@example.com'),
-('User Five','user5@example.com'),
-('User Six','user6@example.com'),
-('User Seven','user7@example.com'),
-('User Eight','user8@example.com'),
-('User Nine','user9@example.com'),
-('User Ten','user10@example.com');
-
--- Two forms owned by user 1 and user 2
-INSERT INTO forms (user_id, title, description, capacity, open_at, close_at)
-VALUES
-((SELECT id FROM users WHERE full_name='User One'), 'Form A', 'Test form A', 100, now(), '2026-12-31'),
-((SELECT id FROM users WHERE full_name='User Two'), 'Form B', 'Test form B', 100, now(), '2026-12-31');
-
--- Questions for Form A (positions 1..5) using all types
-INSERT INTO questions (form_id, question_title, question_description, question_type, required, position, max)
-VALUES
-((SELECT id FROM forms WHERE title='Form A'), 'A - Q1 Single choice', 'Single choice question', 'single_choice', true, 1, NULL),
-((SELECT id FROM forms WHERE title='Form A'), 'A - Q2 Multiple choice', 'Multiple choice question', 'multiple_choice', true, 2, NULL),
-((SELECT id FROM forms WHERE title='Form A'), 'A - Q3 Text', 'Open text question', 'text', false, 3, NULL),
-((SELECT id FROM forms WHERE title='Form A'), 'A - Q4 Number', 'Numeric answer', 'number', false, 4, NULL),
-((SELECT id FROM forms WHERE title='Form A'), 'A - Q5 Date', 'Date answer', 'date', false, 5, NULL);
-
--- Questions for Form B (positions 1..5) using all types
-INSERT INTO questions (form_id, question_title, question_description, question_type, required, position, max)
-VALUES
-((SELECT id FROM forms WHERE title='Form B'), 'B - Q1 Single choice', 'Single choice question', 'single_choice', true, 1, NULL),
-((SELECT id FROM forms WHERE title='Form B'), 'B - Q2 Multiple choice', 'Multiple choice question', 'multiple_choice', true, 2, NULL),
-((SELECT id FROM forms WHERE title='Form B'), 'B - Q3 Text', 'Open text question', 'text', false, 3, NULL),
-((SELECT id FROM forms WHERE title='Form B'), 'B - Q4 Number', 'Numeric answer', 'number', false, 4, NULL),
-((SELECT id FROM forms WHERE title='Form B'), 'B - Q5 Date', 'Date answer', 'date', false, 5, NULL);
-
--- Options for single_choice and multiple_choice questions (4 options each)
--- Form A: single (pos=1) and multiple (pos=2)
-INSERT INTO question_options (question_id, option_text, position)
-SELECT q_single.id, opts.opt_text, opts.opt_pos
-FROM (
-  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form A') AND position=1
-) q_single,
-(VALUES ('Option A1',1),('Option A2',2),('Option A3',3),('Option A4',4)) AS opts(opt_text,opt_pos)
-ORDER BY q_single.id, opts.opt_pos;
-
-INSERT INTO question_options (question_id, option_text, position)
-SELECT q_multi.id, opts.opt_text, opts.opt_pos
-FROM (
-  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form A') AND position=2
-) q_multi,
-(VALUES ('Multi A1',1),('Multi A2',2),('Multi A3',3),('Multi A4',4)) AS opts(opt_text,opt_pos)
-ORDER BY q_multi.id, opts.opt_pos;
-
--- Form B: single (pos=1) and multiple (pos=2)
-INSERT INTO question_options (question_id, option_text, position)
-SELECT q_single.id, opts.opt_text, opts.opt_pos
-FROM (
-  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form B') AND position=1
-) q_single,
-(VALUES ('Option B1',1),('Option B2',2),('Option B3',3),('Option B4',4)) AS opts(opt_text,opt_pos)
-ORDER BY q_single.id, opts.opt_pos;
-
-INSERT INTO question_options (question_id, option_text, position)
-SELECT q_multi.id, opts.opt_text, opts.opt_pos
-FROM (
-  SELECT id FROM questions WHERE form_id=(SELECT id FROM forms WHERE title='Form B') AND position=2
-) q_multi,
-(VALUES ('Multi B1',1),('Multi B2',2),('Multi B3',3),('Multi B4',4)) AS opts(opt_text,opt_pos)
-ORDER BY q_multi.id, opts.opt_pos;
-
--- Create 10 submissions per form (one per user)
-INSERT INTO submissions (form_id, user_id, submitted_at)
-SELECT f.id, u.id, now()
-FROM users u CROSS JOIN forms f
-WHERE f.title='Form A';
-
-INSERT INTO submissions (form_id, user_id, submitted_at)
-SELECT f.id, u.id, now()
-FROM users u CROSS JOIN forms f
-WHERE f.title='Form B';
-
--- Answers:
--- 1) single_choice: one answer per submission (10 answers per single_choice question)
-INSERT INTO answers (submission_id, question_id, option_id, created_at, updated_at)
-SELECT s.id, q.id,
-  (SELECT id FROM question_options qo WHERE qo.question_id = q.id AND qo.position = ((s.user_id-1)%4)+1 LIMIT 1),
-  now(), now()
-FROM submissions s
-JOIN questions q ON q.form_id = s.form_id
-WHERE q.question_type = 'single_choice';
-
--- 2) multiple_choice: create one answers row per submission (so 10 answers per multiple_choice question),
---    and store chosen options in answer_options (two options per submission)
-INSERT INTO answers (submission_id, question_id, created_at, updated_at)
-SELECT s.id, q.id, now(), now()
-FROM submissions s
-JOIN questions q ON q.form_id = s.form_id
-WHERE q.question_type = 'multiple_choice';
-
--- populate answer_options: pick two option positions per submission (pos and pos+1 wrap)
-INSERT INTO answer_options (answer_id, option_id)
-SELECT a.id,
-       qo.id
-FROM answers a
-JOIN submissions s ON s.id = a.submission_id
-JOIN questions q ON q.id = a.question_id
-JOIN question_options qo ON qo.question_id = q.id
-WHERE q.question_type = 'multiple_choice'
-  AND qo.position IN ( ((s.user_id-1)%4)+1, ((s.user_id)%4)+1 );
-
--- 3) text answers (one per submission -> 10 answers per text question)
-INSERT INTO answers (submission_id, question_id, answer_text, created_at, updated_at)
-SELECT s.id, q.id, 'Text answer from user ' || s.user_id, now(), now()
-FROM submissions s
-JOIN questions q ON q.form_id = s.form_id
-WHERE q.question_type = 'text';
-
--- 4) number answers (store as text in answer_text)
-INSERT INTO answers (submission_id, question_id, answer_text, created_at, updated_at)
-SELECT s.id, q.id, (s.user_id * 10)::text, now(), now()
-FROM submissions s
-JOIN questions q ON q.form_id = s.form_id
-WHERE q.question_type = 'number';
-
--- 5) date answers (store as ISO date string in answer_text)
-INSERT INTO answers (submission_id, question_id, answer_text, created_at, updated_at)
-SELECT s.id, q.id, to_char((CURRENT_DATE + (s.user_id || ' days')::interval)::date, 'YYYY-MM-DD'), now(), now()
-FROM submissions s
-JOIN questions q ON q.form_id = s.form_id
-WHERE q.question_type = 'date';

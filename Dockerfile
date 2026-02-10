@@ -11,12 +11,15 @@ COPY default.vcl /etc/varnish/default.vcl
 
 COPY ./api/go.mod .
 COPY ./api/go.sum .
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 COPY entrypoint.sh ./entrypoint.sh
 
 RUN go mod download
 
 COPY ./api .
+
+RUN swag init -g main.go -o ./docs
 
 RUN go build -o main main.go
 

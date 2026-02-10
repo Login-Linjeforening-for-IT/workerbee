@@ -1346,83 +1346,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v2/forms": {
-            "get": {
-                "description": "Returns a list of forms, supports search and pagination",
-                "tags": [
-                    "forms"
-                ],
-                "summary": "List forms",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Search string",
-                        "name": "search",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.FormsResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            },
-            "post": {
-                "description": "Creates a new form",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "forms"
-                ],
-                "summary": "Create a new form",
-                "parameters": [
-                    {
-                        "description": "Form object",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Form"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/models.Form"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {}
-                    }
-                }
-            }
-        },
         "/api/v2/forms/submissions/{id}": {
             "get": {
                 "description": "Returns a submission by its ID",
@@ -1508,110 +1431,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v2/forms/{id}": {
-            "get": {
-                "description": "Returns a form by its ID",
-                "tags": [
-                    "forms"
-                ],
-                "summary": "Get a single form",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Form ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Form"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            },
-            "put": {
-                "description": "Updates a form by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "forms"
-                ],
-                "summary": "Update a form",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Form ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Form object",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Form"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Form"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {}
-                    }
-                }
-            },
-            "delete": {
-                "description": "Deletes a form by ID",
-                "tags": [
-                    "forms"
-                ],
-                "summary": "Delete a form",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Form ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {}
-                    }
-                }
-            }
-        },
         "/api/v2/honey/services": {
             "get": {
                 "description": "Retrieves a list of all available text services.",
@@ -1634,6 +1453,39 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/api/v2/honey/{id}": {
+            "get": {
+                "description": "Retrieves a honey entry by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "honey"
+                ],
+                "summary": "Get honey by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Honey ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateHoney"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     }
                 }
@@ -1900,7 +1752,41 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v2/images/upload/{path}": {
+        "/api/v2/images/{path}": {
+            "get": {
+                "description": "Retrieves a list of image URLs available in the specified path.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "images"
+                ],
+                "summary": "Get image URLs in a specified path in a digital ocean bucket",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Path to retrieve images from",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "post": {
                 "description": "Uploads an image file to the specified path in the image service.",
                 "consumes": [
@@ -1942,42 +1828,6 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {}
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/api/v2/images/{path}": {
-            "get": {
-                "description": "Retrieves a list of image URLs available in the specified path.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "images"
-                ],
-                "summary": "Get image URLs in a specified path in a digital ocean bucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Path to retrieve images from",
-                        "name": "path",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -3002,7 +2852,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v2/organizations/names": {
+        "/api/v2/organizations/all": {
             "get": {
                 "description": "Retrieves a list of all organization names.",
                 "produces": [
@@ -3018,7 +2868,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/models.OrganizationNames"
                             }
                         }
                     },
@@ -3579,6 +3429,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "image_count": {
+                    "type": "integer"
+                },
                 "images": {
                     "type": "array",
                     "items": {
@@ -3617,6 +3470,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "image_count": {
+                    "type": "integer"
+                },
                 "images": {
                     "type": "array",
                     "items": {
@@ -3628,9 +3484,6 @@ const docTemplate = `{
                 },
                 "name_no": {
                     "type": "string"
-                },
-                "total_count": {
-                    "type": "integer"
                 },
                 "updated_at": {
                     "$ref": "#/definitions/internal.LocalTime"
@@ -3792,6 +3645,36 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CreateHoney": {
+            "type": "object",
+            "required": [
+                "language",
+                "page",
+                "service",
+                "text"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "language": {
+                    "type": "string",
+                    "enum": [
+                        "en",
+                        "no"
+                    ]
+                },
+                "page": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Event": {
             "type": "object",
             "required": [
@@ -3922,87 +3805,6 @@ const docTemplate = `{
                 },
                 "time_start": {
                     "$ref": "#/definitions/internal.LocalTime"
-                }
-            }
-        },
-        "models.Form": {
-            "type": "object",
-            "properties": {
-                "capacity": {
-                    "type": "integer"
-                },
-                "close_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "created_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "open_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.FormWithTotalCount": {
-            "type": "object",
-            "properties": {
-                "capacity": {
-                    "type": "integer"
-                },
-                "close_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "created_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "open_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "totalCount": {
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "$ref": "#/definitions/internal.LocalTime"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.FormsResponse": {
-            "type": "object",
-            "properties": {
-                "forms": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.FormWithTotalCount"
-                    }
-                },
-                "total_count": {
-                    "type": "integer"
                 }
             }
         },
@@ -4332,6 +4134,20 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "$ref": "#/definitions/internal.LocalTime"
+                }
+            }
+        },
+        "models.OrganizationNames": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name_en": {
+                    "type": "string"
+                },
+                "name_no": {
+                    "type": "string"
                 }
             }
         },

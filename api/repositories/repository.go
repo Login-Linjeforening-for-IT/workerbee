@@ -8,7 +8,6 @@ import (
 type Repositories struct {
 	Audiences     Audiencerepository
 	Categories    Categoryrepository
-	Forms         Formrepositories
 	Locations     LocationRepository
 	Organizations OrganizationRepository
 	Events        Eventrepositories
@@ -29,7 +28,6 @@ func NewRepositories(db *sqlx.DB, do *s3.Client) *Repositories {
 	return &Repositories{
 		Audiences:     NewAudiencerepository(db),
 		Categories:    NewCategoryRepository(db),
-		Forms:         NewFormrepositories(db),
 		Events:        NewEventrepositories(db),
 		Jobs:          NewJobrepositories(db),
 		Questions:     NewQuestionrepositories(db),
