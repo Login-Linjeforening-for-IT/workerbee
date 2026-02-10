@@ -306,7 +306,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.SetAlbumCover,
 			)
-			albums.POST(
+			albums.PUT(
 				"/compress",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(1),
