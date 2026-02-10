@@ -159,19 +159,19 @@ CREATE TABLE "skills" (
     "name" varchar NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "albums" (
-    id SERIAL PRIMARY KEY,
-    name_no TEXT NOT NULL,
-    name_en TEXT NOT NULL,
-    description_no TEXT NOT NULL,
-    description_en TEXT NOT NULL,
-    year INT NOT NULL,
-    event_id INT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "albums" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" TEXT NOT NULL,
+    "name_en" TEXT NOT NULL,
+    "description_no" TEXT NOT NULL,
+    "description_en" TEXT NOT NULL,
+    "year" INT NOT NULL,
+    "event_id" INT,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE quotes (
+CREATE TABLE "quotes" (
     "id" SERIAL PRIMARY KEY,
     "author" text NOT NULL,
     "quoted" text NOT NULL,
@@ -179,51 +179,6 @@ CREATE TABLE quotes (
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE INDEX ON "albums" ("year");
-CREATE INDEX ON "albums" ("created_at");
-CREATE INDEX ON "albums" ("updated_at");
-
-CREATE INDEX ON "events" ("visible");
-CREATE INDEX ON "events" ("highlight");
-CREATE INDEX ON "events" ("time_start");
-CREATE INDEX ON "events" ("time_end");
-CREATE INDEX ON "events" ("updated_at");
-CREATE INDEX ON "events" ("created_at");
-
-
-CREATE INDEX ON "rules" ("updated_at");
-CREATE INDEX ON "rules" ("created_at");
-
-CREATE INDEX ON "organizations" ("updated_at");
-CREATE INDEX ON "organizations" ("created_at");
-
-CREATE INDEX ON "locations" ("updated_at");
-CREATE INDEX ON "locations" ("created_at");
-
-CREATE INDEX ON "jobs" ("updated_at");
-CREATE INDEX ON "jobs" ("created_at");
-CREATE INDEX ON "ad_city_relation" ("job_id");
-CREATE INDEX ON "ad_city_relation" ("city_id");
-CREATE INDEX ON "ad_skill_relation" ("job_id");
-CREATE INDEX ON "ad_skill_relation" ("skill_id");
-
-ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-
-ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Insert default values
 INSERT INTO "audiences" ("name_en", "name_no")
@@ -283,8 +238,6 @@ CREATE TABLE "alerts" (
   UNIQUE(service, page)
 );
 
-CREATE INDEX idx_alerts_service ON "alerts"(service);
-
 -- Honey
 
 CREATE TABLE IF NOT EXISTS "honey" (
@@ -295,9 +248,6 @@ CREATE TABLE IF NOT EXISTS "honey" (
     text TEXT NOT NULL,
     UNIQUE(service, page, language)
 );
-
-CREATE INDEX idx_honey_service_page ON "honey"(service, page);
-CREATE INDEX idx_honey_service ON "honey"(service);
 
 CREATE TABLE daily_history (
     insert_date DATE NOT NULL PRIMARY KEY,
@@ -399,29 +349,75 @@ CREATE TRIGGER track_alerts_inserts
     AFTER INSERT ON alerts
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
+
+CREATE INDEX ON "albums" ("year");
+CREATE INDEX ON "albums" ("created_at");
+CREATE INDEX ON "albums" ("updated_at");
+
+CREATE INDEX ON "events" ("visible");
+CREATE INDEX ON "events" ("highlight");
+CREATE INDEX ON "events" ("time_start");
+CREATE INDEX ON "events" ("time_end");
+CREATE INDEX ON "events" ("updated_at");
+CREATE INDEX ON "events" ("created_at");
+
+CREATE INDEX ON "rules" ("updated_at");
+CREATE INDEX ON "rules" ("created_at");
+
+CREATE INDEX ON "organizations" ("updated_at");
+CREATE INDEX ON "organizations" ("created_at");
+
+CREATE INDEX ON "locations" ("updated_at");
+CREATE INDEX ON "locations" ("created_at");
+
+CREATE INDEX ON "jobs" ("updated_at");
+CREATE INDEX ON "jobs" ("created_at");
+CREATE INDEX ON "ad_city_relation" ("job_id");
+CREATE INDEX ON "ad_city_relation" ("city_id");
+CREATE INDEX ON "ad_skill_relation" ("job_id");
+CREATE INDEX ON "ad_skill_relation" ("skill_id");
+
+CREATE INDEX ON "honey"(service, page);
+CREATE INDEX ON "honey"(service);
+
+CREATE INDEX ON "alerts"(service);
+
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+
 ------------------
 -- Dummy Data
 ------------------
 
-INSERT INTO quotes(author, quoted, content) VALUES
+INSERT INTO "quotes" ("author", "quoted", "content") VALUES
 ('Hermanius Elganius', 'Gjermund', 'Han er en innvikler.'),
 ('Ole', 'Hoff', '9090 incase 5432 is in use.'),
 ('Eirik', 'Riwa','Jeg blir fysisk sint av å se på kode.'),
 ('Ole', 'Hoff', 'Eg tenker en pepperbiff, med flødegratinerde poteter og stekegrad på rååååååååååå');
 
-INSERT INTO alerts (service, page, title_en, title_no, description_en, description_no) VALUES
+INSERT INTO "alerts" (service, page, title_en, title_no, description_en, description_no) VALUES
 ('beehive', '/events', 'Important Beehive Update', 'Viktig Beehive Oppdatering', 'This is an important message for Beehive users. Please read carefully.', 'Dette er en viktig melding for Beehive brukere. Vennligst les nøye.'),
 ('beehive', '/jobs', 'New Job Opportunities', 'Nye Jobbmuligheter', 'Check out the latest job openings available for members.', 'Sjekk ut de siste ledige stillingene tilgjengelig for medlemmer.'),
 ('tekkom', '/events', 'TekKom Event Announcement', 'TekKom Arrangement Annonsering', 'Join us for upcoming TekKom events and workshops.', 'Bli med oss for kommende TekKom arrangementer og workshops.'),
 ('tekkom', '/jobs', 'TekKom Job Listings', 'TekKom Jobbannonser', 'Explore new job listings through TekKom.', 'Utforsk nye jobbannonser via TekKom.');
 
-
-INSERT INTO "job_types" ("name_en", "name_no") VALUES
-('Full Time', 'Fulltid'),
-('Part Time', 'Deltid'),
-('Internship', 'Praksisplass'),
-('Voluntairy', 'Verv'),
-('Summer', 'Sommer');
+INSERT INTO "albums" ("name_no", "name_en", "description_no", "description_en", "year", "event_id", "created_at", "updated_at") VALUES
+('Album', 'Album', 'Photos from events', 'Bilder fra arrangementer', 2023, NULL, now(), now()),
+('Album', 'Album', 'Photos from events', 'Bilder fra arrangementer', 2024, NULL, now(), now());
 
 INSERT INTO "audiences" ("name_en", "name_no")
 VALUES
@@ -479,7 +475,7 @@ INSERT INTO "cities" ("name") VALUES
 ('Stavanger'),
 ('Tromsø');
 
-INSERT INTO honey (service, language, page, text) VALUES
+INSERT INTO "honey" ("service", "language", "page", "text") VALUES
 ('beehive', 'no', '/events', '{"title": "Arrangementer", "description": "Alle kommende arrangementer for Login."}'),
 ('beehive', 'en', '/events', '{"title": "Events", "description": "All upcoming events for Login."}'),
 ('beehive', 'no', '/jobs', '{"title": "Jobber", "description": "Ledige stillinger og verv for medlemmer."}'),
@@ -670,35 +666,35 @@ VALUES
   'An exciting opportunity for recent graduates to develop software.', 
   'Som Junior Software Developer vil du være med på utvikling av applikasjoner og programvare.', 
   'As a Junior Software Developer, you will be involved in the development of applications and software.', 
-  1, now(), now(),'https://www.example.com/banner.jpg', 
+  1, now() + interval '1 days', now() + interval '1 years','https://www.example.com/banner.jpg', 
   1, 'https://www.uio.no/job-apply', now(), now() - interval '4 days'),
 (true, true, 'Markedsføringskoordinator', 'Marketing Coordinator', 'Markedsføringsspesialist', 
   'Marketing Specialist', 'Bli en del av vårt markedsføringsteam og jobb med spennende prosjekter.', 
   'Join our marketing team and work on exciting projects.', 
   'Som markedsføringskoordinator vil du ha ansvar for markedsføring og kommunikasjon på tvers av kanaler.', 
   'As a Marketing Coordinator, you will be responsible for marketing and communication across channels.', 
-  2, now(), '2026-05-31', 'https://www.example.com/banner2.jpg', 
+  2, now() + interval '1 days', now() + interval '1 years', 'https://www.example.com/banner2.jpg', 
   3, 'https://www.dnb.no/job-apply', now(), now()),
 (false, false, 'Prosjektleder', 'Project Manager', 'Senior prosjektleder', 
   'Senior Project Manager', 'Vi søker en erfaren prosjektleder til å lede store prosjekter.', 
   'We are looking for an experienced project manager to lead large projects.', 
   'Som prosjektleder vil du ha ansvar for å lede prosjekter fra start til slutt, inkludert budsjett og tidsplanlegging.', 
   'As a Project Manager, you will be responsible for leading projects from start to finish, including budgeting and scheduling.', 
-  3, now(), '2027-06-30', 'https://www.example.com/banner3.jpg', 
+  3, now() + interval '1 days', now() + interval '1 years', 'https://www.example.com/banner3.jpg', 
   4, 'https://www.telenor.no/job-apply', now(), now()),
 (true, false, 'Kundestøtteagent', 'Customer Support Agent', 'Kundestøtteansvarlig', 
   'Customer Support Manager', 'Bli en del av vårt kundeserviceteam og hjelp kunder med deres henvendelser.', 
   'Join our customer service team and assist customers with their inquiries.', 
   'Som kundestøtteansvarlig vil du hjelpe kunder via telefon, e-post og chat, samt sikre god kundetilfredshet.', 
   'As a Customer Support Manager, you will assist customers via phone, email, and chat, ensuring high customer satisfaction.', 
-  2, now(), '2027-04-15', 'https://www.example.com/banner4.jpg', 
+  2, now() + interval '1 days', now() + interval '1 years', 'https://www.example.com/banner4.jpg', 
   5, 'https://www.sintef.no/job-apply', now(), now()),
 (true, true, 'Dataanalytiker', 'Data Analyst', 'Dataanalytiker', 
   'Data Analyst', 'Er du en dataanalytiker som elsker å finne innsikt fra store datamengder?', 
   'Are you a data analyst who loves to derive insights from large datasets?', 
   'Som dataanalytiker vil du analysere data for å identifisere trender og lage rapporter som støtter beslutningstaking.', 
   'As a Data Analyst, you will analyze data to identify trends and create reports that support decision-making.', 
-  1, now(), '2026-07-31', 'https://www.example.com/banner5.jpg', 
+  1, now() + interval '1 days', now() + interval '1 years', 'https://www.example.com/banner5.jpg', 
   2, 'https://www.ntnu.no/job-apply', now(), now());
 
 INSERT INTO "ad_skill_relation" ("job_id", "skill_id")
@@ -717,52 +713,57 @@ VALUES
 (4, 27),  -- Customer Support Agent (SINTEF) - Trondheim
 (5, 27);  -- Data Analyst (NTNU) - Trondheim
 
-INSERT INTO events (
-  visible, name_no, name_en, description_no, description_en, 
-  informational_no, informational_en, time_type, time_start, time_end, 
-  time_publish, time_signup_release, time_signup_deadline, canceled, 
-  digital, highlight, image_small, image_banner, link_facebook, 
-  link_discord, link_signup, link_stream, capacity, is_full, 
-  organization_id, location_id, parent_id, rule_id, audience_id, category_id, created_at, updated_at
+INSERT INTO "events" (
+  "visible", "name_no", "name_en", "description_no", "description_en", 
+  "informational_no", "informational_en", "time_type", "time_start", "time_end", 
+  "time_publish", "time_signup_release", "time_signup_deadline", "canceled", 
+  "digital", "highlight", "image_small", "image_banner", "link_facebook", 
+  "link_discord", "link_signup", "link_stream", "capacity", "is_full", 
+  "organization_id", "location_id", "parent_id", "rule_id", "audience_id", "category_id", "created_at", "updated_at"
 )
 VALUES
+-- Event 1: Published, starts in 3 days (WILL show in public API)
 (true, 'Hackathon Oslo', 'Hackathon Oslo', 
  'Bli med på en spennende hackathon i Oslo!', 'Join an exciting hackathon in Oslo!', 
  'Mer informasjon kommer snart.', 'More information coming soon.',
- 'whole_day', '2025-02-01 09:00:00', '2025-02-01 18:00:00', 
- '2025-01-15 08:00:00', '2025-01-15 08:00:00', '2025-01-30 23:59:00', 
+ 'whole_day', NOW() + interval '3 days', NOW() + interval '3 days' + interval '9 hours', 
+ NOW() - interval '15 days', NOW() - interval '10 days', NOW() + interval '2 days', 
  false, true, false, NULL, 'https://www.example.com/banner_hackathon.jpg', 
- NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 1, 1, now()- interval '3 days', now()),
+ NULL, NULL, NULL, NULL, 100, false, 1, 1, NULL, 1, 1, 1, NOW() - interval '3 days', NOW()),
 
+-- Event 2: Published, starts in 2 weeks (WILL show in public API)
 (true, 'Tech Conference Bergen', 'Tech Conference Bergen', 
  'Lær om de nyeste teknologiene på Tech Conference i Bergen.', 
  'Learn about the latest technologies at Tech Conference in Bergen.', 
  'Påmelding nødvendig.', 'Registration required.',
- 'whole_day', '2025-03-10 09:00:00', '2025-03-10 17:00:00', 
- '2025-02-01 09:00:00', '2025-02-15 08:00:00', '2025-03-01 23:59:00', 
+ 'whole_day', NOW() + interval '14 days', NOW() + interval '14 days' + interval '8 hours', 
+ NOW() - interval '5 days', NOW() - interval '3 days', NOW() + interval '12 days', 
  false, true, true, NULL, 'https://www.example.com/banner_tech_conference.jpg', 
- NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 2, 1, now(), now()),
+ NULL, NULL, NULL, NULL, 200, false, 2, 2, NULL, 1, 2, 1, NOW(), NOW()),
 
+-- Event 3: NOT YET published (will NOT show in public API - publishes in 1 week)
 (true, 'AI Workshop Trondheim', 'AI Workshop Trondheim', 
  'Utforsk kunstig intelligens i Trondheim!', 'Explore artificial intelligence in Trondheim!', 
  'Gratis workshop for alle interesserte.', 'Free workshop for all interested.',
- 'whole_day', '2025-04-05 10:00:00', '2025-04-05 16:00:00', 
- '2025-03-20 08:00:00', '2025-03-20 08:00:00', '2025-04-01 23:59:00', 
+ 'whole_day', NOW() + interval '21 days', NOW() + interval '21 days' + interval '6 hours', 
+ NOW() + interval '7 days', NOW() + interval '7 days', NOW() + interval '20 days', 
  false, true, false, NULL, 'https://www.example.com/banner_ai_workshop.jpg', 
- NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 1, 1, now(), now()),
+ NULL, NULL, NULL, NULL, 50, false, 3, 3, NULL, 1, 1, 1, NOW(), NOW()),
 
+-- Event 4: Published, HAPPENING NOW (started 1 hour ago, ends in 3 hours - WILL show in public API)
 (true, 'Cybersecurity Summit Stavanger', 'Cybersecurity Summit Stavanger', 
  'Lær om cybersikkerhet i Stavanger!', 'Learn about cybersecurity in Stavanger!', 
  'Fokus på praktiske løsninger.', 'Focus on practical solutions.',
- 'whole_day', '2025-05-12 09:00:00', '2025-05-12 17:00:00', 
- '2025-04-01 09:00:00', '2025-04-10 08:00:00', '2025-05-01 23:59:00', 
+ 'default', NOW() - interval '1 hour', NOW() + interval '3 hours', 
+ NOW() - interval '20 days', NOW() - interval '15 days', NOW() - interval '2 days', 
  false, true, true, NULL, 'https://www.example.com/banner_cybersecurity_summit.jpg', 
- NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 1, 4, now(), now()),
+ NULL, NULL, NULL, NULL, 150, false, 4, 3, NULL, 3, 1, 4, NOW(), NOW()),
 
+-- Event 5: Published, starts in 1 month (WILL show in public API)
 (true, 'Cloud Computing Meetup Tromsø', 'Cloud Computing Meetup Tromsø', 
  'Møt eksperter innen skyteknologi i Tromsø.', 'Meet cloud technology experts in Tromsø.', 
  'Networking muligheter.', 'Networking opportunities.',
- 'whole_day', '2025-06-20 10:00:00', '2025-06-20 14:00:00', 
- '2025-05-01 09:00:00', '2025-05-15 08:00:00', '2025-06-10 23:59:00', 
+ 'whole_day', NOW() + interval '30 days', NOW() + interval '30 days' + interval '4 hours', 
+ NOW() - interval '2 days', NOW() + interval '5 days', NOW() + interval '28 days', 
  false, true, false, NULL, 'https://www.example.com/banner_cloud_meetup.jpg', 
- NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 2, 5, now(), now());
+ NULL, NULL, NULL, NULL, 80, false, 5, 1, NULL, 2, 2, 5, NOW(), NOW());

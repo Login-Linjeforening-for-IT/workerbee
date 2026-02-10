@@ -159,19 +159,19 @@ CREATE TABLE "skills" (
     "name" varchar NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "albums" (
-    id SERIAL PRIMARY KEY,
-    name_no TEXT NOT NULL,
-    name_en TEXT NOT NULL,
-    description_no TEXT NOT NULL,
-    description_en TEXT NOT NULL,
-    year INT NOT NULL,
-    event_id INT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "albums" (
+    "id" SERIAL PRIMARY KEY,
+    "name_no" TEXT NOT NULL,
+    "name_en" TEXT NOT NULL,
+    "description_no" TEXT NOT NULL,
+    "description_en" TEXT NOT NULL,
+    "year" INT NOT NULL,
+    "event_id" INT,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE quotes (
+CREATE TABLE "quotes" (
     "id" SERIAL PRIMARY KEY,
     "author" text NOT NULL,
     "quoted" text NOT NULL,
@@ -179,51 +179,6 @@ CREATE TABLE quotes (
     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP,
     "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE INDEX ON "albums" ("year");
-CREATE INDEX ON "albums" ("created_at");
-CREATE INDEX ON "albums" ("updated_at");
-
-CREATE INDEX ON "events" ("visible");
-CREATE INDEX ON "events" ("highlight");
-CREATE INDEX ON "events" ("time_start");
-CREATE INDEX ON "events" ("time_end");
-CREATE INDEX ON "events" ("updated_at");
-CREATE INDEX ON "events" ("created_at");
-
-
-CREATE INDEX ON "rules" ("updated_at");
-CREATE INDEX ON "rules" ("created_at");
-
-CREATE INDEX ON "organizations" ("updated_at");
-CREATE INDEX ON "organizations" ("created_at");
-
-CREATE INDEX ON "locations" ("updated_at");
-CREATE INDEX ON "locations" ("created_at");
-
-CREATE INDEX ON "jobs" ("updated_at");
-CREATE INDEX ON "jobs" ("created_at");
-CREATE INDEX ON "ad_city_relation" ("job_id");
-CREATE INDEX ON "ad_city_relation" ("city_id");
-CREATE INDEX ON "ad_skill_relation" ("job_id");
-CREATE INDEX ON "ad_skill_relation" ("skill_id");
-
-ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-
-ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Insert default values
 INSERT INTO "audiences" ("name_en", "name_no")
@@ -283,8 +238,6 @@ CREATE TABLE "alerts" (
   UNIQUE(service, page)
 );
 
-CREATE INDEX idx_alerts_service ON "alerts"(service);
-
 -- Honey
 
 CREATE TABLE IF NOT EXISTS "honey" (
@@ -295,9 +248,6 @@ CREATE TABLE IF NOT EXISTS "honey" (
     text TEXT NOT NULL,
     UNIQUE(service, page, language)
 );
-
-CREATE INDEX idx_honey_service_page ON "honey"(service, page);
-CREATE INDEX idx_honey_service ON "honey"(service);
 
 CREATE TABLE daily_history (
     insert_date DATE NOT NULL PRIMARY KEY,
@@ -399,3 +349,52 @@ CREATE TRIGGER track_alerts_inserts
     AFTER INSERT ON alerts
     FOR EACH ROW
     EXECUTE FUNCTION update_insert_history();
+
+CREATE INDEX ON "albums" ("year");
+CREATE INDEX ON "albums" ("created_at");
+CREATE INDEX ON "albums" ("updated_at");
+
+CREATE INDEX ON "events" ("visible");
+CREATE INDEX ON "events" ("highlight");
+CREATE INDEX ON "events" ("time_start");
+CREATE INDEX ON "events" ("time_end");
+CREATE INDEX ON "events" ("updated_at");
+CREATE INDEX ON "events" ("created_at");
+
+CREATE INDEX ON "rules" ("updated_at");
+CREATE INDEX ON "rules" ("created_at");
+
+CREATE INDEX ON "organizations" ("updated_at");
+CREATE INDEX ON "organizations" ("created_at");
+
+CREATE INDEX ON "locations" ("updated_at");
+CREATE INDEX ON "locations" ("created_at");
+
+CREATE INDEX ON "jobs" ("updated_at");
+CREATE INDEX ON "jobs" ("created_at");
+CREATE INDEX ON "ad_city_relation" ("job_id");
+CREATE INDEX ON "ad_city_relation" ("city_id");
+CREATE INDEX ON "ad_skill_relation" ("job_id");
+CREATE INDEX ON "ad_skill_relation" ("skill_id");
+
+CREATE INDEX ON "honey"(service, page);
+CREATE INDEX ON "honey"(service);
+
+CREATE INDEX ON "alerts"(service);
+
+ALTER TABLE "events" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("location_id") REFERENCES "locations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("rule_id") REFERENCES "rules" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("parent_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "events" ADD FOREIGN KEY ("audience_id") REFERENCES "audiences" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE "jobs" ADD FOREIGN KEY ("organization_id") REFERENCES "organizations" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "jobs" ADD FOREIGN KEY ("job_type_id") REFERENCES "job_types" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_city_relation" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("job_id") REFERENCES "jobs" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "ad_skill_relation" ADD FOREIGN KEY ("skill_id") REFERENCES "skills" ("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE "locations" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id") ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "albums" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON UPDATE CASCADE ON DELETE SET NULL;

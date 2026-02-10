@@ -14,7 +14,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 	c.GET("/api", h.RootHandler)
 	v2 := c.Group(internal.BASE_PATH)
 	{
-		v2.GET("/", h.RootHandler)
+		v2.GET("", h.RootHandler)
 		v2.GET("/ping", handlers.PingHandler)
 		v2.GET("/docs", handlers.GetDocs)
 		v2.GET("/status", handlers.GetStatus)
@@ -24,9 +24,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			events.GET("/:id", h.GetEvent)
 			events.GET("/all", middleware.AuthMiddleware(), h.GetEventNames)
 			events.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedEvents)
-			events.GET("/", h.GetEvents)
+			events.GET("", h.GetEvents)
 			events.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateEvent,
@@ -51,9 +51,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			rules.GET("/:id", h.GetRule)
 			rules.GET("/all", h.GetRuleNames)
-			rules.GET("/", h.GetRules)
+			rules.GET("", h.GetRules)
 			rules.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateRule,
@@ -74,9 +74,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		categories := v2.Group("/categories")
 		{
 			categories.GET("/:id", h.GetCategory)
-			categories.GET("/", h.GetCategories)
+			categories.GET("", h.GetCategories)
 			categories.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateCategory,
@@ -98,8 +98,8 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			locations.GET("/:id", h.GetLocation)
 			locations.GET("/all", h.GetLocationNames)
-			locations.GET("/", h.GetLocations)
-			locations.POST("/", middleware.AuthMiddleware(), h.CreateLocation)
+			locations.GET("", h.GetLocations)
+			locations.POST("", middleware.AuthMiddleware(), h.CreateLocation)
 			locations.PUT(
 				"/:id",
 				middleware.AuthMiddleware(),
@@ -118,9 +118,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			organizations.GET("/:id", h.GetOrganization)
 			organizations.GET("/all", h.GetOrganizationNames)
-			organizations.GET("/", h.GetOrganizations)
+			organizations.GET("", h.GetOrganizations)
 			organizations.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateOrganization,
@@ -142,9 +142,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			jobs.GET("/:id", h.GetJob)
 			jobs.GET("/protected/:id", middleware.AuthMiddleware(), h.GetProtectedJob)
-			jobs.GET("/", h.GetJobs)
+			jobs.GET("", h.GetJobs)
 			jobs.GET("/protected", middleware.AuthMiddleware(), h.GetProtectedJobs)
-			jobs.POST("/", h.CreateJob)
+			jobs.POST("", h.CreateJob)
 			jobs.PUT(
 				"/:id",
 				middleware.AuthMiddleware(),
@@ -161,10 +161,10 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 			jobs.GET("/skills", h.GetJobSkills)
 			types := jobs.Group("/types")
 			{
-				types.GET("/", h.GetActiveJobTypes)
+				types.GET("", h.GetActiveJobTypes)
 				types.GET("/all", h.GetAllJobTypes)
 				types.GET("/:id", h.GetJobType)
-				types.POST("/", middleware.AuthMiddleware(), h.CreateJobType)
+				types.POST("", middleware.AuthMiddleware(), h.CreateJobType)
 				types.PUT("/:id", middleware.AuthMiddleware(), h.UpdateJobType)
 				types.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteJobType)
 			}
@@ -173,9 +173,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		audiences := v2.Group("/audiences")
 		{
 			audiences.GET("/:id", h.GetAudience)
-			audiences.GET("/", h.GetAudiences)
+			audiences.GET("", h.GetAudiences)
 			audiences.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateAudience,
@@ -202,12 +202,12 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		images := v2.Group("/images/:path")
 		{
 			images.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.UploadImage,
 			)
-			images.GET("/", middleware.AuthMiddleware(), h.GetImageURLs)
+			images.GET("", middleware.AuthMiddleware(), h.GetImageURLs)
 			images.DELETE(
 				"/:imageName",
 				middleware.AuthMiddleware(),
@@ -219,7 +219,7 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		{
 			honey.GET("/:id", h.GetHoney)
 			honey.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateHoney,
@@ -240,13 +240,13 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		text := v2.Group("/text")
 		{
-			text.GET("/", h.GetTextServices)
+			text.GET("", h.GetTextServices)
 			service := text.Group("/:service")
 			{
-				service.GET("/", h.GetAllPathsInService)
+				service.GET("", h.GetAllPathsInService)
 				content := service.Group("/:path")
 				{
-					content.GET("/", h.GetAllContentInPath)
+					content.GET("", h.GetAllContentInPath)
 					content.GET("/:language", h.GetOneLanguage)
 				}
 			}
@@ -254,11 +254,11 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		alerts := v2.Group("/alerts")
 		{
-			alerts.GET("/", h.GetAllAlerts)
+			alerts.GET("", h.GetAllAlerts)
 			alerts.GET("/:service", h.GetAlertByServiceAndPage)
 			alerts.GET("/id/:id", h.GetAlertByID)
 			alerts.POST(
-				"/",
+				"",
 				middleware.AuthMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateAlert,
@@ -278,9 +278,9 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		albums := v2.Group("/albums")
 		{
-			albums.POST("/", middleware.AuthMiddleware(), h.CreateAlbum)
+			albums.POST("", middleware.AuthMiddleware(), h.CreateAlbum)
 			albums.POST("/:id", middleware.AuthMiddleware(), h.UploadImagesToAlbum)
-			albums.GET("/", h.GetAlbums)
+			albums.GET("", h.GetAlbums)
 			albums.GET("/:id", h.GetAlbum)
 			albums.PUT(
 				"/:id",
@@ -315,17 +315,17 @@ func Route(c *gin.Engine, h *handlers.Handler) {
 		}
 		calendar := v2.Group("/calendar")
 		{
-			calendar.GET("/", h.GetCalendar)
+			calendar.GET("", h.GetCalendar)
 		}
 		quotes := v2.Group("/quotes")
 		{
 			quotes.POST(
-				"/",
+				"",
 				middleware.QuoteMiddleware(),
 				middleware.RateLimitMiddleware(config.AllowedRequestsPerMinute),
 				h.CreateQuote,
 			)
-			quotes.GET("/", h.GetQuotes)
+			quotes.GET("", h.GetQuotes)
 			quotes.DELETE(
 				"/:id",
 				middleware.QuoteMiddleware(),
