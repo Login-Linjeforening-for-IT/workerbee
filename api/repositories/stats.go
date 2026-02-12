@@ -13,7 +13,7 @@ import (
 type Statsrepositories interface {
 	GetYearlyStats() ([]models.YearlyActivity, error)
 	GetCategoriesStats() ([]models.CategoriesStats, error)
-	GetNewAdditionsStats() ([]models.NewAddition, error)
+	GetNewAdditionsStats(limit int) ([]models.NewAddition, error)
 	GetMostActiveCategories() ([]models.CategoriesStats, error)
 }
 
@@ -60,9 +60,20 @@ func (r *statsrepositories) GetCategoriesStats() ([]models.CategoriesStats, erro
 	return categoriesStats, nil
 }
 
-func (r *statsrepositories) GetNewAdditionsStats() ([]models.NewAddition, error) {
-	return db.FetchAllForeignAttributes[models.NewAddition](
-		r.db,
-		"./db/stats/get_new_additions_stats.sql",
-	)
+func (r *statsrepositories) GetNewAdditionsStats(limit int) ([]models.NewAddition, error) {
+	var result []models.NewAddition
+
+	sqlBytes, err := os.ReadFile("./db/stats/get_new_additions_stats.sql")
+	if err != nil {
+		log.Println("unable to read SQL file:", err)
+		return nil, err
+	}
+
+	query := string(sqlBytes)
+	if err := r.db.Select(&result, query, limit); err != nil {
+		log.Println("unable to query DB:", err)
+		return nil, err
+	}
+
+	return result, nil
 }

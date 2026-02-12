@@ -22,6 +22,6 @@ func (s *StatsService) GetYearlyStats() ([]models.YearlyActivity, error) {
 	return s.repo.GetYearlyStats()
 }
 
-func (s *StatsService) GetNewAdditionsStats() ([]models.NewAddition, error) {
-	return s.repo.GetNewAdditionsStats()
+func (s *StatsService) GetNewAdditionsStats(limit int) ([]models.NewAddition, error) {
+	return s.repo.GetNewAdditionsStats(limit)
 }

@@ -126,4 +126,4 @@ SELECT * FROM (
   WHERE updated_at > created_at
 ) t
 ORDER BY GREATEST(created_at, updated_at) DESC
-LIMIT 10;
+LIMIT $1;

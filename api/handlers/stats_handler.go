@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
@@ -43,15 +44,24 @@ func (h *Handler) GetMostActiveCategories(c *gin.Context) {
 
 // GetNewAdditionsStats godoc
 // @Summary      Get newest additions
-// @Description  Returns a list of the newest additions across events, categories, audiences, rules, organizations, locations, and job advertisements. Ordered by creation date, limited by the 'limit' query parameter.
+// @Description  Returns a list of the newest additions across events, categories, audiences, rules, organizations, locations, and job advertisements. Ordered by creation date, limited by the 'limit' query parameter (default 10, max 25).
 // @Tags         stats
 // @Produce      json
-// @Param        limit  query  int  false  "Maximum number of results"
+// @Param        limit  query  int  false  "Maximum number of results (1-25)"
 // @Success      200  {array}  models.NewAddition
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/new-additions [get]
 func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
-	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats()
+	limitStr := c.DefaultQuery("limit", "10")
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil || limit <= 0 {
+		limit = 10
+	}
+	if limit > 25 {
+		limit = 25
+	}
+
+	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats(limit)
 	if internal.HandleError(c, err) {
 		return
 	}
