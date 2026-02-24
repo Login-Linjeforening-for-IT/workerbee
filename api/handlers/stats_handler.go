@@ -52,14 +52,7 @@ func (h *Handler) GetMostActiveCategories(c *gin.Context) {
 // @Failure      500  {object}  error
 // @Router       /api/v2/stats/new-additions [get]
 func (h *Handler) GetNewAdditionsStats(c *gin.Context) {
-	limitStr := c.DefaultQuery("limit", "10")
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil || limit <= 0 {
-		limit = 10
-	}
-	if limit > 25 {
-		limit = 25
-	}
+	limit := c.DefaultQuery("limit", "10")
 
 	NewAdditionsStats, err := h.Services.Stats.GetNewAdditionsStats(limit)
 	if internal.HandleError(c, err) {

@@ -2,7 +2,6 @@
 package repositories
 
 import (
-	"log"
 	"os"
 	"workerbee/db"
 	"workerbee/models"
@@ -47,13 +46,11 @@ func (r *statsrepositories) GetCategoriesStats() ([]models.CategoriesStats, erro
 	categoriesStats := []models.CategoriesStats{}
 	sqlBytes, err := os.ReadFile("./db/stats/get_categories_stats.sql")
 	if err != nil {
-		log.Println("unable to read SQL file:", err)
 		return nil, err
 	}
 
 	query := string(sqlBytes)
 	if err := r.db.Select(&categoriesStats, query); err != nil {
-		log.Println("unable to query DB:", err)
 		return nil, err
 	}
 
@@ -65,13 +62,11 @@ func (r *statsrepositories) GetNewAdditionsStats(limit int) ([]models.NewAdditio
 
 	sqlBytes, err := os.ReadFile("./db/stats/get_new_additions_stats.sql")
 	if err != nil {
-		log.Println("unable to read SQL file:", err)
 		return nil, err
 	}
 
 	query := string(sqlBytes)
 	if err := r.db.Select(&result, query, limit); err != nil {
-		log.Println("unable to query DB:", err)
 		return nil, err
 	}
 
