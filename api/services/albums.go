@@ -15,6 +15,8 @@ var allowedSortColumnsAlbums = map[string]string{
 	"description_no": "a.description_no",
 	"description_en": "a.description_en",
 	"year":           "a.year",
+	"created_at":     "a.created_at",
+	"updated_at":     "a.updated_at",
 }
 
 type AlbumService struct {

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 	"workerbee/internal"
 
 	"github.com/gin-gonic/gin"
