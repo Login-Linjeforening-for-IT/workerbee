@@ -91,7 +91,7 @@ func (h *Handler) GetEvents(c *gin.Context) {
 	audiences := c.DefaultQuery("audiences", "")
 	limit := c.DefaultQuery("limit", "20")
 	offset := c.DefaultQuery("offset", "0")
-	orderBy := c.DefaultQuery("order_by", "id")
+	orderBy := c.DefaultQuery("order_by", "time_start")
 	sort := c.DefaultQuery("sort", "asc")
 
 	events, cacheTTL, err := h.Services.Events.GetEvents(search, limit, offset, orderBy, sort, categories, audiences)
