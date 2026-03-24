@@ -19,7 +19,7 @@ RUN swag init -g main.go -o ./docs
 
 RUN go build -o main main.go
 
-# runtime 
+# runtime
 FROM alpine:latest
 
 RUN apk add --no-cache \
